@@ -34,37 +34,20 @@
 # policies, either expressed or implied, of any organization.
 # #L%
 
-cmake_minimum_required(VERSION 2.8)
+include(CheckCXXSourceRuns)
 
+# Xerces-C
+set(CMAKE_REQUIRED_LIBRARIES_SAVE ${CMAKE_REQUIRED_LIBRARIES})
+set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} xerces-c)
+check_cxx_source_runs(
+"#include <xercesc/util/PlatformUtils.hpp>
 
-project(bioformats)
-include(cmake/Version.cmake)
-
-if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
-  message(FATAL_ERROR "In-tree builds are not supported; please run cmake from a separate build directory.")
-endif("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
-
-enable_language(CXX)
-
-include(GNUInstallDirs)
-include(CheckIncludeFileCXX)
-include(CheckCXXCompilerFlag)
-include(CheckCXXSourceCompiles)
-
-include(cmake/CompilerChecks.cmake)
-include(cmake/BoostChecks.cmake)
-include(cmake/RegexChecks.cmake)
-include(cmake/XercesChecks.cmake)
-include(cmake/XsdFu.cmake)
-
-find_package(Threads REQUIRED)
-find_package(GTest REQUIRED)
-
-set(OME_TOPLEVEL_INCLUDES ${PROJECT_SOURCE_DIR}/lib ${PROJECT_BINARY_DIR}/lib)
-
-add_subdirectory(lib/ome/compat)
-add_subdirectory(lib/ome/xerces)
-add_subdirectory(lib/ome/xml)
-
-enable_testing()
-add_subdirectory(test)
+int main() {
+  xercesc::XMLPlatformUtils::Initialize();
+  xercesc::XMLPlatformUtils::Terminate();
+}"
+XERCES_LINK)
+set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES_SAVE})
+if(XERCES_LINK)
+  set(XERCES_LIBRARY xerces-c)
+endif(XERCES_LINK)
