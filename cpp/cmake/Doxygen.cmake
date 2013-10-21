@@ -34,10 +34,12 @@
 # policies, either expressed or implied, of any organization.
 # #L%
 
-set(OME_TOPLEVEL_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/lib ${CMAKE_CURRENT_BINARY_DIR}/lib)
-
-add_subdirectory(lib/ome/compat)
-add_subdirectory(lib/ome/xerces)
-add_subdirectory(lib/ome/xml)
-add_subdirectory(lib/ome/bioformats)
-add_subdirectory(test)
+# Doxygen documentation
+include(FindDoxygen)
+find_package(Doxygen)
+set(DOXYGEN_DEFAULT OFF)
+if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
+  set (DOXYGEN_DEFAULT ON)
+endif (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
+option(doxygen "Enable doxygen documentation" ${DOXYGEN_DEFAULT})
+set(BUILD_DOXYGEN ${doxygen})
