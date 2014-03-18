@@ -34,40 +34,13 @@
 # policies, either expressed or implied, of any organization.
 # #L%
 
-include_directories(${OME_TOPLEVEL_INCLUDES})
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.h.in
+               ${CMAKE_CURRENT_BINARY_DIR}/version.h)
 
-if(BUILD_TESTS)
-  header_test_from_file(ome-bioformats ome-bioformats ome/bioformats)
-  add_test(ome-bioformats/headers ome-bioformats-headers)
+set(ome_internal_static_headers)
 
-  add_executable(metadatamap metadatamap.cpp)
-  target_link_libraries(metadatamap ome-bioformats)
-  target_link_libraries(metadatamap ${TEST_LIBS})
+set(ome_internal_generated_headers
+   ${CMAKE_CURRENT_BINARY_DIR}/version.h)
 
-  add_test(ome-bioformats/metadatamap metadatamap)
-
-  add_executable(fileinfo fileinfo.cpp)
-  target_link_libraries(fileinfo ome-bioformats)
-  target_link_libraries(fileinfo ${TEST_LIBS})
-
-  add_test(ome-bioformats/fileinfo fileinfo)
-
-  add_executable(pixelbuffer pixelbuffer.cpp)
-  target_link_libraries(pixelbuffer ome-bioformats)
-  target_link_libraries(pixelbuffer ${TEST_LIBS})
-
-  add_test(ome-bioformats/pixelbuffer pixelbuffer)
-
-  add_executable(pixelproperties pixelproperties.cpp)
-  target_link_libraries(pixelproperties ome-bioformats)
-  target_link_libraries(pixelproperties ${TEST_LIBS})
-
-  add_test(ome-bioformats/pixelproperties pixelproperties)
-
-  add_executable(version version.cpp)
-  target_link_libraries(version ome-bioformats)
-  target_link_libraries(version ${TEST_LIBS})
-
-  add_test(ome-bioformats/version version)
-
-endif(BUILD_TESTS)
+# Dump header list for testing
+header_include_list_write(ome_internal_static_headers ome_internal_generated_headers ome/internal ${PROJECT_BINARY_DIR}/cpp/test/ome-internal)
