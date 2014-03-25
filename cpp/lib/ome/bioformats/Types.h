@@ -35,12 +35,17 @@
  * #L%
  */
 
-#ifndef OME_BIOFORMATS_METADATAOPTIONS_H
-#define OME_BIOFORMATS_METADATAOPTIONS_H
+#ifndef OME_BIOFORMATS_TYPES_H
+#define OME_BIOFORMATS_TYPES_H
 
+#include <algorithm>
+#include <iterator>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <sstream>
+
+#include <boost/format.hpp>
+#include <boost/optional.hpp>
 
 #include <ome/compat/cstdint.h>
 
@@ -49,66 +54,21 @@ namespace ome
   namespace bioformats
   {
 
-    /**
-     * Metadata options.
-     */
-    class MetadataOptions
-    {
-    public:
-      /// Amount of metadata to store.
-      enum MetadataLevel
-        {
-          METADATA_MINIMUM,     ///< Store a minimal amount of metadata.
-          METADATA_NO_OVERLAYS, ///< Store all metadata except overlays.
-          METADATA_ALL          ///< Store all metadata.
-        };
-
-    private:
-      /// Amount of metadata to store.
-      MetadataLevel level;
-
-    public:
-      /**
-       * Constructor.  Default to storing all metadata.
-       */
-      MetadataOptions();
-
-      /**
-       * Constructor.
-       *
-       * @param level the amount of metadata to store.
-       */
-      MetadataOptions(MetadataLevel level);
-
-      /// Destructor.
-      virtual
-      ~MetadataOptions();
-
-      /**
-       * Get the metadata level.
-       *
-       * @returns the metadata level.
-       */
-      MetadataLevel
-      getMetadataLevel() const;
-
-      /**
-       * Set the metadata level.
-       *
-       * @param level the metadata level to set.
-       */
-      void
-      setMetadataLevel(MetadataLevel level);
-    };
+    /// Size type for image dimensions.
+    typedef uint32_t dimension_size_type;
+    /// Size type for image counts.
+    typedef uint32_t image_size_type;
+    /// Size type for pixel bit depths.
+    typedef uint8_t pixel_size_type;
 
   }
 }
 
-
-#endif // OME_BIOFORMATS_METADATAOPTIONS_H
+#endif // OME_BIOFORMATS_TYPES_H
 
 /*
  * Local Variables:
  * mode:C++
  * End:
  */
+
