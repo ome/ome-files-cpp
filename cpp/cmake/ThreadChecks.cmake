@@ -36,34 +36,34 @@
 
 include(CheckCXXSourceRuns)
 
-function(regex_test namespace header library outvar outlib)
+find_package(Threads REQUIRED)
+
+function(thread_test namespace header library outvar outlib)
   set(CMAKE_REQUIRED_LIBRARIES_SAVE ${CMAKE_REQUIRED_LIBRARIES})
-  set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${library})
+  set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${library} ${CMAKE_THREAD_LIBS_INIT})
   check_cxx_source_runs(
 "#include <${header}>
 #include <iostream>
 
+namespace
+{
+
+  boost::mutex m1;
+  boost::recursive_mutex m2;
+
+  void
+  threadmain()
+  {
+    boost::lock_guard<boost::mutex> lock1(m1);
+    boost::lock_guard<boost::recursive_mutex> lock2(m2);
+    std::cout << \"In thread\" << std::endl;
+  }
+
+}
+
 int main() {
-  ${namespace} foo(\"^foo[bar]\$\");
-  ${namespace} bar(\"^foo[bar]\$\", ${namespace}::extended);
-  ${namespace} chk(\"^[^:/,.][^:/,]*\$\", ${namespace}::extended);
-
-  std::string test(\"foob\");
-  std::string fail(\"fail:\");
-
-  if (!${namespace}_search(test, foo)) return 1;
-  if (!${namespace}_search(test, bar)) return 2;
-  if (!${namespace}_search(test, chk)) return 3;
-  if (${namespace}_search(fail, foo)) return 4;
-  if (${namespace}_search(fail, bar)) return 5;
-  if (${namespace}_search(fail, chk)) return 6;
-
-  if (!${namespace}_match(test, foo)) return 7;
-  if (!${namespace}_match(test, bar)) return 8;
-  if (!${namespace}_match(test, chk)) return 9;
-  if (${namespace}_match(fail, foo)) return 10;
-  if (${namespace}_match(fail, bar)) return 11;
-  if (${namespace}_match(fail, chk)) return 12;
+  ${namespace} foo(threadmain);
+  foo.join();
 
   return 0;
 }"
@@ -75,15 +75,10 @@ ${outvar})
   if (${outvar})
     set(${outlib} ${library} PARENT_SCOPE)
   endif(${outvar})
-endfunction(regex_test)
+endfunction(thread_test)
 
-regex_test(std::regex regex "" OME_HAVE_REGEX REGEX_LIBRARY)
-if(NOT OME_HAVE_REGEX)
-  regex_test(std::tr1::regex tr1/regex "" OME_HAVE_TR1_REGEX REGEX_LIBRARY)
-  if(NOT OME_HAVE_TR1_REGEX)
-    regex_test(boost::regex boost/regex.hpp "${Boost_REGEX_LIBRARY_RELEASE}" OME_HAVE_BOOST_REGEX REGEX_LIBRARY)
-    if(NOT OME_HAVE_BOOST_REGEX)
-      message(FATAL_ERROR "No working regular expression implementation found")
-    endif(NOT OME_HAVE_BOOST_REGEX)
-  endif(NOT OME_HAVE_TR1_REGEX)
-endif(NOT OME_HAVE_REGEX)
+
+thread_test(boost::thread boost/thread.hpp "${Boost_SYSTEM_LIBRARY_RELEASE};${Boost_THREAD_LIBRARY_RELEASE}" OME_HAVE_BOOST_THREAD THREAD_LIBRARY)
+if(NOT OME_HAVE_BOOST_THREAD)
+  message(FATAL_ERROR "No working thread or mutex implementation found")
+endif(NOT OME_HAVE_BOOST_THREAD)
