@@ -1,6 +1,7 @@
 /*
  * #%L
- * OME-BIOFORMATS C++ library for image IO.
+ * # Bio-Formats C++ libraries (test infrastructure)
+ * %%
  * Copyright © 2006 - 2014 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
  *   - National Institutes of Health
@@ -35,68 +36,12 @@
  * #L%
  */
 
-#include <ome/bioformats/CoreMetadata.h>
+#include <gtest/gtest.h>
 
-namespace ome
+int
+main (int   argc,
+      char *argv[])
 {
-  namespace bioformats
-  {
-
-    CoreMetadata::CoreMetadata():
-      sizeX(1),
-      sizeY(1),
-      sizeZ(1),
-      sizeC(1),
-      sizeT(1),
-      thumbSizeX(1),
-      thumbSizeY(1),
-      pixelType(ome::xml::model::enums::PixelType::UINT8),
-      bitsPerPixel(0), // Default to full size of pixelType
-      imageCount(1),
-      moduloZ("Z"),
-      moduloT("T"),
-      moduloC("C"),
-      dimensionOrder(ome::xml::model::enums::DimensionOrder::XYZTC),
-      orderCertain(true),
-      rgb(false),
-      littleEndian(false),
-      interleaved(false),
-      indexed(false),
-      falseColor(false),
-      metadataComplete(true),
-      seriesMetadata(),
-      thumbnail(false),
-      resolutionCount(1)
-    {
-    }
-
-    CoreMetadata::CoreMetadata(const CoreMetadata &copy):
-      sizeX(copy.sizeX),
-      sizeY(copy.sizeY),
-      sizeZ(copy.sizeZ),
-      sizeC(copy.sizeC),
-      sizeT(copy.sizeT),
-      thumbSizeX(copy.thumbSizeX),
-      thumbSizeY(copy.thumbSizeY),
-      pixelType(copy.pixelType),
-      bitsPerPixel(copy.bitsPerPixel),
-      imageCount(copy.imageCount),
-      moduloZ(copy.moduloZ),
-      moduloT(copy.moduloT),
-      moduloC(copy.moduloC),
-      dimensionOrder(copy.dimensionOrder),
-      orderCertain(copy.orderCertain),
-      rgb(copy.rgb),
-      littleEndian(copy.littleEndian),
-      interleaved(copy.interleaved),
-      indexed(copy.indexed),
-      falseColor(copy.falseColor),
-      metadataComplete(copy.metadataComplete),
-      seriesMetadata(copy.seriesMetadata),
-      thumbnail(copy.thumbnail),
-      resolutionCount(copy.resolutionCount)
-    {
-    }
-
-  }
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }
