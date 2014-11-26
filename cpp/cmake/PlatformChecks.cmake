@@ -1,7 +1,7 @@
 # #%L
 # Bio-Formats C++ libraries (cmake build infrastructure)
 # %%
-# Copyright © 2006 - 2013 Open Microscopy Environment:
+# Copyright © 2014 Open Microscopy Environment:
 #   - Massachusetts Institute of Technology
 #   - National Institutes of Health
 #   - University of Dundee
@@ -34,29 +34,25 @@
 # policies, either expressed or implied, of any organization.
 # #L%
 
-include_directories(${OME_TOPLEVEL_INCLUDES}
-                    ${GTEST_INCLUDE_DIR})
+include(CheckCXXSourceCompiles)
 
-if(BUILD_TESTS)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+find_package(LibDl)
 
-  set(ome_test_static_headers
-      test.h)
+if(LIBDL_FOUND)
+  set(CMAKE_REQUIRED_INCLUDES_SAVE ${CMAKE_REQUIRED_INCLUDES})
+  set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${LibDl_INCLUDE_DIRS})
+  set(CMAKE_REQUIRED_LIBRARIES_SAVE ${CMAKE_REQUIRED_LIBRARIES})
+  set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${LibDl_LIBRARIES})
 
-  set(ome_test_generated_headers
-     ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+  check_cxx_source_compiles(
+"#include <dlfcn.h>
 
-  set(ome_test_sources main.cpp)
+int main() {
+  Dl_info info;
+  dladdr(reinterpret_cast<void *>(main), &info);
+}"
+  OME_HAVE_DLADDR)
 
-  add_library(ome-test STATIC
-              ${ome_test_sources}
-              ${ome_test_static_headers}
-              ${ome_test_generated_headers})
-
-  target_link_libraries(ome-test ${GTEST_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-  set_target_properties(ome-test PROPERTIES LINKER_LANGUAGE CXX)
-
-  # Dump header list for testing
-  header_include_list_write(ome_test_static_headers ome_test_generated_headers ome/test ${PROJECT_BINARY_DIR}/cpp/test/ome-test)
-endif(BUILD_TESTS)
+  set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES_SAVE})
+  set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES_SAVE})
+endif()

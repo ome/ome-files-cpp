@@ -1,7 +1,6 @@
 /*
  * #%L
  * OME-BIOFORMATS C++ library for image IO.
- * %%
  * Copyright © 2006 - 2014 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
  *   - National Institutes of Health
@@ -36,45 +35,55 @@
  * #L%
  */
 
-#include <ome/bioformats/Version.h>
+#ifndef OME_BIOFORMATS_IN_TIFFREADER_H
+#define OME_BIOFORMATS_IN_TIFFREADER_H
 
-#include <ome/internal/version.h>
+#include <ome/bioformats/in/MinimalTIFFReader.h>
+#include <ome/bioformats/tiff/ImageJMetadata.h>
 
-#include <ome/test/test.h>
-
-#include <sstream>
-#include <stdexcept>
-#include <iostream>
-
-TEST(Version, CorrectVersion)
+namespace ome
 {
-  ASSERT_EQ(ome::bioformats::release_version.major, OME_VERSION_MAJOR);
-  ASSERT_EQ(ome::bioformats::release_version.minor, OME_VERSION_MINOR);
-  ASSERT_EQ(ome::bioformats::release_version.patch, OME_VERSION_PATCH);
-  ASSERT_EQ(ome::bioformats::release_version.extra, OME_VERSION_EXTRA_S);
+  namespace bioformats
+  {
+    namespace in
+    {
+
+      /**
+       * TIFF reader with support for ImageJ extensions.
+       */
+      class TIFFReader : public MinimalTIFFReader
+      {
+      protected:
+        /// ImageJ metadata.
+        boost::optional<tiff::ImageJMetadata> ijmeta;
+
+      public:
+        /// Constructor.
+        TIFFReader();
+
+        /// Destructor.
+        virtual
+        ~TIFFReader();
+
+      protected:
+        // Documented in superclass.
+        void
+        readIFDs();
+
+      public:
+        // Documented in superclass.
+        void
+        close(bool fileOnly = false);
+      };
+
+    }
+  }
 }
 
-TEST(Version, VersionStreamOutput)
-{
-  std::ostringstream os;
-  os << ome::bioformats::release_version;
-  std::string expected(OME_VERSION_MAJOR_S "." OME_VERSION_MINOR_S "." OME_VERSION_PATCH_S OME_VERSION_EXTRA_S);
+#endif // OME_BIOFORMATS_IN_TIFFREADER_H
 
-  ASSERT_EQ(os.str(), expected);
-}
-
-TEST(Version, CorrectDate)
-{
-  ASSERT_EQ(static_cast<boost::posix_time::ptime>(ome::bioformats::release_date), boost::posix_time::from_time_t(OME_VCS_DATE));
-}
-
-TEST(Version, DateStreamOutput)
-{
-  std::ostringstream os;
-  os << ome::bioformats::release_date;
-
-  std::ostringstream expected;
-  expected << ome::xml::model::primitives::Timestamp(boost::posix_time::from_time_t(OME_VCS_DATE));
-
-  ASSERT_EQ(os.str(), expected.str());
-}
+/*
+ * Local Variables:
+ * mode:C++
+ * End:
+ */

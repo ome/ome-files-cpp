@@ -1,8 +1,8 @@
 /*
  * #%L
- * OME-BIOFORMATS C++ library for image IO.
+ * OME-INTERNAL C++ headers for internal use only
  * %%
- * Copyright © 2006 - 2014 Open Microscopy Environment:
+ * Copyright © 2013 - 2014 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
  *   - National Institutes of Health
  *   - University of Dundee
@@ -36,45 +36,25 @@
  * #L%
  */
 
-#include <ome/bioformats/Version.h>
+#ifndef OME_TEST_TEST_H
+#define OME_TEST_TEST_H
 
-#include <ome/internal/version.h>
+// Google Test has a problem with the protection of its
+// testing::internal::ImplicitlyConvertible<From, To> class
+// constructor; suppress these warnings.  It also misses declaration
+// for INSTANTIATE_TEST_CASE_P.
+#ifdef __GNUC__
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
+#endif
 
-#include <ome/test/test.h>
+#include <gtest/gtest.h>
+#include <gtest/gtest-death-test.h>
 
-#include <sstream>
-#include <stdexcept>
-#include <iostream>
+#ifdef __GNUC__
+#  pragma GCC diagnostic pop
+#endif
 
-TEST(Version, CorrectVersion)
-{
-  ASSERT_EQ(ome::bioformats::release_version.major, OME_VERSION_MAJOR);
-  ASSERT_EQ(ome::bioformats::release_version.minor, OME_VERSION_MINOR);
-  ASSERT_EQ(ome::bioformats::release_version.patch, OME_VERSION_PATCH);
-  ASSERT_EQ(ome::bioformats::release_version.extra, OME_VERSION_EXTRA_S);
-}
+#include <ome/test/config.h>
 
-TEST(Version, VersionStreamOutput)
-{
-  std::ostringstream os;
-  os << ome::bioformats::release_version;
-  std::string expected(OME_VERSION_MAJOR_S "." OME_VERSION_MINOR_S "." OME_VERSION_PATCH_S OME_VERSION_EXTRA_S);
-
-  ASSERT_EQ(os.str(), expected);
-}
-
-TEST(Version, CorrectDate)
-{
-  ASSERT_EQ(static_cast<boost::posix_time::ptime>(ome::bioformats::release_date), boost::posix_time::from_time_t(OME_VCS_DATE));
-}
-
-TEST(Version, DateStreamOutput)
-{
-  std::ostringstream os;
-  os << ome::bioformats::release_date;
-
-  std::ostringstream expected;
-  expected << ome::xml::model::primitives::Timestamp(boost::posix_time::from_time_t(OME_VCS_DATE));
-
-  ASSERT_EQ(os.str(), expected.str());
-}
+#endif // OME_TEST_TEST_H
