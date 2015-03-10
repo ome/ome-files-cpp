@@ -34,10 +34,9 @@
 # policies, either expressed or implied, of any organization.
 # #L%
 
-set(OME_TOPLEVEL_INCLUDES
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib
-    ${CMAKE_CURRENT_BINARY_DIR}/lib)
+set(OME_LIBEXEC_INCLUDES
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR})
 
-add_subdirectory(lib)
-add_subdirectory(libexec)
-add_subdirectory(test)
+add_subdirectory(glview)
+add_subdirectory(showinf)
