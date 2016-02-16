@@ -37,7 +37,7 @@
 include_directories(${OME_TOPLEVEL_INCLUDES}
                     ${XercesC_INCLUDE_DIRS})
 
-set(exampledir "${PROJECT_SOURCE_DIR}/docs/sphinx/developers/cpp/examples")
+set(exampledir "${PROJECT_SOURCE_DIR}/docs/sphinx/examples")
 
 add_executable(model-io "${exampledir}/model-io.cpp")
 target_link_libraries(model-io OME::XML ${CMAKE_THREAD_LIBS_INIT})
