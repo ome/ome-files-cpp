@@ -105,7 +105,7 @@ public:
   {
     const TileTestParameters& params = GetParam();
 
-    path dir(PROJECT_BINARY_DIR "/cpp/test/ome-bioformats/data");
+    path dir(PROJECT_BINARY_DIR "/test/ome-bioformats/data");
     testfile = dir / (std::string("ometiffwriter-") + path(params.file).filename().string());
     testfile.replace_extension(".ome.tiff");
 

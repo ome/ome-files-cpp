@@ -45,7 +45,7 @@ find_tile_tests()
 {
   std::vector<TileTestParameters> params;
 
-  path dir(PROJECT_BINARY_DIR "/cpp/test/ome-bioformats/data");
+  path dir(PROJECT_BINARY_DIR "/test/ome-bioformats/data");
   if (exists(dir) && is_directory(dir))
     {
       for(directory_iterator i(dir); i != directory_iterator(); ++i)

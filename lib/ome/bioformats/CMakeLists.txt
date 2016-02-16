@@ -155,8 +155,8 @@ add_library(ome-bioformats
             ${BIOFORMATS_HEADERS})
 
 target_include_directories(ome-bioformats PUBLIC
-                           $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/cpp/lib>
-                           $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/cpp/lib>
+                           $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/lib>
+                           $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/lib>
                            $<BUILD_INTERFACE:${TIFF_INCLUDE_DIR}>)
 
 target_link_libraries(ome-bioformats
@@ -196,4 +196,4 @@ install(FILES ${OME_BIOFORMATS_TIFF_HEADERS}
         DESTINATION ${ome_bioformats_includedir}/tiff)
 
 # Dump header list for testing
-header_include_list_write(BIOFORMATS_STATIC_HEADERS BIOFORMATS_GENERATED_HEADERS ome/bioformats ${PROJECT_BINARY_DIR}/cpp/test/ome-bioformats)
+header_include_list_write(BIOFORMATS_STATIC_HEADERS BIOFORMATS_GENERATED_HEADERS ome/bioformats ${PROJECT_BINARY_DIR}/test/ome-bioformats)

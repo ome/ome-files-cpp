@@ -432,7 +432,7 @@ This example demonstrates several features:
 - The operator is expanded once for each pixel type
 - The operators can be special-cased for individual pixel types; here
   we use the `SFINAE rule
-  <http://en.cppreference.com/w/cpp/language/sfinae>`_ to implement a
+  <http://en.cppreference.com/w/language/sfinae>`_ to implement a
   specialization for an entire category of pixel types (complex
   numbers), but standard function overloading and templates will also
   work for more common cases

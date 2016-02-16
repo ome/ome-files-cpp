@@ -45,7 +45,7 @@ if(BUILD_DOXYGEN)
                      DEPENDS gensrc ${CMAKE_CURRENT_BINARY_DIR}/bioformats.dox)
 
   add_custom_target(doc-check
-                    COMMAND ${CMAKE_COMMAND} -Dlogfile=${CMAKE_CURRENT_BINARY_DIR}/bioformats.log -P ${PROJECT_SOURCE_DIR}/cpp/cmake/DoxygenCheck.cmake
+                    COMMAND ${CMAKE_COMMAND} -Dlogfile=${CMAKE_CURRENT_BINARY_DIR}/bioformats.log -P ${PROJECT_SOURCE_DIR}/cmake/DoxygenCheck.cmake
                     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/bioformats.log)
 
   add_custom_target(doc-api ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/bioformats.log doc-check)

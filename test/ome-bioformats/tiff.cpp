@@ -835,7 +835,7 @@ public:
   readPNGData()
   {
     // Sample image to check validity of TIFF reading.
-    const char * const pngfile = PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/data-layout.png";
+    const char * const pngfile = PROJECT_SOURCE_DIR "/test/ome-bioformats/data/data-layout.png";
 
     std::FILE *png = std::fopen(pngfile, "rb");
     ASSERT_TRUE(png);
@@ -1347,7 +1347,7 @@ public:
       << '-' << (optimal ? "optimal" : "suboptimal")
       << ".tiff";
 
-    path dir(PROJECT_BINARY_DIR "/cpp/test/ome-bioformats/data");
+    path dir(PROJECT_BINARY_DIR "/test/ome-bioformats/data");
     if (!exists(dir) && !is_directory(dir) && !create_directories(dir))
       throw std::runtime_error("Image directory unavailable and could not be created");
     dir /= f.str();

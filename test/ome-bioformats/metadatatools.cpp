@@ -175,7 +175,7 @@ typedef Corrections Corr;
 const Corrections corrections[] =
   {
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/validchannels.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/validchannels.ome"),
       true,
       true,
       0,
@@ -183,7 +183,7 @@ const Corrections corrections[] =
       { 1, 1, { 1, 0, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/validchannels.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/validchannels.ome"),
       true,
       true,
       1,
@@ -191,7 +191,7 @@ const Corrections corrections[] =
       { 4, 4, { 1, 1, 1, 1, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/validchannels.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/validchannels.ome"),
       true,
       true,
       2,
@@ -199,7 +199,7 @@ const Corrections corrections[] =
       { 3, 1, { 3, 0, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/validchannels.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/validchannels.ome"),
       true,
       true,
       3,
@@ -207,7 +207,7 @@ const Corrections corrections[] =
       { 6, 2, { 3, 0, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/validchannels.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/validchannels.ome"),
       true,
       true,
       4,
@@ -215,7 +215,7 @@ const Corrections corrections[] =
       { 4, 2, { 1, 3, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       0,
@@ -223,7 +223,7 @@ const Corrections corrections[] =
       { 1, 1, { 1, 0, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       1,
@@ -231,7 +231,7 @@ const Corrections corrections[] =
       { 1, 1, { 1, 0, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       2,
@@ -239,7 +239,7 @@ const Corrections corrections[] =
       { 2, 1, { 2, 0, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       3,
@@ -247,7 +247,7 @@ const Corrections corrections[] =
       { 1, 1, { 1, 0, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       4,
@@ -255,7 +255,7 @@ const Corrections corrections[] =
       { 1, 1, { 1, 0, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       5,
@@ -263,7 +263,7 @@ const Corrections corrections[] =
       { 4, 4, { 1, 1, 1, 1, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       6,
@@ -271,7 +271,7 @@ const Corrections corrections[] =
       { 3, 3, { 1, 1, 1, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       7,
@@ -279,7 +279,7 @@ const Corrections corrections[] =
       { 4, 4, { 1, 1, 1, 1, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       8,
@@ -287,7 +287,7 @@ const Corrections corrections[] =
       { 6, 4, { 2, 2, 1, 1, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       9,
@@ -295,7 +295,7 @@ const Corrections corrections[] =
       { 4, 4, { 1, 1, 1, 1, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       10,
@@ -303,7 +303,7 @@ const Corrections corrections[] =
       { 4, 4, { 1, 1, 1, 1, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       11,
@@ -311,7 +311,7 @@ const Corrections corrections[] =
       { 4, 4, { 1, 1, 1, 1, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       12,
@@ -319,7 +319,7 @@ const Corrections corrections[] =
       { 3, 1, { 3, 0, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       13,
@@ -327,7 +327,7 @@ const Corrections corrections[] =
       { 3, 3, { 1, 1, 1, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       14,
@@ -335,7 +335,7 @@ const Corrections corrections[] =
       { 5, 1, { 5, 0, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       15,
@@ -343,7 +343,7 @@ const Corrections corrections[] =
       { 3, 1, { 3, 0, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       16,
@@ -351,7 +351,7 @@ const Corrections corrections[] =
       { 3, 1, { 3, 0, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       17,
@@ -359,7 +359,7 @@ const Corrections corrections[] =
       { 6, 2, { 3, 3, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       18,
@@ -367,7 +367,7 @@ const Corrections corrections[] =
       { 3, 1, { 3, 0, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       19,
@@ -375,7 +375,7 @@ const Corrections corrections[] =
       { 6, 6, { 1, 1, 1, 1, 1, 1 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       20,
@@ -383,7 +383,7 @@ const Corrections corrections[] =
       { 8, 2, { 5, 3, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       21,
@@ -391,7 +391,7 @@ const Corrections corrections[] =
       { 6, 2, { 3, 3, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       22,
@@ -399,7 +399,7 @@ const Corrections corrections[] =
       { 6, 2, { 3, 3, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       23,
@@ -407,7 +407,7 @@ const Corrections corrections[] =
       { 6, 2, { 3, 3, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       24,
@@ -415,7 +415,7 @@ const Corrections corrections[] =
       { 4, 2, { 1, 3, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       25,
@@ -423,7 +423,7 @@ const Corrections corrections[] =
       { 1, 1, { 1, 0, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       26,
@@ -431,7 +431,7 @@ const Corrections corrections[] =
       { 4, 4, { 1, 1, 1, 1, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       27,
@@ -439,7 +439,7 @@ const Corrections corrections[] =
       { 8, 2, { 5, 3, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       28,
@@ -447,7 +447,7 @@ const Corrections corrections[] =
       { 4, 2, { 1, 3, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       29,
@@ -455,7 +455,7 @@ const Corrections corrections[] =
       { 4, 2, { 1, 3, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       30,
@@ -463,7 +463,7 @@ const Corrections corrections[] =
       { 4, 2, { 1, 3, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-correctable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-correctable.ome"),
       false,
       true,
       31,
@@ -471,7 +471,7 @@ const Corrections corrections[] =
       { 4, 2, { 2, 2, 0, 0, 0, 0 } }
     },
     {
-      path(PROJECT_SOURCE_DIR "/cpp/test/ome-bioformats/data/brokenchannels-uncorrectable.ome"),
+      path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/brokenchannels-uncorrectable.ome"),
       false,
       false,
       0,

@@ -47,4 +47,4 @@ set(ome_internal_generated_headers
     ${CMAKE_CURRENT_BINARY_DIR}/version.h)
 
 # Dump header list for testing
-header_include_list_write(ome_internal_static_headers ome_internal_generated_headers ome/internal ${PROJECT_BINARY_DIR}/cpp/test/ome-internal)
+header_include_list_write(ome_internal_static_headers ome_internal_generated_headers ome/internal ${PROJECT_BINARY_DIR}/test/ome-internal)

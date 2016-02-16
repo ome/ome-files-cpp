@@ -48,7 +48,7 @@ if (BUILD_SPHINX AND SPHINX_BUILD)
                  @ONLY)
 
   sphinx_manpages("${sphinx_srcdir}" "${sphinx_builddir}"
-                  "${PROJECT_BINARY_DIR}/cpp/man" MAN_PAGES)
+                  "${PROJECT_BINARY_DIR}/man" MAN_PAGES)
   sphinx_manpage_dependencies("${sphinx_srcdir}" "${sphinx_builddir}"
                               MAN_PAGE_DEPENDENCIES)
   sphinx_dependencies("${sphinx_srcdir}" SPHINX_DEPENDENCIES)
@@ -57,14 +57,14 @@ if (BUILD_SPHINX AND SPHINX_BUILD)
 
   add_custom_command(OUTPUT ${MAN_PAGES}
                      COMMAND ${CMAKE_COMMAND} -E make_directory "${sphinx_builddir}/cache"
-                     COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/cpp/man"
+                     COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/man"
                      COMMAND ${SPHINX_BUILD}
                              -D "release=${OME_VERSION_SHORT}"
                              -D "version=${OME_VERSION_MAJOR}.${OME_VERSION_MINOR}"
                              -c "${sphinx_builddir}"
                              -d "${sphinx_builddir}/cache"
                              -b man
-                             "${sphinx_srcdir}" "${PROJECT_BINARY_DIR}/cpp/man"
+                             "${sphinx_srcdir}" "${PROJECT_BINARY_DIR}/man"
                      WORKING_DIRECTORY "${sphinx_srcdir}"
                      DEPENDS ${MAN_PAGE_DEPENDENCIES})
 

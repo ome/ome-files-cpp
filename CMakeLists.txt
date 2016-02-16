@@ -45,14 +45,14 @@ enable_language(CXX)
 enable_language(C)
 
 list(APPEND CMAKE_MODULE_PATH
-     "${CMAKE_CURRENT_LIST_DIR}/cpp/cmake")
+     "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-include("${CMAKE_CURRENT_LIST_DIR}/cpp/cmake/BioFormatsCommon.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/cmake/BioFormatsCommon.cmake")
 
 project(bioformats)
 message(STATUS "Configuring Bio-Formats main build")
 
-include(cpp/cmake/Version.cmake)
+include(cmake/Version.cmake)
 
 if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
   message(FATAL_ERROR "In-tree builds are not supported; please run cmake from a separate build directory.")
@@ -75,21 +75,11 @@ include(XercesChecks)
 include(XalanChecks)
 include(ImageLibraries)
 include(QtGLChecks)
-include(XsdFu)
 include(GTest)
 include(Doxygen)
 include(HeaderTest)
 
-# This is a hack to generate the model sources without having to have
-# ome-common available.  It will be removed or moved once the model
-# has been split out.
-option(model-source-only "Generate model source only" OFF)
-if(NOT model-source-only)
-  find_package(OME 5.2.0 REQUIRED Compat Common)
-else()
-  add_library(OME::Compat INTERFACE IMPORTED)
-  add_library(OME::Common INTERFACE IMPORTED)
-endif()
+find_package(OME 5.2.0 REQUIRED Compat Common XML)
 
 if(MSVC)
   # Debug library suffix.
@@ -155,11 +145,9 @@ set(OME_TOPLEVEL_INCLUDES
     ${CMAKE_CURRENT_BINARY_DIR}/lib)
 
 # Add test, making sure it's run with a suitable environment.
-# If updated, make sure to update the wrappers in cpp/cmake.
+# If updated, make sure to update the wrappers in cmake/.
 function(bf_add_test)
   add_test(${ARGV})
-  set_tests_properties(${ARGV0}
-    PROPERTIES ENVIRONMENT "BIOFORMATS_SCHEMADIR=${PROJECT_SOURCE_DIR}/components/specification/released-schema;BIOFORMATS_TRANSFORMDIR=${PROJECT_SOURCE_DIR}/components/specification/transforms")
 endfunction()
 
 add_subdirectory(lib)
@@ -169,27 +157,27 @@ add_subdirectory(test)
 add_subdirectory(examples)
 
 set(LIBRARY_PREFIX OME)
-file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/cpp/bin")
-configure_file(${PROJECT_SOURCE_DIR}/cpp/cmake/TemplateShellConfig.cmake.in
+file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
+configure_file(${PROJECT_SOURCE_DIR}/cmake/TemplateShellConfig.cmake.in
                ${PROJECT_BINARY_DIR}/config @ONLY)
-configure_file(${PROJECT_SOURCE_DIR}/cpp/cmake/TemplateInternalShellWrapper.cmake.in
-               ${PROJECT_BINARY_DIR}/cpp/cmake/bf-test @ONLY)
-configure_file(${PROJECT_SOURCE_DIR}/cpp/cmake/TemplateShellWrapper.cmake.in
-               ${PROJECT_BINARY_DIR}/cpp/bin/bf-test @ONLY)
-file(COPY ${PROJECT_BINARY_DIR}/cpp/cmake/bf-test
+configure_file(${PROJECT_SOURCE_DIR}/cmake/TemplateInternalShellWrapper.cmake.in
+               ${PROJECT_BINARY_DIR}/cmake/bf-test @ONLY)
+configure_file(${PROJECT_SOURCE_DIR}/cmake/TemplateShellWrapper.cmake.in
+               ${PROJECT_BINARY_DIR}/bin/bf-test @ONLY)
+file(COPY ${PROJECT_BINARY_DIR}/cmake/bf-test
      DESTINATION ${PROJECT_BINARY_DIR}
      FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
      GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
-install(PROGRAMS ${PROJECT_BINARY_DIR}/cpp/bin/bf-test
+install(PROGRAMS ${PROJECT_BINARY_DIR}/bin/bf-test
         DESTINATION ${CMAKE_INSTALL_BINDIR})
 if(WIN32)
-  configure_file(${PROJECT_SOURCE_DIR}/cpp/cmake/TemplateCmdConfig.cmake.in
+  configure_file(${PROJECT_SOURCE_DIR}/cmake/TemplateCmdConfig.cmake.in
                  ${PROJECT_BINARY_DIR}/config.bat @ONLY)
-  configure_file(${PROJECT_SOURCE_DIR}/cpp/cmake/TemplateInternalCmdWrapper.cmake.in
+  configure_file(${PROJECT_SOURCE_DIR}/cmake/TemplateInternalCmdWrapper.cmake.in
                  ${PROJECT_BINARY_DIR}/bf-test.bat @ONLY)
-  configure_file(${PROJECT_SOURCE_DIR}/cpp/cmake/TemplateCmdWrapper.cmake.in
-                 ${PROJECT_BINARY_DIR}/cpp/bin/bf-test.bat @ONLY)
-  install(PROGRAMS ${PROJECT_BINARY_DIR}/cpp/bin/bf-test.bat
+  configure_file(${PROJECT_SOURCE_DIR}/cmake/TemplateCmdWrapper.cmake.in
+                 ${PROJECT_BINARY_DIR}/bin/bf-test.bat @ONLY)
+  install(PROGRAMS ${PROJECT_BINARY_DIR}/bin/bf-test.bat
           DESTINATION ${CMAKE_INSTALL_BINDIR})
   endif()
 return()

@@ -137,7 +137,7 @@ if (OME_QTOPENGL)
           DESTINATION ${ome_qtwidgets_includedir}/glsl/v110)
 
   # Dump header list for testing
-  header_include_list_write(QTWIDGETS_HEADERS "" ome/qtwidgets ${PROJECT_BINARY_DIR}/cpp/test/ome-qtwidgets)
+  header_include_list_write(QTWIDGETS_HEADERS "" ome/qtwidgets ${PROJECT_BINARY_DIR}/test/ome-qtwidgets)
 
 else()
   message(WARNING "Not building Qt widgets and view program; Qt5.2, OpenGL or glm not found, or explicitly disabled")

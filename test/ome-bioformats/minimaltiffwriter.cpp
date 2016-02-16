@@ -105,7 +105,7 @@ public:
   {
     const TileTestParameters& params = GetParam();
 
-    path dir(PROJECT_BINARY_DIR "/cpp/test/ome-bioformats/data");
+    path dir(PROJECT_BINARY_DIR "/test/ome-bioformats/data");
     testfile = dir / (std::string("minimaltiffwriter-") + path(params.file).filename().string());
 
     ASSERT_NO_THROW(tiff = TIFF::open(params.file, "r"));

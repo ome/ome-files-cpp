@@ -45,7 +45,7 @@
 #define URL_BIO_FORMATS "http://www.openmicroscopy.org/site/products/bio-formats"
 
 /// URL of 'Bio-Formats C++ overview' web page.
-#define URL_BIO_FORMATS_LIBRARIES "http://www.openmicroscopy.org/site/support/bio-formats/developers/cpp/overview.html"
+#define URL_BIO_FORMATS_LIBRARIES "http://www.openmicroscopy.org/site/support/bio-formats/developers/overview.html"
 
 /// URL of OME-TIFF web page.
 #define URL_OME_TIFF "http://www.openmicroscopy.org/site/support/ome-model/ome-tiff/"
