@@ -48,10 +48,12 @@
 #include <ome/test/test.h>
 #include <ome/test/io.h>
 
+#include <ome/common/module.h>
 #include <ome/common/xml/Platform.h>
 #include <ome/common/xml/dom/Document.h>
 
 #include <ome/xml/Document.h>
+#include <ome/xml/version.h>
 #include <ome/xml/OMETransformResolver.h>
 #include <ome/xml/OMETransformResolver.h>
 #include <ome/xml/model/enums/EnumerationException.h>
@@ -117,13 +119,15 @@ TEST(MetadataToolsTest, CreateID4)
 
 TEST(MetadataToolsTest, CurrentModelVersion)
 {
-  ASSERT_EQ(std::string(OME_MODEL_VERSION), ome::bioformats::getModelVersion());
+  ASSERT_EQ(std::string(OME_XML_MODEL_VERSION), ome::bioformats::getModelVersion());
 }
 
 TEST(MetadataToolsTest, ModelVersionFromString)
 {
   std::string xml;
-  readFile(PROJECT_SOURCE_DIR "/components/specification/samples/2012-06/18x24y5z5t2c8b-text.ome", xml);
+  boost::filesystem::path sample_path(ome::common::module_runtime_path("ome-xml-sample"));
+
+  readFile(sample_path / "2012-06/18x24y5z5t2c8b-text.ome", xml);
   ASSERT_EQ(std::string("2012-06"), ome::bioformats::getModelVersion(xml));
 }
 
@@ -132,7 +136,9 @@ TEST(MetadataToolsTest, ModelVersionFromDocument)
   ome::common::xml::Platform xmlplat;
 
   std::string xml;
-  readFile(PROJECT_SOURCE_DIR "/components/specification/samples/2013-06/18x24y5z5t2c8b-text.ome", xml);
+  boost::filesystem::path sample_path(ome::common::module_runtime_path("ome-xml-sample"));
+
+  readFile(sample_path / "2013-06/18x24y5z5t2c8b-text.ome", xml);
 
   ome::common::xml::dom::Document doc = ome::xml::createDocument(xml);
   ASSERT_TRUE(doc);
@@ -582,10 +588,10 @@ namespace
     ome::xml::OMETransformResolver tr;
     std::set<std::string> versions = tr.schema_versions();
 
-    path samplesdir(PROJECT_SOURCE_DIR "/components/specification/samples");
-    if (exists(samplesdir) && is_directory(samplesdir))
+    boost::filesystem::path sample_path(ome::common::module_runtime_path("ome-xml-sample"));
+    if (exists(sample_path) && is_directory(sample_path))
       {
-        for (directory_iterator si(samplesdir); si != directory_iterator(); ++si)
+        for (directory_iterator si(sample_path); si != directory_iterator(); ++si)
           {
             if (versions.find(si->path().filename().string()) == versions.end())
               continue; // Not a schema directory with transforms.

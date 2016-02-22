@@ -155,7 +155,7 @@ namespace
   {
     std::vector<TIFFTestParameters> params;
 
-    std::string filename(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff");
+    std::string filename(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/2010-06-18x24y5z1t2c8b-text.ome.tiff");
 
     TIFFTestParameters p(filename, 10);
 

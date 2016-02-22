@@ -1,8 +1,8 @@
 /*
  * #%L
- * OME-INTERNAL C++ headers for internal use only
+ * OME-BIOFORMATS C++ library for image IO.
  * %%
- * Copyright © 2006 - 2015 Open Microscopy Environment:
+ * Copyright © 2016 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
  *   - National Institutes of Health
  *   - University of Dundee
@@ -36,33 +36,18 @@
  * #L%
  */
 
-#ifndef OME_INTERNAL_VERSION_H
-#define OME_INTERNAL_VERSION_H
+#include <ome/xml/config.h>
 
-// Version metadata as integers
+#define OME_COMMON_MODULE_INTROSPECTION 1
+#include <ome/common/module.h>
 
-#define OME_VERSION_MAJOR ${OME_VERSION_MAJOR}U
-#define OME_VERSION_MINOR ${OME_VERSION_MINOR}U
-#define OME_VERSION_PATCH ${OME_VERSION_PATCH}U
+namespace
+{
+  using ome::common::RegisterModule;
 
-// Version metadata as strings
-
-#define OME_VERSION_MAJOR_S "${OME_VERSION_MAJOR}"
-#define OME_VERSION_MINOR_S "${OME_VERSION_MINOR}"
-#define OME_VERSION_PATCH_S "${OME_VERSION_PATCH}"
-#define OME_VERSION_EXTRA_S "${OME_VERSION_EXTRA}"
-#ifndef OME_VERSION_EXTRA_S
-# define OME_VERSION_EXTRA_S ""
-#endif
-
-// Revision number in version control
-#define OME_VCS_SHORTREVISION "${OME_VCS_SHORTREVISION}"
-#define OME_VCS_REVISION "${OME_VCS_REVISION}"
-
-// Release date (seconds since the UNIX epoch)
-#define OME_VCS_DATE ${OME_VCS_DATE}
-
-// Release date as ISO-8601 string
-#define OME_VCS_DATE_S "${OME_VCS_DATE_S}"
-
-#endif // OME_INTERNAL_VERSION_H
+  // Bio-Formats package-specific paths.
+  RegisterModule bf_root("bf-root", "BIOFORMATS_HOME", INSTALL_PREFIX, "", module_path);
+  RegisterModule bf_data("bf-data", "BIOFORMATS_DATADIR", OME_BIOFORMATS_INSTALL_FULL_DATADIR, OME_BIOFORMATS_INSTALL_DATADIR, module_path);
+  RegisterModule bf_icon("bf-icon", "BIOFORMATS_ICONDIR", OME_BIOFORMATS_INSTALL_FULL_ICONDIR, OME_BIOFORMATS_INSTALL_ICONDIR, module_path);
+  RegisterModule bf_libexec("bf-libexec", "BIOFORMATS_LIBEXECDIR", OME_BIOFORMATS_INSTALL_FULL_LIBEXECDIR, OME_BIOFORMATS_INSTALL_LIBEXECDIR, module_path);
+}

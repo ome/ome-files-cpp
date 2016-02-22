@@ -1,5 +1,5 @@
 include(CMakeFindDependencyMacro)
-find_dependency(OME REQUIRED COMPONENTS Common XML)
+find_dependency(OMECommon REQUIRED COMPONENTS Common XML)
 find_dependency(Boost 1.46 REQUIRED COMPONENTS boost iostreams filesystem)
 find_dependency(TIFF REQUIRED)
 

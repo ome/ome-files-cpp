@@ -197,26 +197,39 @@ namespace
 
 std::vector<TileTestParameters> tile_params(find_tile_tests());
 
-TEST(TIFFTest, Construct)
+class TIFFTest : public ::testing::Test
 {
-  ASSERT_NO_THROW(TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+public:
+  boost::filesystem::path tiff_path;
+
+  TIFFTest():
+    ::testing::Test(),
+    tiff_path(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/2010-06-18x24y5z1t2c8b-text.ome.tiff")
+  {
+  }
+
+};
+
+TEST_F(TIFFTest, Construct)
+{
+  ASSERT_NO_THROW(TIFF::open(tiff_path, "r"));
 }
 
-TEST(TIFFTest, ConstructFailMode)
+TEST_F(TIFFTest, ConstructFailMode)
 {
-  ASSERT_THROW(TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "XK"),
+  ASSERT_THROW(TIFF::open(tiff_path, "XK"),
                ome::bioformats::tiff::Exception);
 }
 
-TEST(TIFFTest, ConstructFailFile)
+TEST_F(TIFFTest, ConstructFailFile)
 {
   ASSERT_THROW(TIFF::open(PROJECT_SOURCE_DIR "/CMakeLists.txt", "r"), ome::bioformats::tiff::Exception);
 }
 
-TEST(TIFFTest, IFDsByIndex)
+TEST_F(TIFFTest, IFDsByIndex)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t =TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t =TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   for (directory_index_type i = 0; i < 10; ++i)
@@ -228,10 +241,10 @@ TEST(TIFFTest, IFDsByIndex)
   ASSERT_THROW(t->getDirectoryByIndex(40), ome::bioformats::tiff::Exception);
 }
 
-TEST(TIFFTest, IFDsByOffset)
+TEST_F(TIFFTest, IFDsByOffset)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t =TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t =TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   for (directory_index_type i = 0; i < 10; ++i)
@@ -245,10 +258,10 @@ TEST(TIFFTest, IFDsByOffset)
   ASSERT_THROW(t->getDirectoryByOffset(0), ome::bioformats::tiff::Exception);
 }
 
-TEST(TIFFTest, IFDSimpleIter)
+TEST_F(TIFFTest, IFDSimpleIter)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd = t->getDirectoryByIndex(0);
@@ -259,10 +272,10 @@ TEST(TIFFTest, IFDSimpleIter)
     }
 }
 
-TEST(TIFFTest, TIFFIter)
+TEST_F(TIFFTest, TIFFIter)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   for (TIFF::iterator pos = t->begin(); pos != t->end(); ++pos)
@@ -270,10 +283,10 @@ TEST(TIFFTest, TIFFIter)
     }
 }
 
-TEST(TIFFTest, TIFFConstIter)
+TEST_F(TIFFTest, TIFFConstIter)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   for (TIFF::const_iterator pos = t->begin(); pos != t->end(); ++pos)
@@ -281,10 +294,10 @@ TEST(TIFFTest, TIFFConstIter)
     }
 }
 
-TEST(TIFFTest, TIFFConstIter2)
+TEST_F(TIFFTest, TIFFConstIter2)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   for (TIFF::const_iterator pos = t->begin(); pos != t->end(); ++pos)
@@ -292,10 +305,10 @@ TEST(TIFFTest, TIFFConstIter2)
     }
 }
 
-TEST(TIFFTest, RawField)
+TEST_F(TIFFTest, RawField)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -306,10 +319,10 @@ TEST(TIFFTest, RawField)
   ifd->getRawField(270, &text);
 }
 
-TEST(TIFFTest, RawField0)
+TEST_F(TIFFTest, RawField0)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -320,10 +333,10 @@ TEST(TIFFTest, RawField0)
   ASSERT_THROW(ifd->getRawField(0, &text), ome::bioformats::tiff::Exception);
 }
 
-TEST(TIFFTest, FieldWrapString)
+TEST_F(TIFFTest, FieldWrapString)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -344,10 +357,10 @@ TEST(TIFFTest, FieldWrapString)
   ASSERT_THROW(ifd->getField(ome::bioformats::tiff::TARGETPRINTER).get(text), ome::bioformats::tiff::Exception);
 }
 
-TEST(TIFFTest, FieldWrapStringArray)
+TEST_F(TIFFTest, FieldWrapStringArray)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -361,10 +374,10 @@ TEST(TIFFTest, FieldWrapStringArray)
     }
 }
 
-TEST(TIFFTest, FieldWrapUInt16)
+TEST_F(TIFFTest, FieldWrapUInt16)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -387,10 +400,10 @@ TEST(TIFFTest, FieldWrapUInt16)
   ASSERT_EQ(1, value);
 }
 
-TEST(TIFFTest, FieldWrapCompression)
+TEST_F(TIFFTest, FieldWrapCompression)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -403,10 +416,10 @@ TEST(TIFFTest, FieldWrapCompression)
   ASSERT_EQ(ome::bioformats::tiff::COMPRESSION_NONE, value);
 }
 
-TEST(TIFFTest, FieldWrapFillOrder)
+TEST_F(TIFFTest, FieldWrapFillOrder)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -418,10 +431,10 @@ TEST(TIFFTest, FieldWrapFillOrder)
   ASSERT_THROW(ifd->getField(ome::bioformats::tiff::FILLORDER).get(value), ome::bioformats::tiff::Exception);
 }
 
-TEST(TIFFTest, FieldWrapOrientation)
+TEST_F(TIFFTest, FieldWrapOrientation)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -433,10 +446,10 @@ TEST(TIFFTest, FieldWrapOrientation)
   ASSERT_THROW(ifd->getField(ome::bioformats::tiff::ORIENTATION).get(value), ome::bioformats::tiff::Exception);
 }
 
-TEST(TIFFTest, FieldWrapPlanarConfiguration)
+TEST_F(TIFFTest, FieldWrapPlanarConfiguration)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -449,10 +462,10 @@ TEST(TIFFTest, FieldWrapPlanarConfiguration)
   ASSERT_EQ(ome::bioformats::tiff::SEPARATE, value);
 }
 
-TEST(TIFFTest, FieldWrapPhotometricInterpretation)
+TEST_F(TIFFTest, FieldWrapPhotometricInterpretation)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -465,10 +478,10 @@ TEST(TIFFTest, FieldWrapPhotometricInterpretation)
   ASSERT_EQ(ome::bioformats::tiff::MIN_IS_BLACK, value);
 }
 
-TEST(TIFFTest, FieldWrapPredictor)
+TEST_F(TIFFTest, FieldWrapPredictor)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -480,10 +493,10 @@ TEST(TIFFTest, FieldWrapPredictor)
   ASSERT_THROW(ifd->getField(ome::bioformats::tiff::PREDICTOR).get(value), ome::bioformats::tiff::Exception);
 }
 
-TEST(TIFFTest, FieldWrapSampleFormat)
+TEST_F(TIFFTest, FieldWrapSampleFormat)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -495,10 +508,10 @@ TEST(TIFFTest, FieldWrapSampleFormat)
   ASSERT_THROW(ifd->getField(ome::bioformats::tiff::SAMPLEFORMAT).get(value), ome::bioformats::tiff::Exception);
 }
 
-TEST(TIFFTest, FieldWrapThreshholding)
+TEST_F(TIFFTest, FieldWrapThreshholding)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -510,10 +523,10 @@ TEST(TIFFTest, FieldWrapThreshholding)
   ASSERT_THROW(ifd->getField(ome::bioformats::tiff::THRESHHOLDING).get(value), ome::bioformats::tiff::Exception);
 }
 
-TEST(TIFFTest, FieldWrapYCbCrPosition)
+TEST_F(TIFFTest, FieldWrapYCbCrPosition)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -525,10 +538,10 @@ TEST(TIFFTest, FieldWrapYCbCrPosition)
   ASSERT_THROW(ifd->getField(ome::bioformats::tiff::YCBCRPOSITIONING).get(value), ome::bioformats::tiff::Exception);
 }
 
-TEST(TIFFTest, FieldWrapUInt16Pair)
+TEST_F(TIFFTest, FieldWrapUInt16Pair)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -543,10 +556,10 @@ TEST(TIFFTest, FieldWrapUInt16Pair)
   ASSERT_THROW(ifd->getField(ome::bioformats::tiff::YCBCRSUBSAMPLING).get(value), ome::bioformats::tiff::Exception);
 }
 
-TEST(TIFFTest, FieldWrapFloat)
+TEST_F(TIFFTest, FieldWrapFloat)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -563,10 +576,10 @@ TEST(TIFFTest, FieldWrapFloat)
   ASSERT_THROW(ifd->getField(ome::bioformats::tiff::YPOSITION).get(value), ome::bioformats::tiff::Exception);
 }
 
-TEST(TIFFTest, FieldWrapFloat2)
+TEST_F(TIFFTest, FieldWrapFloat2)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -578,10 +591,10 @@ TEST(TIFFTest, FieldWrapFloat2)
   ASSERT_THROW(ifd->getField(ome::bioformats::tiff::WHITEPOINT).get(value), ome::bioformats::tiff::Exception);
 }
 
-TEST(TIFFTest, FieldWrapFloat3)
+TEST_F(TIFFTest, FieldWrapFloat3)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -594,10 +607,10 @@ TEST(TIFFTest, FieldWrapFloat3)
 }
 
 
-TEST(TIFFTest, FieldWrapFloat6)
+TEST_F(TIFFTest, FieldWrapFloat6)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -610,10 +623,10 @@ TEST(TIFFTest, FieldWrapFloat6)
   ASSERT_THROW(ifd->getField(ome::bioformats::tiff::REFERENCEBLACKWHITE).get(value), ome::bioformats::tiff::Exception);
 }
 
-TEST(TIFFTest, FieldWrapUInt16ExtraSamplesArray)
+TEST_F(TIFFTest, FieldWrapUInt16ExtraSamplesArray)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -624,10 +637,10 @@ TEST(TIFFTest, FieldWrapUInt16ExtraSamplesArray)
   ASSERT_THROW(ifd->getField(ome::bioformats::tiff::EXTRASAMPLES).get(value), ome::bioformats::tiff::Exception);
 }
 
-TEST(TIFFTest, FieldWrapUInt16Array3)
+TEST_F(TIFFTest, FieldWrapUInt16Array3)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -639,10 +652,10 @@ TEST(TIFFTest, FieldWrapUInt16Array3)
   ASSERT_THROW(ifd->getField(ome::bioformats::tiff::TRANSFERFUNCTION).get(value), ome::bioformats::tiff::Exception);
 }
 
-TEST(TIFFTest, FieldWrapUInt32)
+TEST_F(TIFFTest, FieldWrapUInt32)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -668,10 +681,10 @@ TEST(TIFFTest, FieldWrapUInt32)
   ASSERT_THROW(ifd->getField(ome::bioformats::tiff::TILEWIDTH).get(value), ome::bioformats::tiff::Exception);
 }
 
-TEST(TIFFTest, FieldWrapUInt32Array)
+TEST_F(TIFFTest, FieldWrapUInt32Array)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -683,10 +696,10 @@ TEST(TIFFTest, FieldWrapUInt32Array)
   ASSERT_THROW(ifd->getField(ome::bioformats::tiff::RICHTIFFIPTC).get(value), ome::bioformats::tiff::Exception);
 }
 
-TEST(TIFFTest, FieldWrapUInt64Array)
+TEST_F(TIFFTest, FieldWrapUInt64Array)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -701,10 +714,10 @@ TEST(TIFFTest, FieldWrapUInt64Array)
   ASSERT_THROW(ifd->getField(ome::bioformats::tiff::TILEOFFSETS).get(value), ome::bioformats::tiff::Exception);
 }
 
-TEST(TIFFTest, FieldWrapByteArray)
+TEST_F(TIFFTest, FieldWrapByteArray)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -720,10 +733,10 @@ TEST(TIFFTest, FieldWrapByteArray)
   ASSERT_THROW(ifd->getField(ome::bioformats::tiff::IMAGEJ_META_DATA).get(value), ome::bioformats::tiff::Exception);
 }
 
-TEST(TIFFTest, ValueProxy)
+TEST_F(TIFFTest, ValueProxy)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -735,10 +748,10 @@ TEST(TIFFTest, ValueProxy)
   d = ifd->getField(ome::bioformats::tiff::IMAGEDESCRIPTION);
 }
 
-TEST(TIFFTest, Value)
+TEST_F(TIFFTest, Value)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -749,10 +762,10 @@ TEST(TIFFTest, Value)
   text = ifd->getField(ome::bioformats::tiff::IMAGEDESCRIPTION);
 }
 
-TEST(TIFFTest, FieldName)
+TEST_F(TIFFTest, FieldName)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -769,10 +782,10 @@ TEST(TIFFTest, FieldName)
 #endif
 }
 
-TEST(TIFFTest, FieldCount)
+TEST_F(TIFFTest, FieldCount)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;
@@ -785,10 +798,10 @@ TEST(TIFFTest, FieldCount)
   ASSERT_FALSE(count);
 }
 
-TEST(TIFFTest, PixelType)
+TEST_F(TIFFTest, PixelType)
 {
   ome::compat::shared_ptr<TIFF> t;
-  ASSERT_NO_THROW(t = TIFF::open(PROJECT_SOURCE_DIR "/components/specification/samples/2010-06/18x24y5z1t2c8b-text.ome.tiff", "r"));
+  ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   ome::compat::shared_ptr<IFD> ifd;

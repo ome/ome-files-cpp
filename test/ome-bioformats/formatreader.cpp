@@ -38,6 +38,8 @@
 
 #include <stdexcept>
 
+#include <ome/common/module.h>
+
 #include <ome/bioformats/FormatReader.h>
 #include <ome/bioformats/VariantPixelBuffer.h>
 #include <ome/bioformats/PixelProperties.h>
@@ -271,11 +273,13 @@ public:
 class FormatReaderTest : public ::testing::TestWithParam<FormatReaderTestParameters>
 {
 public:
+  const boost::filesystem::path sample_path;
   FormatReaderCustom r;
   const FormatReader& cr;
 
   FormatReaderTest():
     ::testing::TestWithParam<FormatReaderTestParameters>(),
+    sample_path(ome::common::module_runtime_path("ome-xml-sample")),
     r(GetParam()),
     cr(r)
   {
@@ -914,7 +918,7 @@ TEST_P(FormatReaderTest, DefaultFile)
   EXPECT_FALSE(r.isUsedFile("unused-nonexistent-file"));
 
   // Valid but unused file, getUsedFiles throws.
-  EXPECT_THROW(r.isUsedFile(PROJECT_SOURCE_DIR "/components/specification/samples/2012-06/18x24y5z5t2c8b-text.ome"), std::logic_error);
+  EXPECT_THROW(r.isUsedFile(sample_path / "2012-06/18x24y5z5t2c8b-text.ome"), std::logic_error);
 }
 
 TEST_P(FormatReaderTest, FlatFile)
@@ -933,7 +937,7 @@ TEST_P(FormatReaderTest, FlatFile)
   EXPECT_FALSE(r.isUsedFile("unused-nonexistent-file"));
 
   // Valid but unused file
-  EXPECT_FALSE(r.isUsedFile(PROJECT_SOURCE_DIR "/components/specification/samples/2012-06/18x24y5z5t2c8b-text.ome"));
+  EXPECT_FALSE(r.isUsedFile(sample_path / "2012-06/18x24y5z5t2c8b-text.ome"));
 }
 
 TEST_P(FormatReaderTest, DefaultMetadata)

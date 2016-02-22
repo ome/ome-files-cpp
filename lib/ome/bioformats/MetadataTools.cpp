@@ -47,8 +47,6 @@
 
 #include <ome/compat/regex.h>
 
-#include <ome/internal/version.h>
-
 #include <ome/common/xml/Platform.h>
 #include <ome/common/xml/String.h>
 #include <ome/common/xml/dom/Document.h>
@@ -58,6 +56,7 @@
 
 #include <ome/xml/Document.h>
 #include <ome/xml/OMETransform.h>
+#include <ome/xml/version.h>
 
 #include <ome/xml/meta/Convert.h>
 #include <ome/xml/meta/MetadataException.h>
@@ -228,7 +227,7 @@ namespace ome
       ome::common::xml::dom::Document upgraded_doc;
       ome::common::xml::dom::Element docroot;
 
-      if (getModelVersion(document) != OME_MODEL_VERSION)
+      if (getModelVersion(document) != OME_XML_MODEL_VERSION)
         {
           // Transform to latest
           ome::xml::OMEEntityResolver entity_resolver;
@@ -238,7 +237,7 @@ namespace ome
           ome::common::xml::dom::writeDocument(document, xml);
 
           std::string upgraded_xml;
-          ome::xml::transform(OME_MODEL_VERSION, xml, upgraded_xml,
+          ome::xml::transform(OME_XML_MODEL_VERSION, xml, upgraded_xml,
                               entity_resolver, transform_resolver);
 
           try
@@ -1067,7 +1066,7 @@ namespace ome
     std::string
     getModelVersion()
     {
-      return OME_MODEL_VERSION;
+      return OME_XML_MODEL_VERSION;
     }
 
     std::string
@@ -1150,7 +1149,7 @@ namespace ome
       ome::xml::OMETransformResolver transform_resolver;
 
       std::string upgraded_xml;
-      ome::xml::transform(OME_MODEL_VERSION, document, upgraded_xml,
+      ome::xml::transform(OME_XML_MODEL_VERSION, document, upgraded_xml,
                           entity_resolver, transform_resolver);
 
       return upgraded_xml;

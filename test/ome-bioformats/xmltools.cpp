@@ -104,8 +104,8 @@ TEST_P(XMLToolsFileTest, ValidateXML)
 
 XMLToolsFileTestParameters params[] =
   {
-    XMLToolsFileTestParameters(PROJECT_SOURCE_DIR "/components/specification/samples/2012-06/18x24y5z5t2c8b-text.ome", true),
-    XMLToolsFileTestParameters(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/18x24y5z5t2c8b-text-invalid.ome", false),
+    XMLToolsFileTestParameters(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/18x24y5z5t2c8b-text.ome",          true),
+    XMLToolsFileTestParameters(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/18x24y5z5t2c8b-text-invalid.ome",  false),
     XMLToolsFileTestParameters(PROJECT_SOURCE_DIR "/test/ome-bioformats/data/18x24y5z5t2c8b-text-invalid2.ome", false)
   };
 
