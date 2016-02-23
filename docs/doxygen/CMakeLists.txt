@@ -35,6 +35,9 @@
 # #L%
 
 if(BUILD_DOXYGEN)
+  set(OME_COMMON_TAGFILE "${CMAKE_INSTALL_FULL_DATADIR}/doc/ome-common/api/ome-common.tag")
+  set(OME_XML_TAGFILE "${CMAKE_INSTALL_FULL_DATADIR}/doc/ome-xml/api/ome-xml.tag")
+
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bioformats.dox.cmake
                  ${CMAKE_CURRENT_BINARY_DIR}/bioformats.dox @ONLY)
 
@@ -53,5 +56,5 @@ if(BUILD_DOXYGEN)
   add_custom_target(doc DEPENDS doc-api)
 
   install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bioformats/"
-          DESTINATION "${CMAKE_INSTALL_DOCDIR}/cpp-api")
+          DESTINATION "${CMAKE_INSTALL_DOCDIR}/api")
 endif(BUILD_DOXYGEN)
