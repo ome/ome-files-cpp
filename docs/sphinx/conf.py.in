@@ -181,26 +181,6 @@ extlinks = {
     }
 
 rst_epilog = """
-.. _Hibernate: http://www.hibernate.org
-.. _ZeroC: http://www.zeroc.com
-.. _Ice: http://www.zeroc.com
-.. |JVM| replace:: :abbr:`JVM (Java Virtual Machine)`
-
-.. |Poor| image:: /images/crystal-1.png
-           :alt: 1 - Poor
-.. |Fair| image:: /images/crystal-2.png
-           :alt: 2 - Fair
-.. |Good| image:: /images/crystal-3.png
-           :alt: 3 - Good
-.. |Very Good| image:: /images/crystal-4.png
-                :alt: 4 - Very Good
-.. |Outstanding| image:: /images/crystal-5.png
-                  :alt: 5 - Outstanding
-.. |no| image:: /images/crystal-no.png
-         :alt: No
-.. |yes| image:: /images/crystal-yes.png
-          :alt: Yes
-
 """
 
 # -- Options for HTML output ---------------------------------------------------
@@ -335,12 +315,12 @@ latex_show_urls = 'footnote'
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('developers/cpp/overview', 'bf-cpp-overview', 'C++ implementation overview', author, 7),
-    ('developers/cpp/conversion', 'bf-cpp-conversion', 'C++ conventions for Java programmers switching to the C++ implementation', author, 7),
-    ('developers/cpp/bf-env', 'bf-env', 'Bio-Formats environment variables', author, 7),
-    ('developers/cpp/commands/bf-test', 'bf-test', 'run Bio-Formats (C++) test tools', author, 1),
-    ('developers/cpp/commands/bf-test-info', 'bf-test-info', 'display and validate image metadata', author, 1),
-    ('developers/cpp/commands/bf-test-view', 'bf-test-view', 'view image pixel data', author, 1)
+    ('overview', 'bf-cpp-overview', 'C++ implementation overview', author, 7),
+    ('conversion', 'bf-cpp-conversion', 'C++ conventions for Java programmers switching to the C++ implementation', author, 7),
+    ('bf-env', 'bf-env', 'Bio-Formats environment variables', author, 7),
+    ('commands/bf-test', 'bf-test', 'run Bio-Formats (C++) test tools', author, 1),
+    ('commands/bf-test-info', 'bf-test-info', 'display and validate image metadata', author, 1),
+    ('commands/bf-test-view', 'bf-test-view', 'view image pixel data', author, 1)
 ]
 
 # If true, show URL addresses after external links.
