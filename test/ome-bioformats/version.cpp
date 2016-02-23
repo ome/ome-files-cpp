@@ -38,8 +38,6 @@
 
 #include <ome/bioformats/Version.h>
 
-#include <ome/internal/version.h>
-
 #include <ome/test/test.h>
 
 #include <sstream>
@@ -48,24 +46,24 @@
 
 TEST(Version, CorrectVersion)
 {
-  ASSERT_EQ(ome::bioformats::release_version.major, OME_VERSION_MAJOR);
-  ASSERT_EQ(ome::bioformats::release_version.minor, OME_VERSION_MINOR);
-  ASSERT_EQ(ome::bioformats::release_version.patch, OME_VERSION_PATCH);
-  ASSERT_EQ(ome::bioformats::release_version.extra, OME_VERSION_EXTRA_S);
+  ASSERT_EQ(ome::bioformats::release_version.major, OME_BIOFORMATS_VERSION_MAJOR);
+  ASSERT_EQ(ome::bioformats::release_version.minor, OME_BIOFORMATS_VERSION_MINOR);
+  ASSERT_EQ(ome::bioformats::release_version.patch, OME_BIOFORMATS_VERSION_PATCH);
+  ASSERT_EQ(ome::bioformats::release_version.extra, OME_BIOFORMATS_VERSION_EXTRA_S);
 }
 
 TEST(Version, VersionStreamOutput)
 {
   std::ostringstream os;
   os << ome::bioformats::release_version;
-  std::string expected(OME_VERSION_MAJOR_S "." OME_VERSION_MINOR_S "." OME_VERSION_PATCH_S OME_VERSION_EXTRA_S);
+  std::string expected(OME_BIOFORMATS_VERSION_MAJOR_S "." OME_BIOFORMATS_VERSION_MINOR_S "." OME_BIOFORMATS_VERSION_PATCH_S OME_BIOFORMATS_VERSION_EXTRA_S);
 
   ASSERT_EQ(os.str(), expected);
 }
 
 TEST(Version, CorrectDate)
 {
-  ASSERT_EQ(static_cast<boost::posix_time::ptime>(ome::bioformats::release_date), boost::posix_time::from_time_t(OME_VCS_DATE));
+  ASSERT_EQ(static_cast<boost::posix_time::ptime>(ome::bioformats::release_date), boost::posix_time::from_time_t(OME_BIOFORMATS_VCS_DATE));
 }
 
 TEST(Version, DateStreamOutput)
@@ -74,7 +72,7 @@ TEST(Version, DateStreamOutput)
   os << ome::bioformats::release_date;
 
   std::ostringstream expected;
-  expected << ome::xml::model::primitives::Timestamp(boost::posix_time::from_time_t(OME_VCS_DATE));
+  expected << ome::xml::model::primitives::Timestamp(boost::posix_time::from_time_t(OME_BIOFORMATS_VCS_DATE));
 
   ASSERT_EQ(os.str(), expected.str());
 }

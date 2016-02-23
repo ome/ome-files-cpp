@@ -40,14 +40,13 @@
 #include <cstdarg>
 #include <cassert>
 
-#include <ome/internal/config.h>
-
 #include <boost/format.hpp>
 #include <boost/thread.hpp>
 
 #include <ome/bioformats/PlaneRegion.h>
 #include <ome/bioformats/TileBuffer.h>
 #include <ome/bioformats/TileCache.h>
+#include <ome/bioformats/tiff/config.h>
 #include <ome/bioformats/tiff/IFD.h>
 #include <ome/bioformats/tiff/Tags.h>
 #include <ome/bioformats/tiff/Field.h>

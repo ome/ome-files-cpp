@@ -43,8 +43,6 @@
 #include <ome/bioformats/FormatException.h>
 #include <ome/bioformats/MetadataTools.h>
 
-#include <ome/internal/version.h>
-
 #include <ome/test/test.h>
 #include <ome/test/io.h>
 

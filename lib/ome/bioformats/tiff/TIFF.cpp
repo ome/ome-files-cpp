@@ -42,6 +42,8 @@
 #include <boost/range/size.hpp>
 #include <boost/thread.hpp>
 
+#include <ome/bioformats/Version.h>
+#include <ome/bioformats/tiff/config.h>
 #include <ome/bioformats/tiff/Field.h>
 #include <ome/bioformats/tiff/Tags.h>
 #include <ome/bioformats/tiff/TIFF.h>
@@ -51,9 +53,6 @@
 #include <ome/bioformats/detail/tiff/Tags.h>
 
 #include <ome/common/string.h>
-
-#include <ome/internal/config.h>
-#include <ome/internal/version.h>
 
 #include <tiffio.h>
 
@@ -290,7 +289,7 @@ namespace ome
       {
         Sentry sentry;
 
-        static const std::string software("OME Bio-Formats (C++) " OME_VERSION_MAJOR_S "." OME_VERSION_MINOR_S "." OME_VERSION_PATCH_S);
+        static const std::string software("OME Bio-Formats (C++) " OME_BIOFORMATS_VERSION_MAJOR_S "." OME_BIOFORMATS_VERSION_MINOR_S "." OME_BIOFORMATS_VERSION_PATCH_S);
         getCurrentDirectory()->getField(SOFTWARE).set(software);
 
         if (!TIFFWriteDirectory(impl->tiff))

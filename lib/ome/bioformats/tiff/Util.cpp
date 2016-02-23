@@ -35,8 +35,7 @@
  * #L%
  */
 
-#include <ome/internal/config.h>
-
+#include <ome/bioformats/tiff/config.h>
 #include <ome/bioformats/CoreMetadata.h>
 #include <ome/bioformats/FormatException.h>
 #include <ome/bioformats/tiff/Field.h>

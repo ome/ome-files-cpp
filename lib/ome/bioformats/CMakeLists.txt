@@ -34,6 +34,13 @@
 # policies, either expressed or implied, of any organization.
 # #L%
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Version.h.in
+               ${CMAKE_CURRENT_BINARY_DIR}/Version.h @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config-internal.h.in
+               ${CMAKE_CURRENT_BINARY_DIR}/config-internal.h @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/tiff/config.h.in
+               ${CMAKE_CURRENT_BINARY_DIR}/tiff/config.h @ONLY)
+
 set(OME_BIOFORMATS_SOURCES
     CoreMetadata.cpp
     FormatException.cpp
@@ -76,8 +83,11 @@ set(OME_BIOFORMATS_HEADERS
     UnknownFormatException.h
     UnsupportedCompressionException.h
     VariantPixelBuffer.h
-    Version.h
+    ${CMAKE_CURRENT_BINARY_DIR}/Version.h
     XMLTools.h)
+
+set(OME_BIOFORMATS_PRIVATE_HEADERS
+    ${CMAKE_CURRENT_BINARY_DIR}/config-internal.h)
 
 set(OME_BIOFORMATS_DETAIL_SOURCES
     detail/FormatReader.cpp
@@ -119,6 +129,7 @@ set(OME_BIOFORMATS_TIFF_SOURCES
     tiff/Util.cpp)
 
 set(OME_BIOFORMATS_TIFF_HEADERS
+    ${CMAKE_CURRENT_BINARY_DIR}/tiff/config.h
     tiff/Codec.h
     tiff/Exception.h
     tiff/Field.h
@@ -145,10 +156,12 @@ set(BIOFORMATS_STATIC_HEADERS
     ${OME_BIOFORMATS_OUT_HEADERS}
     ${OME_BIOFORMATS_TIFF_HEADERS})
 
-set(BIOFORMATS_GENERATED_HEADERS)
+set(BIOFORMATS_GENERATED_HEADERS
+    ${OME_BIOFORMATS_PRIVATE_HEADERS})
 
 set(BIOFORMATS_HEADERS
-    ${BIOFORMATS_STATIC_HEADERS})
+    ${BIOFORMATS_STATIC_HEADERS}
+    ${BIOFORMATS_GENERATED_HEADERS})
 
 add_library(ome-bioformats
             ${BIOFORMATS_SOURCES}

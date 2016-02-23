@@ -44,6 +44,7 @@
 #include <boost/type_traits.hpp>
 
 #include <ome/bioformats/PixelProperties.h>
+#include <ome/bioformats/tiff/config.h>
 #include <ome/bioformats/tiff/Codec.h>
 #include <ome/bioformats/tiff/TileInfo.h>
 #include <ome/bioformats/tiff/TIFF.h>
@@ -52,8 +53,6 @@
 #include <ome/bioformats/tiff/Exception.h>
 
 #include <ome/compat/regex.h>
-
-#include <ome/internal/config.h>
 
 #include <ome/test/config.h>
 #include <ome/test/test.h>

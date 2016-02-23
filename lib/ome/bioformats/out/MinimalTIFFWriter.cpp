@@ -48,8 +48,6 @@
 #include <ome/bioformats/tiff/TIFF.h>
 #include <ome/bioformats/tiff/Util.h>
 
-#include <ome/internal/config.h>
-
 using ome::bioformats::detail::WriterProperties;
 using ome::bioformats::tiff::TIFF;
 using ome::bioformats::tiff::IFD;

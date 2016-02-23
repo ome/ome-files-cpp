@@ -37,13 +37,12 @@
 
 #include <limits>
 
+#include <ome/bioformats/tiff/config.h>
 #include <ome/bioformats/tiff/Field.h>
 #include <ome/bioformats/tiff/IFD.h>
 #include <ome/bioformats/tiff/Sentry.h>
 #include <ome/bioformats/tiff/TIFF.h>
 #include <ome/bioformats/detail/tiff/Tags.h>
-
-#include <ome/internal/config.h>
 
 #include <tiffio.h>
 

@@ -58,8 +58,6 @@
 #include <ome/common/endian.h>
 #include <ome/common/filesystem.h>
 
-#include <ome/internal/config.h>
-
 #include <ome/xml/meta/Convert.h>
 
 #include <tiffio.h>

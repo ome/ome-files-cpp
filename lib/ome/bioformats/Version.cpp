@@ -37,8 +37,6 @@
 
 #include <ome/bioformats/Version.h>
 
-#include <ome/internal/version.h>
-
 // Work around glibc bug in sysmacros.h and FreeBSD bug in sys/types.h.
 #if defined(major)
 #undef major
@@ -57,7 +55,7 @@ namespace ome
       boost::posix_time::ptime
       posix_release_date()
       {
-        return boost::posix_time::from_time_t(OME_VCS_DATE);
+        return boost::posix_time::from_time_t(OME_BIOFORMATS_VCS_DATE);
       }
     }
 
@@ -72,7 +70,7 @@ namespace ome
     {
     }
 
-    const Version release_version(OME_VERSION_MAJOR, OME_VERSION_MINOR, OME_VERSION_PATCH, OME_VERSION_EXTRA_S);
+    const Version release_version(OME_BIOFORMATS_VERSION_MAJOR, OME_BIOFORMATS_VERSION_MINOR, OME_BIOFORMATS_VERSION_PATCH, OME_BIOFORMATS_VERSION_EXTRA_S);
 
     const ::ome::xml::model::primitives::Timestamp release_date(posix_release_date());
 

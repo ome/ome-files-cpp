@@ -1,6 +1,6 @@
 /*
  * #%L
- * OME-INTERNAL C++ headers for internal use only
+ * OME-BIOFORMATS C++ library for image IO.
  * %%
  * Copyright © 2006 - 2015 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
@@ -36,18 +36,22 @@
  * #L%
  */
 
-#ifndef OME_INTERNAL_URL_H
-#define OME_INTERNAL_URL_H
+#ifndef OME_BIOFORMATS_TIFF_CONFIG_H
+#define OME_BIOFORMATS_TIFF_CONFIG_H
 
-// Public URLs for embedding in messages, metadata, etc.
- 
-/// URL of Bio-Formats web page.
-#define URL_BIO_FORMATS "http://www.openmicroscopy.org/site/products/bio-formats"
+#cmakedefine TIFF_HAVE_BIGTIFF 1
+#cmakedefine TIFF_HAVE_FIELD 1
+#cmakedefine TIFF_HAVE_FIELDINFO 1
+#cmakedefine TIFF_HAVE_MERGEFIELDINFO 1
+#cmakedefine TIFF_HAVE_MERGEFIELDINFO_RETURN 1
+#cmakedefine TIFF_HAVE_TMSIZE_T 1
+#cmakedefine TIFF_HAVE_TSIZE_T 1
 
-/// URL of 'Bio-Formats C++ overview' web page.
-#define URL_BIO_FORMATS_LIBRARIES "http://www.openmicroscopy.org/site/support/bio-formats/developers/overview.html"
+#ifndef TIFF_HAVE_TMSIZE_T
+typedef signed long tmsize_t;
+#endif // ! TIFF_HAVE_TMSIZE_T
+#ifndef TIFF_HAVE_TSIZE_T
+typedef unsigned long tsize_t;
+#endif // !TIFF_HAVE_TSIZE_T
 
-/// URL of OME-TIFF web page.
-#define URL_OME_TIFF "http://www.openmicroscopy.org/site/support/ome-model/ome-tiff/"
-
-#endif // OME_INTERNAL_URL_H
+#endif // OME_BIOFORMATS_TIFF_CONFIG_H

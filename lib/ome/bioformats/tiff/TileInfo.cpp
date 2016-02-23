@@ -35,6 +35,7 @@
  * #L%
  */
 
+#include <ome/bioformats/tiff/config.h>
 #include <ome/bioformats/tiff/Field.h>
 #include <ome/bioformats/tiff/IFD.h>
 #include <ome/bioformats/tiff/Tags.h>
@@ -43,7 +44,6 @@
 #include <ome/bioformats/tiff/TIFF.h>
 #include <ome/bioformats/Types.h>
 
-#include <ome/internal/config.h>
 
 #include <tiffio.h>
 

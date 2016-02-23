@@ -39,7 +39,7 @@
 
 #include <boost/format.hpp>
 
-#include <ome/internal/version.h>
+#include <ome/bioformats/Version.h>
 
 #include <ome/common/log.h>
 #include <ome/common/module.h>
@@ -64,8 +64,8 @@ namespace
   {
     format fmtr("%1% (%2%) %3% (%4%)");
     fmtr % "bf-test info" % "OME Bio-Formats"
-      % OME_VERSION_MAJOR_S "." OME_VERSION_MINOR_S "." OME_VERSION_PATCH_S OME_VERSION_EXTRA_S
-      % OME_VCS_DATE_S;
+      % OME_BIOFORMATS_VERSION_MAJOR_S "." OME_BIOFORMATS_VERSION_MINOR_S "." OME_BIOFORMATS_VERSION_PATCH_S OME_BIOFORMATS_VERSION_EXTRA_S
+      % OME_BIOFORMATS_VCS_DATE_S;
 
     format fmtc("Copyright © %1%–%2% Open Microscopy Environment");
     fmtc % "2006" % "2014";

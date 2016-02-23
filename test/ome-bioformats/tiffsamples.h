@@ -42,10 +42,9 @@
 #include <boost/filesystem.hpp>
 
 #include <ome/bioformats/Types.h>
+#include <ome/bioformats/tiff/config.h>
 
 #include <ome/compat/regex.h>
-
-#include <ome/internal/config.h>
 
 #include <ome/test/config.h>
 #include <ome/test/test.h>
