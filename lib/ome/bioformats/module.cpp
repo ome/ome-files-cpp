@@ -36,18 +36,50 @@
  * #L%
  */
 
-#include <ome/xml/config.h>
+#include <ome/bioformats/config-internal.h>
 
 #define OME_COMMON_MODULE_INTROSPECTION 1
 #include <ome/common/module.h>
+#include <ome/xml/module.h>
+#include <ome/bioformats/module.h>
 
 namespace
 {
   using ome::common::RegisterModule;
 
-  // Bio-Formats package-specific paths.
-  RegisterModule bf_root("bf-root", "BIOFORMATS_HOME", INSTALL_PREFIX, "", module_path);
-  RegisterModule bf_data("bf-data", "BIOFORMATS_DATADIR", OME_BIOFORMATS_INSTALL_FULL_DATADIR, OME_BIOFORMATS_INSTALL_DATADIR, module_path);
-  RegisterModule bf_icon("bf-icon", "BIOFORMATS_ICONDIR", OME_BIOFORMATS_INSTALL_FULL_ICONDIR, OME_BIOFORMATS_INSTALL_ICONDIR, module_path);
-  RegisterModule bf_libexec("bf-libexec", "BIOFORMATS_LIBEXECDIR", OME_BIOFORMATS_INSTALL_FULL_LIBEXECDIR, OME_BIOFORMATS_INSTALL_LIBEXECDIR, module_path);
+  void register_paths()
+  {
+    // Bio-Formats package-specific paths.
+    static RegisterModule bf_root("bf-root", "BIOFORMATS_HOME", INSTALL_PREFIX, "", module_path);
+    static RegisterModule bf_data("bf-data", "BIOFORMATS_DATADIR", OME_BIOFORMATS_INSTALL_FULL_DATADIR, OME_BIOFORMATS_INSTALL_DATADIR, module_path);
+    static RegisterModule bf_icon("bf-icon", "BIOFORMATS_ICONDIR", OME_BIOFORMATS_INSTALL_FULL_ICONDIR, OME_BIOFORMATS_INSTALL_ICONDIR, module_path);
+    static RegisterModule bf_libexec("bf-libexec", "BIOFORMATS_LIBEXECDIR", OME_BIOFORMATS_INSTALL_FULL_LIBEXECDIR, OME_BIOFORMATS_INSTALL_LIBEXECDIR, module_path);
+  }
+
+  struct AutoRegister
+  {
+    AutoRegister()
+    {
+      register_paths();
+    }
+  };
+
+  AutoRegister path_register;
+
+}
+
+namespace ome
+{
+  namespace bioformats
+  {
+
+    void
+    register_module_paths()
+    {
+      ome::common::register_module_paths();
+      ome::xml::register_module_paths();
+      register_paths();
+    }
+
+  }
 }

@@ -49,6 +49,7 @@ set(OME_BIOFORMATS_SOURCES
     MetadataOptions.cpp
     MetadataTools.cpp
     Modulo.cpp
+    module.cpp
     PixelBuffer.cpp
     PixelProperties.cpp
     TileBuffer.cpp
@@ -73,6 +74,7 @@ set(OME_BIOFORMATS_HEADERS
     MetadataOptions.h
     MetadataTools.h
     Modulo.h
+    module.h
     PixelBuffer.h
     PixelProperties.h
     PlaneRegion.h

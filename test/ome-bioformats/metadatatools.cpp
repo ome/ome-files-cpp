@@ -47,6 +47,8 @@
 #include <ome/test/io.h>
 
 #include <ome/common/module.h>
+#include <ome/bioformats/module.h>
+
 #include <ome/common/xml/Platform.h>
 #include <ome/common/xml/dom/Document.h>
 
@@ -586,6 +588,7 @@ namespace
     ome::xml::OMETransformResolver tr;
     std::set<std::string> versions = tr.schema_versions();
 
+    ome::bioformats::register_module_paths();
     boost::filesystem::path sample_path(ome::common::module_runtime_path("ome-xml-sample"));
     if (exists(sample_path) && is_directory(sample_path))
       {

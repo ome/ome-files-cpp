@@ -1,8 +1,8 @@
 /*
  * #%L
- * OME-INTERNAL C++ headers for internal use only
+ * OME-BIOFORMATS C++ library for image IO.
  * %%
- * Copyright © 2006 - 2015 Open Microscopy Environment:
+ * Copyright © 2016 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
  *   - National Institutes of Health
  *   - University of Dundee
@@ -36,36 +36,40 @@
  * #L%
  */
 
-#ifndef OME_BIOFORMATS_CONFIG_INTERNAL_H
-#define OME_BIOFORMATS_CONFIG_INTERNAL_H
+#ifndef OME_BIOFORMATS_MODULE_H
+#define OME_BIOFORMATS_MODULE_H
 
-#define INSTALL_PREFIX "@CMAKE_INSTALL_PREFIX@"
+#include <ome/bioformats/module.h>
 
-#define INSTALL_BINDIR "@CMAKE_INSTALL_BINDIR@"
-#define INSTALL_SBINDIR "@CMAKE_INSTALL_SBINDIR@"
-#define INSTALL_LIBEXECDIR "@CMAKE_INSTALL_LIBEXECDIR@"
-#define INSTALL_SYSCONFDIR "@CMAKE_INSTALL_SYSCONFDIR@"
-#define INSTALL_SHAREDSTATEDIR "@CMAKE_INSTALL_SHAREDSTATEDIR@"
-#define INSTALL_LOCALSTATEDIR "@CMAKE_INSTALL_LOCALSTATEDIR@"
-#define INSTALL_LIBDIR "@CMAKE_INSTALL_LIBDIR@"
-#define INSTALL_INCLUDEDIR "@CMAKE_INSTALL_INCLUDEDIR@"
-#define INSTALL_OLDINCLUDEDIR "@CMAKE_INSTALL_OLDINCLUDEDIR@"
-#define INSTALL_DATAROOTDIR "@CMAKE_INSTALL_DATAROOTDIR@"
-#define INSTALL_DATADIR "@CMAKE_INSTALL_DATADIR@"
-#define INSTALL_INFODIR "@CMAKE_INSTALL_INFODIR@"
-#define INSTALL_LOCALEDIR "@CMAKE_INSTALL_LOCALEDIR@"
-#define INSTALL_MANDIR "@CMAKE_INSTALL_MANDIR@"
-#define INSTALL_DOCDIR "@CMAKE_INSTALL_DOCDIR@"
+namespace ome
+{
+  namespace bioformats
+  {
 
-#define OME_BIOFORMATS_INSTALL_DATADIR "@OME_BIOFORMATS_INSTALL_DATADIR@"
-#define OME_BIOFORMATS_INSTALL_FULL_DATADIR "@OME_BIOFORMATS_INSTALL_FULL_DATADIR@"
+    /**
+     * Register the Bio-Formats module paths with OME-Common.
+     *
+     * This function forces path registration.
+     *
+     * @note This is a hack to allow static linking to work on
+     * Windows; without this, the module object is omitted and the
+     * paths aren't automatically registered.  This will no longer be
+     * required once it is built as a DLL.  Its only purpose is to
+     * force object inclusion when static linking, and ensure that the
+     * registration happens independently of object static
+     * construction order to allow use prior to main() entry.  You
+     * should not use this.
+     */
+    void
+    register_module_paths();
 
-#define OME_BIOFORMATS_INSTALL_ICONDIR "@OME_BIOFORMATS_INSTALL_ICONDIR@"
-#define OME_BIOFORMATS_INSTALL_FULL_ICONDIR "@OME_BIOFORMATS_INSTALL_FULL_ICONDIR@"
+  }
+}
 
-#define OME_BIOFORMATS_INSTALL_LIBEXECDIR "@OME_BIOFORMATS_INSTALL_LIBEXECDIR@"
-#define OME_BIOFORMATS_INSTALL_FULL_LIBEXECDIR "@OME_BIOFORMATS_INSTALL_FULL_LIBEXECDIR@"
+#endif // OME_BIOFORMATS_MODULE_H
 
-#cmakedefine OME_HAVE_CSTDARG 1
-
-#endif // OME_BIOFORMATS_CONFIG_INTERNAL_H
+/*
+ * Local Variables:
+ * mode:C++
+ * End:
+ */
