@@ -83,10 +83,12 @@ set(OME_BIOFORMATS_HEADERS
     UnknownFormatException.h
     UnsupportedCompressionException.h
     VariantPixelBuffer.h
-    ${CMAKE_CURRENT_BINARY_DIR}/Version.h
     XMLTools.h)
 
-set(OME_BIOFORMATS_PRIVATE_HEADERS
+set(OME_BIOFORMATS_GENERATED_HEADERS
+    ${CMAKE_CURRENT_BINARY_DIR}/Version.h)
+
+set(OME_BIOFORMATS_GENERATED_PRIVATE_HEADERS
     ${CMAKE_CURRENT_BINARY_DIR}/config-internal.h)
 
 set(OME_BIOFORMATS_DETAIL_SOURCES
@@ -129,7 +131,6 @@ set(OME_BIOFORMATS_TIFF_SOURCES
     tiff/Util.cpp)
 
 set(OME_BIOFORMATS_TIFF_HEADERS
-    ${CMAKE_CURRENT_BINARY_DIR}/tiff/config.h
     tiff/Codec.h
     tiff/Exception.h
     tiff/Field.h
@@ -141,6 +142,9 @@ set(OME_BIOFORMATS_TIFF_HEADERS
     tiff/TileInfo.h
     tiff/Types.h
     tiff/Util.h)
+
+set(OME_BIOFORMATS_TIFF_GENERATED_HEADERS
+    ${CMAKE_CURRENT_BINARY_DIR}/tiff/config.h)
 
 set(BIOFORMATS_SOURCES
     ${OME_BIOFORMATS_SOURCES}
@@ -157,7 +161,9 @@ set(BIOFORMATS_STATIC_HEADERS
     ${OME_BIOFORMATS_TIFF_HEADERS})
 
 set(BIOFORMATS_GENERATED_HEADERS
-    ${OME_BIOFORMATS_PRIVATE_HEADERS})
+    ${OME_BIOFORMATS_GENERATED_HEADERS}
+    ${OME_BIOFORMATS_GENERATED_PRIVATE_HEADERS}
+    ${OME_BIOFORMATS_TIFF_GENERATED_HEADERS})
 
 set(BIOFORMATS_HEADERS
     ${BIOFORMATS_STATIC_HEADERS}
@@ -197,7 +203,7 @@ install(FILES OMEBioFormatsConfig.cmake
 
 set(ome_bioformats_includedir "${CMAKE_INSTALL_INCLUDEDIR}/ome/bioformats")
 
-install(FILES ${OME_BIOFORMATS_HEADERS}
+install(FILES ${OME_BIOFORMATS_HEADERS} ${OME_BIOFORMATS_GENERATED_HEADERS}
         DESTINATION ${ome_bioformats_includedir})
 install(FILES ${OME_BIOFORMATS_DETAIL_HEADERS}
         DESTINATION ${ome_bioformats_includedir}/detail)
@@ -205,7 +211,7 @@ install(FILES ${OME_BIOFORMATS_IN_HEADERS}
         DESTINATION ${ome_bioformats_includedir}/in)
 install(FILES ${OME_BIOFORMATS_OUT_HEADERS}
         DESTINATION ${ome_bioformats_includedir}/out)
-install(FILES ${OME_BIOFORMATS_TIFF_HEADERS}
+install(FILES ${OME_BIOFORMATS_TIFF_HEADERS} ${OME_BIOFORMATS_TIFF_GENERATED_HEADERS}
         DESTINATION ${ome_bioformats_includedir}/tiff)
 
 # Dump header list for testing
