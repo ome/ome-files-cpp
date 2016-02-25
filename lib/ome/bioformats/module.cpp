@@ -50,10 +50,38 @@ namespace
   void register_paths()
   {
     // Bio-Formats package-specific paths.
-    static RegisterModule bf_root("bf-root", "BIOFORMATS_HOME", INSTALL_PREFIX, "", module_path);
-    static RegisterModule bf_data("bf-data", "BIOFORMATS_DATADIR", OME_BIOFORMATS_INSTALL_FULL_DATADIR, OME_BIOFORMATS_INSTALL_DATADIR, module_path);
-    static RegisterModule bf_icon("bf-icon", "BIOFORMATS_ICONDIR", OME_BIOFORMATS_INSTALL_FULL_ICONDIR, OME_BIOFORMATS_INSTALL_ICONDIR, module_path);
-    static RegisterModule bf_libexec("bf-libexec", "BIOFORMATS_LIBEXECDIR", OME_BIOFORMATS_INSTALL_FULL_LIBEXECDIR, OME_BIOFORMATS_INSTALL_LIBEXECDIR, module_path);
+    static RegisterModule bf_data
+      ("bf-data",
+       "BIOFORMATS_PKGDATADIR",
+       "BIOFORMATS_HOME",
+       "BIOFORMATS_HOME",
+       OME_BIOFORMATS_INSTALL_FULL_PKGDATADIR,
+       OME_BIOFORMATS_INSTALL_PKGDATADIR,
+       OME_BIOFORMATS_INSTALL_PREFIX,
+       OME_BIOFORMATS_SHLIBDIR,
+       module_path);
+
+    static RegisterModule bf_icon
+      ("bf-icon",
+       "BIOFORMATS_ICONDIR",
+       "BIOFORMATS_HOME",
+       "BIOFORMATS_HOME",
+       OME_BIOFORMATS_INSTALL_FULL_ICONDIR,
+       OME_BIOFORMATS_INSTALL_ICONDIR,
+       OME_BIOFORMATS_INSTALL_PREFIX,
+       OME_BIOFORMATS_SHLIBDIR,
+       module_path);
+
+    static RegisterModule bf_libexec
+      ("bf-libexec",
+       "BIOFORMATS_PKGLIBEXECDIR",
+       "BIOFORMATS_HOME",
+       "BIOFORMATS_HOME",
+       OME_BIOFORMATS_INSTALL_FULL_PKGLIBEXECDIR,
+       OME_BIOFORMATS_INSTALL_PKGLIBEXECDIR,
+       OME_BIOFORMATS_INSTALL_PREFIX,
+       OME_BIOFORMATS_SHLIBDIR,
+       module_path);
   }
 
   struct AutoRegister

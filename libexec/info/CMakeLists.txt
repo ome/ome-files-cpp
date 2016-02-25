@@ -49,7 +49,7 @@ add_executable(info ${info_SOURCES})
 target_link_libraries(info OME::XML OME::BioFormats Boost::program_options ${CMAKE_THREAD_LIBS_INIT})
 
 install(TARGETS info RUNTIME
-        DESTINATION ${OME_BIOFORMATS_INSTALL_LIBEXECDIR}
+        DESTINATION ${OME_BIOFORMATS_INSTALL_PKGLIBEXECDIR}
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
                     GROUP_READ GROUP_EXECUTE
                     WORLD_READ WORLD_EXECUTE)
