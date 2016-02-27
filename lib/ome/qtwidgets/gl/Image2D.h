@@ -1,6 +1,6 @@
 /*
  * #%L
- * OME-QTWIDGETS C++ library for display of Bio-Formats pixel data and metadata.
+ * OME-QTWIDGETS C++ library for display of OME-Files pixel data and metadata.
  * %%
  * Copyright © 2014 - 2015 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
@@ -44,8 +44,8 @@
 #include <QtGui/QOpenGLShader>
 #include <QtGui/QOpenGLFunctions>
 
-#include <ome/bioformats/Types.h>
-#include <ome/bioformats/FormatReader.h>
+#include <ome/files/Types.h>
+#include <ome/files/FormatReader.h>
 
 #include <ome/compat/memory.h>
 
@@ -82,8 +82,8 @@ namespace ome
          * @param parent the parent of this object.
          */
         explicit
-        Image2D(ome::compat::shared_ptr<ome::bioformats::FormatReader>  reader,
-                ome::bioformats::dimension_size_type                    series,
+        Image2D(ome::compat::shared_ptr<ome::files::FormatReader>  reader,
+                ome::files::dimension_size_type                    series,
                 QObject                                                *parent = 0);
 
         /// Destructor.
@@ -119,7 +119,7 @@ namespace ome
          * @param plane the plane number.
          */
         void
-        setPlane(ome::bioformats::dimension_size_type plane);
+        setPlane(ome::files::dimension_size_type plane);
 
         /**
          * Get minimum limit for linear contrast.
@@ -219,11 +219,11 @@ namespace ome
         /// Linear contrast correction multipliers.
         glm::vec3 texcorr;
         /// The image reader.
-        ome::compat::shared_ptr<ome::bioformats::FormatReader> reader;
+        ome::compat::shared_ptr<ome::files::FormatReader> reader;
         /// The image series.
-        ome::bioformats::dimension_size_type series;
+        ome::files::dimension_size_type series;
         /// The current image plane.
-        ome::bioformats::dimension_size_type plane;
+        ome::files::dimension_size_type plane;
       };
 
     }

@@ -1,4 +1,4 @@
-.. _bf-cpp-tutorial:
+.. _ome-files-cpp-tutorial:
 
 Tutorial
 ========
@@ -7,7 +7,7 @@ Tutorial
 Metadata
 --------
 
-Bio-Formats supports several different classes of metadata, from very
+OME-Files supports several different classes of metadata, from very
 basic information about the image dimensions and pixel type to
 detailed information about the acquisition hardware and experimental
 parameters.  From simplest to most complex, these are:
@@ -28,7 +28,7 @@ Metadata store
   original metadata content (it can represent all values contained
   within the core and original metadata).  It is an alternative
   representation of the OME-XML data model objects, and is used by the
-  Bio-Formats reader and writer interfaces.
+  OME-Files reader and writer interfaces.
 
 OME-XML data model objects
   The abstract OME-XML data model is realized as a collection of
@@ -52,7 +52,7 @@ certain modifications to the data model may only be made via direct
 access to the model objects, otherwise the higher-level metadata store
 interface should be preferred.
 
-The header file :doxygen:`ome/bioformats/MetadataTools.h
+The header file :doxygen:`ome/files/MetadataTools.h
 <MetadataTools_8h_source.html>` provides several convenience functions
 to work with and manipulate the various forms of metadata, including
 conversion of Core metadata to and from a metadata store.
@@ -76,7 +76,7 @@ themselves are more of an implementation detail at present.
 If implementing a reader, it is fairly typical to set the basic image
 metadata in :cpp:class:`CoreMetadata` objects, and then use the
 :cpp:func:`fillMetadata` function in
-:doxygen:`ome/bioformats/MetadataTools.h
+:doxygen:`ome/files/MetadataTools.h
 <MetadataTools_8h_source.html>` to fill the reader's metadata store
 with this information, before filling the metadata store with
 additional (non-core) metadata as required.  When writing an image, a
@@ -97,8 +97,8 @@ Full example source: :download:`metadata-formatreader.cpp
 
 .. seealso::
 
-  - :doxygen:`CoreMetadata <classome_1_1bioformats_1_1CoreMetadata.html>`
-  - :doxygen:`FormatReader <classome_1_1bioformats_1_1FormatReader.html>`
+  - :doxygen:`CoreMetadata <classome_1_1files_1_1CoreMetadata.html>`
+  - :doxygen:`FormatReader <classome_1_1files_1_1FormatReader.html>`
 
 
 Original metadata
@@ -129,8 +129,8 @@ Full example source: :download:`metadata-formatreader.cpp <examples/metadata-for
 
 .. seealso::
 
-  - :doxygen:`MetadataMap <classome_1_1bioformats_1_1MetadataMap.html>`
-  - :doxygen:`FormatReader <classome_1_1bioformats_1_1FormatReader.html>`
+  - :doxygen:`MetadataMap <classome_1_1files_1_1MetadataMap.html>`
+  - :doxygen:`FormatReader <classome_1_1files_1_1FormatReader.html>`
   - :doxygen:`OriginalMetadataAnnotation <classome_1_1xml_1_1model_1_1OriginalMetadataAnnotation.html>`
 
 Metadata store
@@ -237,9 +237,9 @@ Full example source: :download:`metadata-io.cpp <examples/metadata-io.cpp>`
 .. seealso::
 
   - :doxygen:`Metadata classes <namespaceome_1_1xml_1_1meta.html>`
-  - :doxygen:`createID <namespaceome_1_1bioformats.html#ab3bf80ec03bcf20b199ce2761d48fe01>`
-  - :doxygen:`createOMEXMLMetadata <namespaceome_1_1bioformats.html#ae61f12958973765e8328348874a85731>`
-  - :doxygen:`getOMEXML <namespaceome_1_1bioformats.html#a32e5424991ce09b857ddc0d5be37c4f1>`
+  - :doxygen:`createID <namespaceome_1_1files.html#ab3bf80ec03bcf20b199ce2761d48fe01>`
+  - :doxygen:`createOMEXMLMetadata <namespaceome_1_1files.html#ae61f12958973765e8328348874a85731>`
+  - :doxygen:`getOMEXML <namespaceome_1_1files.html#a32e5424991ce09b857ddc0d5be37c4f1>`
 
 
 OME-XML data model objects
@@ -290,11 +290,11 @@ Pixel data
 
 The Bio-Formats Java implementation stores and passes pixel values in
 a raw :cpp:type:`byte` array.  Due to limitations with C++ array
-passing, this was not possible for the C++ implementation.  While a
-vector or other container could have been used, several problems
-remain.  The type and endianness of the data in the raw bytes is not
-known, and the dimension ordering and dimension extents are also
-unknown, which imposes a significant burden on the programmer to
+passing, this was not possible for the OME-Files C++ implementation.
+While a vector or other container could have been used, several
+problems remain.  The type and endianness of the data in the raw bytes
+is not known, and the dimension ordering and dimension extents are
+also unknown, which imposes a significant burden on the programmer to
 correctly process the data.  The C++ implementation provides two types
 to solve these problems.
 
@@ -306,7 +306,7 @@ externally-provided metadata to describe its structure.  This class
 may be used to contain and process pixel data of a specific pixel
 type.  Internally, the pixel data is contained within a
 :cpp:class:`boost::multi_array` as a 9D hyper-volume, though its usage
-in this release of Bio-Formats is limited to 5D.  The class can either
+in this release of OME-Files is limited to 5D.  The class can either
 contain its own memory allocation for pixel data, or it can reference
 memory allocated or mapped externally, allowing use with memory-mapped
 data, for example.
@@ -345,13 +345,13 @@ The 9D pixel buffer makes a distinction between the logical dimension
 order (used by the API) and the storage order (the layout of the pixel
 data in memory).  The logical order is defined by the values in the
 :doxygen:`Dimensions
-<namespaceome_1_1bioformats.html#ad9ebb405a4815c189fa788325f68a91a>`
+<namespaceome_1_1files.html#ad9ebb405a4815c189fa788325f68a91a>`
 enum.  The storage order is specified by the programmer when creating
 a pixel buffer.
 
 The following example shows creation of a pixel buffer with a defined
 size, and :doxygen:`default storage order
-<classome_1_1bioformats_1_1PixelBufferBase.html#a419ad49f2ea90937a57b81a74b56380b>`:
+<classome_1_1files_1_1PixelBufferBase.html#a419ad49f2ea90937a57b81a74b56380b>`:
 
 .. literalinclude:: examples/pixeldata.cpp
    :language: cpp
@@ -360,7 +360,7 @@ size, and :doxygen:`default storage order
 
 The storage order may be set explicitly.  The order may be created by
 hand, or with a :doxygen:`helper function
-<classome_1_1bioformats_1_1PixelBufferBase.html#ac7e922610bf561f311d13c3d7fcaeb69>`.
+<classome_1_1files_1_1PixelBufferBase.html#ac7e922610bf561f311d13c3d7fcaeb69>`.
 While the helper function is limited to supporting the ordering
 defined by the data model, specifying the order by hand allows
 additional flexibility.  Manual ordering may be used to allow the
@@ -439,14 +439,14 @@ This example demonstrates several features:
 - Pixel data can be assigned to the buffer with a single
   :cpp:func:`assign` call.
 
-The Bio-Formats source uses pixel buffer visitors for several
-purposes, for example to load pixel data into OpenGL textures, which
+The OME-Files source uses pixel buffer visitors for several purposes,
+for example to load pixel data into OpenGL textures, which
 automatically handles pixel format conversion and repacking of pixel
 data as needed.
 
-While the pixel buffers may appear complex, they do permit the
-Bio-Formats library to support all pixel types with relative ease, and
-it will allow your applications to also handle multiple pixel types by
+While the pixel buffers may appear complex, they do permit the OME
+Files library to support all pixel types with relative ease, and it
+will allow your applications to also handle multiple pixel types by
 writing your own visitors.  Assignment of one buffer to another will
 also repack the pixel data if they use different storage ordering
 (i.e. the logical ordering is used for the copy), which can be useful
@@ -470,12 +470,12 @@ Full example source: :download:`pixeldata.cpp <examples/pixeldata.cpp>`
 .. seealso::
 
   - :doxygen:`PixelType <classome_1_1xml_1_1model_1_1enums_1_1PixelType.html>`
-  - :doxygen:`PixelBuffer <classome_1_1bioformats_1_1PixelBuffer.html>`
-  - :doxygen:`VariantPixelBuffer <classome_1_1bioformats_1_1VariantPixelBuffer.html>`
-  - :doxygen:`FormatReader::getLookupTable <classome_1_1bioformats_1_1FormatReader.html#a9b69e3612f0ad4c945d1c0f111242cc2>`
-  - :doxygen:`FormatReader::openBytes <classome_1_1bioformats_1_1FormatReader.html#a5bfa86b4b68b03b63d76bb050cbe7101>`
-  - :doxygen:`FormatWriter::setLookupTable <classome_1_1bioformats_1_1FormatWriter.html#a00ae3dc46c205e64f782c7b6f47bd5ab>`
-  - :doxygen:`FormatWriter::saveBytes <classome_1_1bioformats_1_1FormatWriter.html#ad1e8b427214f7cfd19ce2251d38e24f5>`
+  - :doxygen:`PixelBuffer <classome_1_1files_1_1PixelBuffer.html>`
+  - :doxygen:`VariantPixelBuffer <classome_1_1files_1_1VariantPixelBuffer.html>`
+  - :doxygen:`FormatReader::getLookupTable <classome_1_1files_1_1FormatReader.html#a9b69e3612f0ad4c945d1c0f111242cc2>`
+  - :doxygen:`FormatReader::openBytes <classome_1_1files_1_1FormatReader.html#a5bfa86b4b68b03b63d76bb050cbe7101>`
+  - :doxygen:`FormatWriter::setLookupTable <classome_1_1files_1_1FormatWriter.html#a00ae3dc46c205e64f782c7b6f47bd5ab>`
+  - :doxygen:`FormatWriter::saveBytes <classome_1_1files_1_1FormatWriter.html#ad1e8b427214f7cfd19ce2251d38e24f5>`
 
 Reading images
 --------------
@@ -526,9 +526,9 @@ Full example source: :download:`metadata-formatreader.cpp <examples/metadata-for
 
 .. seealso::
 
-  - :doxygen:`FormatReader <classome_1_1bioformats_1_1FormatReader.html>`
-  - :doxygen:`TIFFReader <classome_1_1bioformats_1_1in_1_1TIFFReader.html>`
-  - :doxygen:`OMETIFFReader <classome_1_1bioformats_1_1in_1_1OMETIFFReader.html>`
+  - :doxygen:`FormatReader <classome_1_1files_1_1FormatReader.html>`
+  - :doxygen:`TIFFReader <classome_1_1files_1_1in_1_1TIFFReader.html>`
+  - :doxygen:`OMETIFFReader <classome_1_1files_1_1in_1_1OMETIFFReader.html>`
 
 Writing images
 --------------
@@ -583,6 +583,6 @@ Full example source: :download:`metadata-formatwriter.cpp <examples/metadata-for
 
 .. seealso::
 
-  - :doxygen:`FormatWriter <classome_1_1bioformats_1_1FormatWriter.html>`
-  - :doxygen:`TIFFWriter <classome_1_1bioformats_1_1out_1_1MinimalTIFFWriter.html>`
-  - :doxygen:`OMETIFFWriter <classome_1_1bioformats_1_1out_1_1OMETIFFWriter.html>`
+  - :doxygen:`FormatWriter <classome_1_1files_1_1FormatWriter.html>`
+  - :doxygen:`TIFFWriter <classome_1_1files_1_1out_1_1MinimalTIFFWriter.html>`
+  - :doxygen:`OMETIFFWriter <classome_1_1files_1_1out_1_1OMETIFFWriter.html>`

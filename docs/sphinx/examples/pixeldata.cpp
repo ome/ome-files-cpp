@@ -1,6 +1,6 @@
 /*
  * #%L
- * OME-BIOFORMATS C++ library for image IO.
+ * OME-FILES C++ library for image IO.
  * Copyright © 2015 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
  *   - National Institutes of Health
@@ -39,17 +39,17 @@
 #include <cstdlib>
 #include <iostream>
 
-#include <ome/bioformats/PixelBuffer.h>
-#include <ome/bioformats/PixelProperties.h>
-#include <ome/bioformats/VariantPixelBuffer.h>
+#include <ome/files/PixelBuffer.h>
+#include <ome/files/PixelProperties.h>
+#include <ome/files/VariantPixelBuffer.h>
 
 #include <ome/xml/model/enums/DimensionOrder.h>
 #include <ome/xml/model/enums/PixelType.h>
 
-using ome::bioformats::PixelBuffer;
-using ome::bioformats::PixelBufferBase;
-using ome::bioformats::PixelProperties;
-using ome::bioformats::VariantPixelBuffer;
+using ome::files::PixelBuffer;
+using ome::files::PixelBufferBase;
+using ome::files::PixelProperties;
+using ome::files::VariantPixelBuffer;
 using ome::xml::model::enums::DimensionOrder;
 using ome::xml::model::enums::PixelType;
 
@@ -73,20 +73,20 @@ namespace
     // 9D index, default values to zero if unused
     PixelBuffer<float_pixel_type>::indices_type idx;
     // Set Z and C indices
-    idx[ome::bioformats::DIM_SPATIAL_Z] = 2;
-    idx[ome::bioformats::DIM_CHANNEL] = 1;
-    idx[ome::bioformats::DIM_TEMPORAL_T] =
-      idx[ome::bioformats::DIM_SUBCHANNEL] =
-      idx[ome::bioformats::DIM_MODULO_Z] =
-      idx[ome::bioformats::DIM_MODULO_T] =
-      idx[ome::bioformats::DIM_MODULO_C] = 0;
+    idx[ome::files::DIM_SPATIAL_Z] = 2;
+    idx[ome::files::DIM_CHANNEL] = 1;
+    idx[ome::files::DIM_TEMPORAL_T] =
+      idx[ome::files::DIM_SUBCHANNEL] =
+      idx[ome::files::DIM_MODULO_Z] =
+      idx[ome::files::DIM_MODULO_T] =
+      idx[ome::files::DIM_MODULO_C] = 0;
 
     for (uint16_t x = 0; x < 512; ++x)
       {
-        idx[ome::bioformats::DIM_SPATIAL_X] = x;
+        idx[ome::files::DIM_SPATIAL_X] = x;
         for (uint16_t y = 0; y < 512; ++y)
           {
-            idx[ome::bioformats::DIM_SPATIAL_Y] = y;
+            idx[ome::files::DIM_SPATIAL_Y] = y;
             buffer.at(idx) = 0.5f;
           }
       }
@@ -110,7 +110,7 @@ namespace
     PixelBuffer<uint16_pixel_type> buffer1
       (boost::extents[512][512][16][1][3][1][1][1][1],
        PixelType::UINT16,
-       ome::bioformats::ENDIAN_NATIVE,
+       ome::files::ENDIAN_NATIVE,
        order1);
 
     // Language type for INT8 pixel data
@@ -126,7 +126,7 @@ namespace
     PixelBuffer<int8_pixel_type> buffer2
       (boost::extents[1024][1024][1][1][1][3][1][1][1],
        PixelType::INT8,
-       ome::bioformats::ENDIAN_NATIVE,
+       ome::files::ENDIAN_NATIVE,
        order2);
     /* create-ordered-example-end */
   }

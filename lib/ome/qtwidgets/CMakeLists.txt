@@ -1,5 +1,5 @@
 # #%L
-# Bio-Formats C++ libraries (cmake build infrastructure)
+# OME Files C++ libraries (cmake build infrastructure)
 # %%
 # Copyright © 2006 - 2015 Open Microscopy Environment:
 #   - Massachusetts Institute of Technology
@@ -109,7 +109,7 @@ if (OME_QTOPENGL)
               ${ome-qtwidgets_HEADERS_MOC}
               ${ome-qtwidgets_RESOURCES})
   qt5_use_modules(ome-qtwidgets Core Gui Widgets Svg)
-  target_link_libraries(ome-qtwidgets OME::BioFormats
+  target_link_libraries(ome-qtwidgets OME::Files
                         Boost::filesystem
                         ${OPENGL_gl_LIBRARY} ${TIFF_LIBRARIES})
 

@@ -1,6 +1,6 @@
 /*
  * #%L
- * OME-BIOFORMATS C++ library for image IO.
+ * OME-FILES C++ library for image IO.
  * Copyright © 2015 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
  *   - National Institutes of Health
@@ -47,19 +47,19 @@
 #include <ome/xml/meta/Convert.h>
 #include <ome/xml/meta/OMEXMLMetadata.h>
 
-#include <ome/bioformats/FormatTools.h>
-#include <ome/bioformats/MetadataTools.h>
+#include <ome/files/FormatTools.h>
+#include <ome/files/MetadataTools.h>
 
 using boost::filesystem::path;
 using ome::compat::array;
 using ome::compat::make_shared;
 using ome::compat::shared_ptr;
-using ome::bioformats::dimension_size_type;
-using ome::bioformats::addMetadataOnly;
-using ome::bioformats::createOMEXMLMetadata;
-using ome::bioformats::createID;
-using ome::bioformats::getZCTCoords;
-using ome::bioformats::getOMEXML;
+using ome::files::dimension_size_type;
+using ome::files::addMetadataOnly;
+using ome::files::createOMEXMLMetadata;
+using ome::files::createID;
+using ome::files::getZCTCoords;
+using ome::files::getOMEXML;
 namespace xml = ome::common::xml;
 namespace meta = ome::xml::meta;
 namespace model = ome::xml::model;

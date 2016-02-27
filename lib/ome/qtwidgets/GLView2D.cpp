@@ -1,6 +1,6 @@
 /*
  * #%L
- * OME-QTWIDGETS C++ library for display of Bio-Formats pixel data and metadata.
+ * OME-QTWIDGETS C++ library for display of OME-Files pixel data and metadata.
  * %%
  * Copyright © 2014 - 2015 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
@@ -74,8 +74,8 @@ namespace ome
   namespace qtwidgets
   {
 
-    GLView2D::GLView2D(ome::compat::shared_ptr<ome::bioformats::FormatReader>  reader,
-                       ome::bioformats::dimension_size_type                    series,
+    GLView2D::GLView2D(ome::compat::shared_ptr<ome::files::FormatReader>  reader,
+                       ome::files::dimension_size_type                    series,
                        QWidget                                                * /* parent */):
       GLWindow(),
       camera(),
@@ -109,13 +109,13 @@ namespace ome
       return QSize(800, 600);
     }
 
-    ome::compat::shared_ptr<ome::bioformats::FormatReader>
+    ome::compat::shared_ptr<ome::files::FormatReader>
     GLView2D::getReader()
     {
       return reader;
     }
 
-    ome::bioformats::dimension_size_type
+    ome::files::dimension_size_type
     GLView2D::getSeries()
     {
       return series;
@@ -157,7 +157,7 @@ namespace ome
       return static_cast<int>(cmax[0] * 255.0*16.0);
     }
 
-    ome::bioformats::dimension_size_type
+    ome::files::dimension_size_type
     GLView2D::getPlane() const
     {
       return plane;
@@ -247,7 +247,7 @@ namespace ome
     }
 
     void
-    GLView2D::setPlane(ome::bioformats::dimension_size_type plane)
+    GLView2D::setPlane(ome::files::dimension_size_type plane)
     {
       if (this->plane != plane)
         {

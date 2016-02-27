@@ -1,6 +1,6 @@
 /*
  * #%L
- * OME-BIOFORMATS C++ library for image IO.
+ * OME-FILES C++ library for image IO.
  * Copyright © 2014 - 2015 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
  *   - National Institutes of Health
@@ -39,7 +39,7 @@
 
 #include <boost/format.hpp>
 
-#include <ome/bioformats/Version.h>
+#include <ome/files/Version.h>
 
 #include <ome/common/log.h>
 #include <ome/common/module.h>
@@ -63,9 +63,9 @@ namespace
   print_version(std::ostream& stream)
   {
     format fmtr("%1% (%2%) %3% (%4%)");
-    fmtr % "bf-test info" % "OME Bio-Formats"
-      % OME_BIOFORMATS_VERSION_MAJOR_S "." OME_BIOFORMATS_VERSION_MINOR_S "." OME_BIOFORMATS_VERSION_PATCH_S OME_BIOFORMATS_VERSION_EXTRA_S
-      % OME_BIOFORMATS_VCS_DATE_S;
+    fmtr % "ome-files info" % "OME Files"
+      % OME_FILES_VERSION_MAJOR_S "." OME_FILES_VERSION_MINOR_S "." OME_FILES_VERSION_PATCH_S OME_FILES_VERSION_EXTRA_S
+      % OME_FILES_VCS_DATE_S;
 
     format fmtc("Copyright © %1%–%2% Open Microscopy Environment");
     fmtc % "2006" % "2014";
@@ -81,7 +81,7 @@ namespace
   print_help(std::ostream& stream,
              const options& opts)
   {
-    stream << "Usage:\n  bf-test info  [OPTION…] [FILE] — display and validate image metadata\n"
+    stream << "Usage:\n  ome-files info  [OPTION…] [FILE] — display and validate image metadata\n"
            << opts.get_visible_options()
            << std::flush;
   }
@@ -93,7 +93,7 @@ namespace
 #ifdef _MSC_VER
     boost::filesystem::path docpath(ome::common::module_runtime_path("doc"));
     docpath = docpath / "manual" / "html" / "developers" / "cpp" / "commands";
-    std::string htmlpage = "bf-test-";
+    std::string htmlpage = "ome-files-";
     htmlpage += name;
     htmlpage += ".html";
     docpath /= htmlpage;
@@ -166,7 +166,7 @@ main(int argc, char *argv[])
           print_help(std::cout, opts);
           break;
         case options::ACTION_HELP:
-          display_manpage("bf-test-info", "1");
+          display_manpage("ome-files-info", "1");
           break;
         case options::ACTION_METADATA:
           print_metadata(std::cout, opts);

@@ -1,6 +1,6 @@
 /*
  * #%L
- * OME-BIOFORMATS C++ library for image IO.
+ * OME-FILES C++ library for image IO.
  * Copyright © 2015 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
  *   - National Institutes of Health
@@ -37,8 +37,8 @@
 
 #include <iostream>
 
-#include <ome/bioformats/VariantPixelBuffer.h>
-#include <ome/bioformats/in/TIFFReader.h>
+#include <ome/files/VariantPixelBuffer.h>
+#include <ome/files/in/TIFFReader.h>
 
 #include <ome/compat/memory.h>
 
@@ -47,11 +47,11 @@
 using boost::filesystem::path;
 using ome::compat::make_shared;
 using ome::compat::shared_ptr;
-using ome::bioformats::dimension_size_type;
-using ome::bioformats::FormatReader;
-using ome::bioformats::MetadataMap;
-using ome::bioformats::in::TIFFReader;
-using ome::bioformats::VariantPixelBuffer;
+using ome::files::dimension_size_type;
+using ome::files::FormatReader;
+using ome::files::MetadataMap;
+using ome::files::in::TIFFReader;
+using ome::files::VariantPixelBuffer;
 
 namespace
 {

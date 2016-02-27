@@ -1,6 +1,6 @@
 /*
  * #%L
- * OME-QTWIDGETS C++ library for display of Bio-Formats pixel data and metadata.
+ * OME-QTWIDGETS C++ library for display of OME-Files pixel data and metadata.
  * Copyright © 2014 - 2015 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
  *   - National Institutes of Health
@@ -38,7 +38,7 @@
 #ifndef OME_QTWIDGETS_TEXELPROPERTIES_H
 #define OME_QTWIDGETS_TEXELPROPERTIES_H
 
-#include <ome/bioformats/PixelProperties.h>
+#include <ome/files/PixelProperties.h>
 
 #include <ome/xml/model/enums/PixelType.h>
 
@@ -87,7 +87,7 @@ namespace ome
     /// Properties of INT8 texels.
     template<>
     struct TexelProperties< ::ome::xml::model::enums::PixelType::INT8> :
-      public ome::bioformats::PixelProperties< ::ome::xml::model::enums::PixelType::INT8>
+      public ome::files::PixelProperties< ::ome::xml::model::enums::PixelType::INT8>
     {
       /// Internal pixel format (single 8-bit channel).
       static const GLenum internal_format = GL_R8;
@@ -97,7 +97,7 @@ namespace ome
       static const ::ome::xml::model::enums::PixelType::enum_value fallback_pixeltype = ome::xml::model::enums::PixelType::INT8;
       /// External pixel type (@c int8_t).
       static const GLint external_type = GL_BYTE;
-      /// Bio-Formats type matches the GL type exactly.
+      /// OME-Files type matches the GL type exactly.
       static const bool conversion_required = false;
       /// Pixel values are automatically normalized by GL.
       static const bool normalization_required = false;
@@ -110,7 +110,7 @@ namespace ome
     /// Properties of INT16 texels.
     template<>
     struct TexelProperties< ::ome::xml::model::enums::PixelType::INT16> :
-      public ome::bioformats::PixelProperties< ::ome::xml::model::enums::PixelType::INT16>
+      public ome::files::PixelProperties< ::ome::xml::model::enums::PixelType::INT16>
     {
       /// Internal pixel format (single 16-bit channel).
       static const GLenum internal_format = GL_R16;
@@ -120,7 +120,7 @@ namespace ome
       static const GLint external_type = GL_SHORT;
       /// External pixel format fallback.
       static const ::ome::xml::model::enums::PixelType::enum_value fallback_pixeltype = ome::xml::model::enums::PixelType::INT8;
-      /// Bio-Formats type matches the GL type exactly.
+      /// OME-Files type matches the GL type exactly.
       static const bool conversion_required = false;
       /// Pixel values are automatically normalized by GL.
       static const bool normalization_required = false;
@@ -133,7 +133,7 @@ namespace ome
     /// Properties of INT32 texels.
     template<>
     struct TexelProperties< ::ome::xml::model::enums::PixelType::INT32> :
-      public ome::bioformats::PixelProperties< ::ome::xml::model::enums::PixelType::INT32>
+      public ome::files::PixelProperties< ::ome::xml::model::enums::PixelType::INT32>
     {
       /// Internal pixel format (single 16-bit channel; note precision loss).
       static const GLenum internal_format = GL_R16;
@@ -143,7 +143,7 @@ namespace ome
       static const GLint external_type = GL_INT;
       /// External pixel format fallback.
       static const ::ome::xml::model::enums::PixelType::enum_value fallback_pixeltype = ome::xml::model::enums::PixelType::INT16;
-      /// Bio-Formats type matches the GL type exactly.
+      /// OME-Files type matches the GL type exactly.
       static const bool conversion_required = false;
       /// Pixel values are automatically normalized by GL.
       static const bool normalization_required = false;
@@ -156,7 +156,7 @@ namespace ome
     /// Properties of UINT8 texels.
     template<>
     struct TexelProperties< ::ome::xml::model::enums::PixelType::UINT8> :
-      public ome::bioformats::PixelProperties< ::ome::xml::model::enums::PixelType::UINT8>
+      public ome::files::PixelProperties< ::ome::xml::model::enums::PixelType::UINT8>
     {
       /// Internal pixel format (single 8-bit channel).
       static const GLenum internal_format = GL_R8;
@@ -166,7 +166,7 @@ namespace ome
       static const GLint external_type = GL_UNSIGNED_BYTE;
       /// External pixel format fallback.
       static const ::ome::xml::model::enums::PixelType::enum_value fallback_pixeltype = ome::xml::model::enums::PixelType::UINT8;
-      /// Bio-Formats type matches the GL type exactly.
+      /// OME-Files type matches the GL type exactly.
       static const bool conversion_required = false;
       /// Pixel values are automatically normalized by GL.
       static const bool normalization_required = false;
@@ -179,7 +179,7 @@ namespace ome
     /// Properties of UINT16 texels.
     template<>
     struct TexelProperties< ::ome::xml::model::enums::PixelType::UINT16> :
-      public ome::bioformats::PixelProperties< ::ome::xml::model::enums::PixelType::UINT16>
+      public ome::files::PixelProperties< ::ome::xml::model::enums::PixelType::UINT16>
     {
       /// Internal pixel format (single 16-bit channel).
       static const GLenum internal_format = GL_R16;
@@ -189,7 +189,7 @@ namespace ome
       static const GLint external_type = GL_UNSIGNED_SHORT;
       /// External pixel format fallback.
       static const ::ome::xml::model::enums::PixelType::enum_value fallback_pixeltype = ome::xml::model::enums::PixelType::UINT8;
-      /// Bio-Formats type matches the GL type exactly.
+      /// OME-Files type matches the GL type exactly.
       static const bool conversion_required = false;
       /// Pixel values are automatically normalized by GL.
       static const bool normalization_required = false;
@@ -202,7 +202,7 @@ namespace ome
     /// Properties of UINT32 texels.
     template<>
     struct TexelProperties< ::ome::xml::model::enums::PixelType::UINT32> :
-      public ome::bioformats::PixelProperties< ::ome::xml::model::enums::PixelType::UINT32>
+      public ome::files::PixelProperties< ::ome::xml::model::enums::PixelType::UINT32>
     {
       /// Internal pixel format (single 16-bit channel; note precision loss).
       static const GLenum internal_format = GL_R16;
@@ -212,7 +212,7 @@ namespace ome
       static const GLint external_type = GL_UNSIGNED_INT;
       /// External pixel format fallback.
       static const ::ome::xml::model::enums::PixelType::enum_value fallback_pixeltype = ome::xml::model::enums::PixelType::UINT16;
-      /// Bio-Formats type matches the GL type exactly.
+      /// OME-Files type matches the GL type exactly.
       static const bool conversion_required = false;
       /// Pixel values are automatically normalized by GL.
       static const bool normalization_required = false;
@@ -225,7 +225,7 @@ namespace ome
     /// Properties of FLOAT texels.
     template<>
     struct TexelProperties< ::ome::xml::model::enums::PixelType::FLOAT> :
-      public ome::bioformats::PixelProperties< ::ome::xml::model::enums::PixelType::FLOAT>
+      public ome::files::PixelProperties< ::ome::xml::model::enums::PixelType::FLOAT>
     {
       /// Internal pixel format (single 32-bit float channel).
       static const GLenum internal_format = GL_R32F;
@@ -235,7 +235,7 @@ namespace ome
       static const GLint external_type = GL_FLOAT;
       /// External pixel format fallback.
       static const ::ome::xml::model::enums::PixelType::enum_value fallback_pixeltype = ome::xml::model::enums::PixelType::INT32;
-      /// Bio-Formats type matches the GL type exactly.
+      /// OME-Files type matches the GL type exactly.
       static const bool conversion_required = false;
       /// Pixel values are automatically normalized by GL.
       static const bool normalization_required = true;
@@ -248,7 +248,7 @@ namespace ome
     /// Properties of DOUBLE texels.
     template<>
     struct TexelProperties< ::ome::xml::model::enums::PixelType::DOUBLE> :
-      public ome::bioformats::PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLE>
+      public ome::files::PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLE>
     {
       /// Internal pixel format (single 32-bit float channel; note precision loss).
       static const GLenum internal_format = GL_R32F;
@@ -258,7 +258,7 @@ namespace ome
       static const GLint external_type = GL_DOUBLE;
       /// External pixel format fallback.
       static const ::ome::xml::model::enums::PixelType::enum_value fallback_pixeltype = ome::xml::model::enums::PixelType::FLOAT;
-      /// Bio-Formats type matches the GL type exactly.
+      /// OME-Files type matches the GL type exactly.
       static const bool conversion_required = false;
       /// Pixel values are automatically normalized by GL.
       static const bool normalization_required = true;
@@ -271,7 +271,7 @@ namespace ome
     /// Properties of BIT texels.
     template<>
     struct TexelProperties< ::ome::xml::model::enums::PixelType::BIT> :
-      public ome::bioformats::PixelProperties< ::ome::xml::model::enums::PixelType::BIT>
+      public ome::files::PixelProperties< ::ome::xml::model::enums::PixelType::BIT>
     {
       /// Internal pixel format (single 8-bit float channel).
       static const GLenum internal_format = GL_R8;
@@ -281,7 +281,7 @@ namespace ome
       static const GLint external_type = GL_UNSIGNED_BYTE;
       /// External pixel format fallback.
       static const ::ome::xml::model::enums::PixelType::enum_value fallback_pixeltype = ome::xml::model::enums::PixelType::BIT;
-      /// Bio-Formats type does not match the GL type; convert to 0 or 255 for 0 and 1, respectively.
+      /// OME-Files type does not match the GL type; convert to 0 or 255 for 0 and 1, respectively.
       static const bool conversion_required = true;
       /// Pixel values are automatically normalized by GL.
       static const bool normalization_required = false;
@@ -294,7 +294,7 @@ namespace ome
     /// Properties of COMPLEX texels.
     template<>
     struct TexelProperties< ::ome::xml::model::enums::PixelType::COMPLEX> :
-      public ome::bioformats::PixelProperties< ::ome::xml::model::enums::PixelType::COMPLEX>
+      public ome::files::PixelProperties< ::ome::xml::model::enums::PixelType::COMPLEX>
     {
       /// Internal pixel format (double 32-bit float channels).
       static const GLenum internal_format = GL_RG32F;
@@ -304,7 +304,7 @@ namespace ome
       static const GLint external_type = GL_FLOAT;
       /// External pixel format fallback.
       static const ::ome::xml::model::enums::PixelType::enum_value fallback_pixeltype = ome::xml::model::enums::PixelType::COMPLEX;
-      /// Bio-Formats type matches the GL type exactly.
+      /// OME-Files type matches the GL type exactly.
       static const bool conversion_required = false;
       /// Pixel values are automatically normalized by GL.
       static const bool normalization_required = true;
@@ -317,7 +317,7 @@ namespace ome
     /// Properties of DOUBLECOMPLEX texels.
     template<>
     struct TexelProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX> :
-      public ome::bioformats::PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX>
+      public ome::files::PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX>
     {
       /// Internal pixel format (double 32-bit float channels; note precision loss).
       static const GLenum internal_format = GL_RG32F;
@@ -327,7 +327,7 @@ namespace ome
       static const GLint external_type = GL_DOUBLE;
       /// External pixel format fallback.
       static const ::ome::xml::model::enums::PixelType::enum_value fallback_pixeltype = ome::xml::model::enums::PixelType::COMPLEX;
-      /// Bio-Formats type matches the GL type exactly.
+      /// OME-Files type matches the GL type exactly.
       static const bool conversion_required = false;
       /// Pixel values are automatically normalized by GL.
       static const bool normalization_required = true;

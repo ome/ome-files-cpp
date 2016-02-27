@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Bio-Formats documentation build configuration file, created by
+# OME-Files documentation build configuration file, created by
 # sphinx-quickstart on Wed Aug 29 15:42:49 2012.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -40,7 +40,7 @@ from datetime import datetime
 extensions = ['sphinx.ext.extlinks', 'edit_on_github']
 
 ## Configuration for the edit_on_github extension
-edit_on_github_project = 'openmicroscopy/bioformats'
+edit_on_github_project = 'ome/files'
 edit_on_github_branch = 'develop'
 edit_on_github_prefix = 'docs/sphinx'
 
@@ -57,7 +57,7 @@ source_suffix = '.txt'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Bio-Formats'
+project = u'OME-Files'
 title = u'%s Documentation' % project
 author = u'The Open Microscopy Environment'
 now = datetime.now()
@@ -110,18 +110,18 @@ source_branch = 'develop'
 if (ext_source_branch is not None and len(ext_source_branch) > 0 and
     ext_source_branch != "@%s@" % ('sphinx_source_branch')):
     source_branch = ext_source_branch
-source_user = 'openmicroscopy'
+source_user = 'ome'
 if (ext_source_user is not None and len(ext_source_user) > 0 and
     ext_source_user != "@%s@" % ('sphinx_source_user}')):
     source_user = ext_source_user
 
 github_root = 'https://github.com/'
-bf_github_root = github_root + source_user + '/bioformats/'
-bf_github_tree = bf_github_root + 'tree/' + source_branch + '/'
-bf_github_blob = bf_github_root + 'blob/' + source_branch + '/'
-gpl_formats = bf_github_blob + 'components/formats-gpl/src/loci/formats/'
-bsd_formats = bf_github_blob + 'components/formats-bsd/src/loci/formats/'
-bf_cpp = bf_github_blob + 'cpp/'
+ome_files_github_root = github_root + source_user + '/files/'
+ome_files_github_tree = ome_files_github_root + 'tree/' + source_branch + '/'
+ome_files_github_blob = ome_files_github_root + 'blob/' + source_branch + '/'
+gpl_formats = ome_files_github_blob + 'components/formats-gpl/src/loci/formats/'
+bsd_formats = ome_files_github_blob + 'components/formats-bsd/src/loci/formats/'
+ome_files_cpp = ome_files_github_blob + 'cpp/'
 
 # Variables used to define Jenkins extlinks
 jenkins_root = 'http://ci.openmicroscopy.org'
@@ -146,13 +146,9 @@ extlinks = {
     'milestone' : (trac_root + '/milestone/%s', ''),
     'report' : (trac_root + '/report/%s', ''),
     # Github links
-    'source' : (bf_github_blob + '%s', ''),
-    'sourcedir' : (bf_github_tree + '%s', ''),
-    'bfreader' : (gpl_formats + 'in/%s', ''),
-    'bsd-reader' : (bsd_formats + 'in/%s', ''),
-    'bfwriter' : (gpl_formats + 'out/' + '%s', ''),
-    'bsd-writer' : (bsd_formats + 'out/' + '%s', ''),
-    'bf-cpp-lib': (bf_cpp + 'lib/' + '%s', ''),
+    'source' : (ome_files_github_blob + '%s', ''),
+    'sourcedir' : (ome_files_github_tree + '%s', ''),
+    'ome-files-cpp': (ome_files_cpp + '%s', ''),
     # Jenkins links
     'jenkins' : (jenkins_root + '/%s', ''),
     'jenkinsjob' : (jenkins_job_root + '/%s', ''),
@@ -171,10 +167,8 @@ extlinks = {
     'omerodoc' : (omerodoc_uri + '/%s', ''),
     'devs_doc' : (oo_site_root + '/support/contributing/%s', ''),
     # Downloads
-    'downloads' : (downloads_root + '/latest/bio-formats5.1/%s', ''),
-    'downloads_cpp' : (downloads_root + '/latest/bio-formats-cpp5.1/%s', ''),
-    'javadoc' : (downloads_root + '/latest/bio-formats5.1/api/%s', ''),
-    'doxygen' : (downloads_root + '/latest/bio-formats-cpp5.1/api/%s', ''),
+    'downloads_cpp' : (downloads_root + '/latest/ome-files-cpp5.2/%s', ''),
+    'doxygen' : (downloads_root + '/latest/ome-files-cpp5.2/api/%s', ''),
     # Miscellaneous links
     'doi' : ('http://dx.doi.org/%s', ''),
     'schema' : (oo_root + '/Schemas/Documentation/Generated/%s', '')
@@ -261,7 +255,7 @@ html_sidebars = { '**' : ['globalbftoc.html', 'pagetoc.html',
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Bio-Formatsdoc'
+htmlhelp_basename = 'OME-Filesdoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -315,12 +309,12 @@ latex_show_urls = 'footnote'
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('overview', 'bf-cpp-overview', 'C++ implementation overview', author, 7),
-    ('conversion', 'bf-cpp-conversion', 'C++ conventions for Java programmers switching to the C++ implementation', author, 7),
-    ('bf-env', 'bf-env', 'Bio-Formats environment variables', author, 7),
-    ('commands/bf-test', 'bf-test', 'run Bio-Formats (C++) test tools', author, 1),
-    ('commands/bf-test-info', 'bf-test-info', 'display and validate image metadata', author, 1),
-    ('commands/bf-test-view', 'bf-test-view', 'view image pixel data', author, 1)
+    ('overview', 'ome-files-cpp-overview', 'C++ implementation overview', author, 7),
+    ('conversion', 'ome-files-cpp-conversion', 'C++ conventions for Java programmers switching to the C++ implementation', author, 7),
+    ('ome-files-env', 'ome-files-env', 'OME-Files environment variables', author, 7),
+    ('commands/ome-files', 'ome-files-test', 'run OME-Files (C++) test tools', author, 1),
+    ('commands/ome-files-info', 'ome-files-test-info', 'display and validate image metadata', author, 1),
+    ('commands/ome-files-view', 'ome-files-test-view', 'view image pixel data', author, 1)
 ]
 
 # If true, show URL addresses after external links.

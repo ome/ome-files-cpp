@@ -1,5 +1,5 @@
 # #%L
-# Bio-Formats C++ libraries (cmake build infrastructure)
+# OME Files C++ libraries (cmake build infrastructure)
 # %%
 # Copyright © 2006 - 2015 Open Microscopy Environment:
 #   - Massachusetts Institute of Technology
@@ -52,6 +52,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/cmake/BioFormatsCommon.cmake")
 project(ome-files)
 
 include(cmake/Version.cmake)
+ome_project_version("OME Files C++" "${CMAKE_CURRENT_SOURCE_DIR}")
 
 if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
   message(FATAL_ERROR "In-tree builds are not supported; please run cmake from a separate build directory.")
@@ -91,49 +92,38 @@ if(MSVC)
 endif()
 
 
-if(NOT DEFINED OME_BIOFORMATS_INSTALL_PKGDATADIR)
-  set(OME_BIOFORMATS_INSTALL_PKGDATADIR "${CMAKE_INSTALL_DATADIR}/ome/bioformats"
-      CACHE PATH "Bio-Formats-specific datadir")
+if(NOT DEFINED OME_FILES_INSTALL_PKGDATADIR)
+  set(OME_FILES_INSTALL_PKGDATADIR "${CMAKE_INSTALL_DATADIR}/ome/files"
+      CACHE PATH "OME Files-specific datadir")
 endif()
 
 # Use standard path if using a prefix.
 if(CMAKE_INSTALL_PREFIX)
-  if (NOT DEFINED OME_BIOFORMATS_INSTALL_PKGLIBEXECDIR)
-    set(OME_BIOFORMATS_INSTALL_PKGLIBEXECDIR "${CMAKE_INSTALL_LIBEXECDIR}/ome/bioformats"
-        CACHE PATH "Bio-Formats-specific libexecdir")
+  if (NOT DEFINED OME_FILES_INSTALL_PKGLIBEXECDIR)
+    set(OME_FILES_INSTALL_PKGLIBEXECDIR "${CMAKE_INSTALL_LIBEXECDIR}/ome/files"
+        CACHE PATH "OME Files-specific libexecdir")
   endif()
-  if (NOT DEFINED OME_BIOFORMATS_INSTALL_ICONDIR)
-    set(OME_BIOFORMATS_INSTALL_ICONDIR "${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable"
+  if (NOT DEFINED OME_FILES_INSTALL_ICONDIR)
+    set(OME_FILES_INSTALL_ICONDIR "${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable"
         CACHE PATH "Icon directory")
   endif()
 else()
-  if (NOT DEFINED OME_BIOFORMATS_INSTALL_PKGLIBEXECDIR)
-    set(OME_BIOFORMATS_INSTALL_PKGLIBEXECDIR "${CMAKE_INSTALL_LIBEXECDIR}"
-        CACHE PATH "Bio-Formats-specific libexecdir")
+  if (NOT DEFINED OME_FILES_INSTALL_PKGLIBEXECDIR)
+    set(OME_FILES_INSTALL_PKGLIBEXECDIR "${CMAKE_INSTALL_LIBEXECDIR}"
+        CACHE PATH "OME Files-specific libexecdir")
   endif()
-  if (NOT DEFINED OME_BIOFORMATS_INSTALL_ICONDIR)
-    set(OME_BIOFORMATS_INSTALL_ICONDIR "${CMAKE_INSTALL_DATADIR}/icons"
+  if (NOT DEFINED OME_FILES_INSTALL_ICONDIR)
+    set(OME_FILES_INSTALL_ICONDIR "${CMAKE_INSTALL_DATADIR}/icons"
         CACHE PATH "Icon directory")
   endif()
-endif()
-
-if (NOT DEFINED OME_BIOFORMATS_INSTALL_SCHEMADIR)
-  set(OME_BIOFORMATS_INSTALL_SCHEMADIR "${CMAKE_INSTALL_DATADIR}/xml/ome"
-      CACHE PATH "Bio-Formats schema directory")
-endif()
-if (NOT DEFINED OME_BIOFORMATS_INSTALL_TRANSFORMDIR)
-  set(OME_BIOFORMATS_INSTALL_TRANSFORMDIR "${CMAKE_INSTALL_DATADIR}/xsl/ome"
-      CACHE PATH "Bio-Formats transform directory")
 endif()
 
 foreach(dir
     PKGDATADIR
     PKGLIBEXECDIR
     ICONDIR
-    SCHEMADIR
-    TRANSFORMDIR
-    )
-  mark_as_advanced(OME_BIOFORMATS_INSTALL_${dir})
+  )
+  mark_as_advanced(OME_FILES_INSTALL_${dir})
 endforeach()
 
 add_subdirectory(docs/doxygen)
@@ -145,7 +135,7 @@ set(OME_TOPLEVEL_INCLUDES
 
 # Add test, making sure it's run with a suitable environment.
 # If updated, make sure to update the wrappers in cmake/.
-function(bf_add_test)
+function(ome_files_add_test)
   add_test(${ARGV})
 endfunction()
 
@@ -160,26 +150,23 @@ file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 configure_file(${PROJECT_SOURCE_DIR}/cmake/TemplateShellConfig.cmake.in
                ${PROJECT_BINARY_DIR}/config @ONLY)
 configure_file(${PROJECT_SOURCE_DIR}/cmake/TemplateInternalShellWrapper.cmake.in
-               ${PROJECT_BINARY_DIR}/cmake/bf-test @ONLY)
+               ${PROJECT_BINARY_DIR}/cmake/ome-files @ONLY)
 configure_file(${PROJECT_SOURCE_DIR}/cmake/TemplateShellWrapper.cmake.in
-               ${PROJECT_BINARY_DIR}/bin/bf-test @ONLY)
-file(COPY ${PROJECT_BINARY_DIR}/cmake/bf-test
+               ${PROJECT_BINARY_DIR}/bin/ome-files @ONLY)
+file(COPY ${PROJECT_BINARY_DIR}/cmake/ome-files
      DESTINATION ${PROJECT_BINARY_DIR}
      FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
      GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
-install(PROGRAMS ${PROJECT_BINARY_DIR}/bin/bf-test
+install(PROGRAMS ${PROJECT_BINARY_DIR}/bin/ome-files
         DESTINATION ${CMAKE_INSTALL_BINDIR})
 if(WIN32)
   configure_file(${PROJECT_SOURCE_DIR}/cmake/TemplateCmdConfig.cmake.in
                  ${PROJECT_BINARY_DIR}/config.bat @ONLY)
   configure_file(${PROJECT_SOURCE_DIR}/cmake/TemplateInternalCmdWrapper.cmake.in
-                 ${PROJECT_BINARY_DIR}/bf-test.bat @ONLY)
+                 ${PROJECT_BINARY_DIR}/ome-files.bat @ONLY)
   configure_file(${PROJECT_SOURCE_DIR}/cmake/TemplateCmdWrapper.cmake.in
-                 ${PROJECT_BINARY_DIR}/bin/bf-test.bat @ONLY)
-  install(PROGRAMS ${PROJECT_BINARY_DIR}/bin/bf-test.bat
+                 ${PROJECT_BINARY_DIR}/bin/ome-files.bat @ONLY)
+  install(PROGRAMS ${PROJECT_BINARY_DIR}/bin/ome-files.bat
           DESTINATION ${CMAKE_INSTALL_BINDIR})
   endif()
 return()
-
-message("NOTE: The Bio-Formats ${OME_VERSION_SHORT} C++ library is new in version 5.1")
-message("NOTE: API stability will not be guaranteed until version 5.2")

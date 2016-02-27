@@ -1,6 +1,6 @@
-#############################
-Bio-Formats C++ Documentation
-#############################
+###########################
+OME-Files C++ Documentation
+###########################
 
 .. toctree::
     :maxdepth: 1
@@ -9,9 +9,9 @@ Bio-Formats C++ Documentation
     overview
     conversion
     tutorial
-    bf-env
+    ome-files-env
     schema
-    commands/bf-test
-    commands/bf-test-info
-    commands/bf-test-view
+    commands/ome-files
+    commands/ome-files-info
+    commands/ome-files-view
     maintenance

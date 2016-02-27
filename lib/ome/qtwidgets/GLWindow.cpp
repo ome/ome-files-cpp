@@ -1,6 +1,6 @@
 /*
  * #%L
- * OME-QTWIDGETS C++ library for display of Bio-Formats pixel data and metadata.
+ * OME-QTWIDGETS C++ library for display of OME-Files pixel data and metadata.
  * %%
  * Copyright © 2014 - 2015 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
@@ -158,7 +158,7 @@ namespace ome
       bool needsInitialize = false;
       bool enableDebug = false;
 
-      if (std::getenv("BIOFORMATS_OPENGL_DEBUG"))
+      if (std::getenv("OME_FILES_OPENGL_DEBUG"))
         enableDebug = true;
 
       if (!glcontext) {

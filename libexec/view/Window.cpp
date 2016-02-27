@@ -1,6 +1,6 @@
 /*
  * #%L
- * GLVIEW program for display of Bio-Formats pixel data and metadata.
+ * GLVIEW program for display of OME-Files pixel data and metadata.
  * %%
  * Copyright © 2014 - 2015 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
@@ -38,8 +38,8 @@
 
 #include <view/Window.h>
 
-#include <ome/bioformats/FormatReader.h>
-#include <ome/bioformats/in/OMETIFFReader.h>
+#include <ome/files/FormatReader.h>
+#include <ome/files/in/OMETIFFReader.h>
 
 #include <ome/common/module.h>
 
@@ -50,7 +50,7 @@
 #include <QtWidgets>
 
 using namespace ome::qtwidgets;
-using ome::bioformats::dimension_size_type;
+using ome::files::dimension_size_type;
 
 namespace view
 {
@@ -76,12 +76,12 @@ namespace view
     connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
 
 
-    setWindowTitle(tr("Bio-Formats GLView"));
+    setWindowTitle(tr("OME-Files GLView"));
   }
 
   void Window::createActions()
   {
-    boost::filesystem::path iconpath(ome::common::module_runtime_path("bf-icon"));
+    boost::filesystem::path iconpath(ome::common::module_runtime_path("ome-files-icon"));
 
     openAction = new QAction(tr("&Open image..."), this);
     openAction->setShortcuts(QKeySequence::Open);
@@ -235,7 +235,7 @@ namespace view
     QFileInfo info(file);
     if (info.exists())
       {
-        ome::compat::shared_ptr<ome::bioformats::FormatReader> reader(ome::compat::make_shared<ome::bioformats::in::OMETIFFReader>());
+        ome::compat::shared_ptr<ome::files::FormatReader> reader(ome::compat::make_shared<ome::files::in::OMETIFFReader>());
         reader->setId(file.toStdString());
         GLView2D *newGlView = new GLView2D(reader, 0, this);
         QWidget *glContainer = new GLContainer(this, newGlView);
@@ -274,8 +274,8 @@ namespace view
         maxSliderUpdate = connect(newGlView, SIGNAL(channelMaxChanged(int)), maxSlider, SLOT(setValue(int)));
 
         navigation->setReader(newGlView->getReader(), newGlView->getSeries(), newGlView->getPlane());
-        navigationChanged = connect(navigation, SIGNAL(planeChanged(ome::bioformats::dimension_size_type)), newGlView, SLOT(setPlane(ome::bioformats::dimension_size_type)));
-        navigationUpdate = connect(newGlView, SIGNAL(planeChanged(ome::bioformats::dimension_size_type)), navigation, SLOT(setPlane(ome::bioformats::dimension_size_type)));
+        navigationChanged = connect(navigation, SIGNAL(planeChanged(ome::files::dimension_size_type)), newGlView, SLOT(setPlane(ome::files::dimension_size_type)));
+        navigationUpdate = connect(newGlView, SIGNAL(planeChanged(ome::files::dimension_size_type)), navigation, SLOT(setPlane(ome::files::dimension_size_type)));
 
         minSlider->setValue(newGlView->getChannelMin());
         maxSlider->setValue(newGlView->getChannelMax());
@@ -283,7 +283,7 @@ namespace view
       }
     else
       {
-        navigation->setReader(ome::compat::shared_ptr<ome::bioformats::FormatReader>(), 0, 0);
+        navigation->setReader(ome::compat::shared_ptr<ome::files::FormatReader>(), 0, 0);
       }
 
     bool enable(newGlView != 0);

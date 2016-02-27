@@ -1,22 +1,20 @@
-C++ overview
-============
+OME-Files C++ overview
+======================
 
-A completely native Bio-Formats C++ interface is now available.
+OME-Files is a native C++ implementation of the Java Bio-Formats
+interfaces, providing a reference implementation of the OME-TIFF file
+format and the OME-XML metadata model for C++ developers.
+
 Unlike the JACE bindings, this does not wrap the Java implementation.
 Readers and writers are provided for TIFF and OME-TIFF.  All other
-readers and writers from the Java implementation are currently
-unavailable; the intention is that support for these will be added
-over time.
+readers and writers from the Bio-Formats Java implementation are
+currently unavailable.
 
 .. note::
-
-  The C++ implementation is functional in Bio-Formats version 5.1.
-  However, API stability will not be guaranteed until version 5.2
-  since it may be necessary to refactor certain parts of the API for
-  optimal usability, robustness and performance.  Applications built
-  against version 5.1 of the API may require updating to work with
-  version 5.2, if they make use of any part of the API which is
-  changed incompatibly.
+  Due to the renaming of Bio-Formats to OME-Files, this will result in
+  an API break between version 5.1 and 5.2 as a result of the renamed
+  namespaces.  Further breaking changes are planned as the basic
+  interfaces are cleaned up to make them more flexible and efficient.
 
 
 Prebuilt packages
@@ -37,7 +35,7 @@ Run::
 .. option:: --with-qt5
 
     Build the Qt5 OpenGL viewer widget library :file:`ome-qtwidgets`
-    and :file:`bf-test view` image viewer (not built by default).
+    and :file:`ome-files view` image viewer (not built by default).
 
 
 Prerequisites
@@ -47,18 +45,18 @@ In order to build the C++ library and its documentation, a number of
 packages are required to be installed.  Note that the minimum version
 is the minimum version we regularly test with; older versions may work
 but are not supported.  Some packages are required only for building
-Bio-Formats (*BF [super]build*).  A subset of these are required for
-building client applications making use of Bio-Formats (*Client
+OME-Files (*OF [super]build*).  A subset of these are required for
+building client applications making use of OME-Files (*Client
 build*).  For end-user deployment (*Deploy*), the library packages
 rather than the development packages should be preferred; in some
 cases such as for Boost and Qt5, these are split up into a separate
 package for each library.
 
-Bio-Formats may be built in two ways.  The first is “standalone” (*BF
+OME-Files may be built in two ways.  The first is “standalone” (*OF
 build*) and requires the prerequisites to be installed in advance, for
 example using your operating system's package manager.  The second is
-using a “super-build” (*BF superbuild*) which builds the prerequisites
-in addition to Bio-Formats, and is useful on systems where the
+using a “super-build” (*OF superbuild*) which builds the prerequisites
+in addition to OME-Files, and is useful on systems where the
 prerequisites are unavailable, for example on Windows which lacks a
 package manager or on older systems such as CentOS 6 where the
 versions available through a package manager are too old.  Note that
@@ -76,7 +74,7 @@ will also be provided by the super-build.
 +---------------+--------------+--------------+--------------------------------------------------+
 |               |           Version           |                   When required                  |
 +---------------+--------------+--------------+----------+---------------+--------------+--------+
-| Package       | Recommended  | Minimum      | BF build | BF superbuild | Client build | Deploy |
+| Package       | Recommended  | Minimum      | OF build | OF superbuild | Client build | Deploy |
 +===============+==============+==============+==========+===============+==============+========+
 | Boost         | 1.54         | 1.48         |    \•    |               | \•           | \•     |
 +---------------+--------------+--------------+----------+---------------+--------------+--------+
@@ -112,10 +110,10 @@ will also be provided by the super-build.
 +---------------+--------------+--------------+----------+---------------+--------------+--------+
 
 \•
-  Required for Bio-Formats build; headers may be needed for client
+  Required for OME-Files build; headers may be needed for client
   build; libraries and any data files required for deployment
 ◦
-  Optional for Bio-Formats build; if used for the Bio-Formats build,
+  Optional for OME-Files build; if used for the OME-Files build,
   headers may be required for client build and libraries and any data
   files required for deployment
 
@@ -131,7 +129,7 @@ will also be provided by the super-build.
 Quick start
 ^^^^^^^^^^^
 
-Install the following packages to build Bio-Formats C++.  A subset of
+Install the following packages to build OME-Files C++.  A subset of
 these packages (or their dependencies) may be used for deployment,
 where the development package headers and tools for building
 documentation etc. are not required.  Run the appropriate command below
@@ -587,11 +585,11 @@ TeX Gyre fonts available:
 Sources
 -------
 
-Download the Bio-Formats source code or the CMake superbuild source
+Download the OME-Files source code or the CMake superbuild source
 code, depending upon which type of build is required, as described
 above.  The :downloads_cpp:`downloads page <>` provides links to the
 source releases for both, as well as links to their git repositories.
-If you wish to build a specific release of Bio-Formats, the source
+If you wish to build a specific release of OME-Files, the source
 release is appropriate, but if you wish to build the latest
 development work, or make changes to the sources, the git repository
 will be more useful.
@@ -633,73 +631,11 @@ If ``qt5`` and ``glm`` are installed, for building the Qt image
 viewer, ensure that :file:`/usr/local/opt/qt5/bin` is on the
 :envvar:`PATH` to allow Qt to be autodetected by :program:`cmake`.
 
-Source tree layout
-------------------
-
-Source tree layout::
-
-  cpp
-  ├── cmake
-  ├── ext
-  ├── lib
-  │   └── ome
-  │       ├── bioformats
-  │       │   ├── detail
-  │       │   ├── in
-  │       │   ├── out
-  │       │   └── tiff
-  │       ├── common
-  │       │   ├── endian
-  │       │   └── xml
-  │       │       └── dom
-  │       ├── compat
-  │       ├── internal
-  │       ├── qtwidgets
-  │       ├── test
-  │       └── xml
-  ├── libexec
-  │   ├── info
-  │   └── view
-  ├── share
-  └── test
-
-Top-level directories inside :file:`cpp`:
-
-:file:`cmake`
-  CMake build infrastructure
-:file:`ext`
-  External third-party code
-:file:`lib`
-  Bio-Formats library headers and sources
-:file:`libexec`
-  Bio-Formats internal binaries (not direct public API)
-:file:`share`
-  Bio-Formats architecture-independent data files
-:file:`test`
-  Bio-Formats unit tests
-
-Components in :file:`lib` and :file:`test`:
-
-:file:`bioformats`
-  Bio-Formats reader and writer interfaces and implementations
-:file:`common`
-  Common functionality used by all other components
-:file:`compat`
-  Compatibility workarounds
-:file:`internal`
-  Private implementation details
-:file:`qtwidgets`
-  Qt5 widgets for image rendering with OpenGL
-:file:`test`
-  Unit test common functions
-:file:`xml`
-  OME XML model and metadata
-
 
 Configuring
 -----------
 
-Bio-Formats uses :program:`cmake`, a generic cross-platform build
+OME-Files uses :program:`cmake`, a generic cross-platform build
 system which generates build files for a large number of common build
 systems and IDEs.  For example, on BSD, Linux and MacOS X, Unix
 :program:`make` :file:`Makefile` files may be created.  On Windows,
@@ -709,7 +645,7 @@ Text or several other IDEs or alternative build systems may be used
 instead, if desired.
 
 Start by creating a temporary build directory.  This directory may be
-in any location inside or outside the Bio-Formats source tree.
+in any location inside or outside the OME-Files source tree.
 However, the source directory cannot be used as the build directory.
 (This fills the source tree full of autogenerated files.)
 
@@ -786,16 +722,16 @@ for further details of all configurable options, and run ``cmake
 --help`` to list the available generators for your platform.
 
 If using the superbuild, most of the options above will be available,
-and will be passed to the bioformats build.  In addition, the
+and will be passed to the OME-Files build.  In addition, the
 following options are provided:
 
 build-packages=packages
   Build the specified list of packages (semicolon-separated).
-  Defaults to ``bioformats``.  This can include any OME or third-party
+  Defaults to ``ome-files``.  This can include any OME or third-party
   packages provided by the superbuild.
 build-prerequisites=(ON|OFF)
   Build third-party prerequisites in addition to OME prerequisites
-  such as ome-common and bioformats.  Enabled by default.  Disable to
+  such as ome-common and ome-files.  Enabled by default.  Disable to
   build against system libraries, with system python modules and
   system tools.
 source-cache=directory
@@ -1068,9 +1004,9 @@ A typical installation layout::
   ├── bin
   ├── include
   │   └── ome
-  │       ├── bioformats
   │       ├── common
   │       ├── compat
+  │       ├── files
   │       └── xml
   ├── lib
   ├── libexec
@@ -1083,4 +1019,4 @@ Using the library
 -----------------
 
 The :doxygen:`Doxygen API reference <annotated.html>` is used to
-document all aspects of the Bio-Formats API.
+document all aspects of the OME-Files API.

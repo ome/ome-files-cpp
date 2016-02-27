@@ -1,6 +1,6 @@
 /*
  * #%L
- * OME-QTWIDGETS C++ library for display of Bio-Formats pixel data and metadata.
+ * OME-QTWIDGETS C++ library for display of OME-Files pixel data and metadata.
  * %%
  * Copyright © 2014 - 2015 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
@@ -36,18 +36,18 @@
  * #L%
  */
 
-#include <ome/bioformats/PixelBuffer.h>
-#include <ome/bioformats/VariantPixelBuffer.h>
+#include <ome/files/PixelBuffer.h>
+#include <ome/files/VariantPixelBuffer.h>
 
 #include <ome/qtwidgets/gl/Image2D.h>
 #include <ome/qtwidgets/gl/Util.h>
 
 #include <iostream>
 
-using ome::bioformats::PixelBuffer;
-using ome::bioformats::PixelBufferBase;
-using ome::bioformats::PixelProperties;
-using ome::bioformats::VariantPixelBuffer;
+using ome::files::PixelBuffer;
+using ome::files::PixelBufferBase;
+using ome::files::PixelProperties;
+using ome::files::VariantPixelBuffer;
 using ome::qtwidgets::gl::check_gl;
 typedef ome::xml::model::enums::PixelType PT;
 
@@ -63,11 +63,11 @@ namespace
     bool make_normal;
     GLint min_filter;
     GLint mag_filter;
-    ome::bioformats::dimension_size_type w;
-    ome::bioformats::dimension_size_type h;
+    ome::files::dimension_size_type w;
+    ome::files::dimension_size_type h;
 
-    TextureProperties(const ome::bioformats::FormatReader& reader,
-                      ome::bioformats::dimension_size_type series):
+    TextureProperties(const ome::files::FormatReader& reader,
+                      ome::files::dimension_size_type series):
       internal_format(GL_R8),
       external_format(GL_RED),
       external_type(GL_UNSIGNED_BYTE),
@@ -77,7 +77,7 @@ namespace
       w(0),
       h(0)
     {
-      ome::bioformats::dimension_size_type oldseries = reader.getSeries();
+      ome::files::dimension_size_type oldseries = reader.getSeries();
       reader.setSeries(series);
       ome::xml::model::enums::PixelType pixeltype = reader.getPixelType();
       reader.setSeries(oldseries);
@@ -182,7 +182,7 @@ namespace
       PixelBufferBase::storage_order_type ret(order);
       // This makes the assumption that the order is SXY or XYS, and
       // switches XYS to SXY if needed.
-      if (order.ordering(0) != ome::bioformats::DIM_SUBCHANNEL)
+      if (order.ordering(0) != ome::files::DIM_SUBCHANNEL)
         {
           PixelBufferBase::size_type ordering[PixelBufferBase::dimensions];
           bool ascending[PixelBufferBase::dimensions] = {true, true, true, true, true, true, true, true, true};
@@ -273,8 +273,8 @@ namespace ome
     namespace gl
     {
 
-      Image2D::Image2D(ome::compat::shared_ptr<ome::bioformats::FormatReader>  reader,
-                       ome::bioformats::dimension_size_type                    series,
+      Image2D::Image2D(ome::compat::shared_ptr<ome::files::FormatReader>  reader,
+                       ome::files::dimension_size_type                    series,
                        QObject                                                *parent):
         QObject(parent),
         image_vertices(QOpenGLBuffer::VertexBuffer),
@@ -300,14 +300,14 @@ namespace ome
       {
         TextureProperties tprop(*reader, series);
 
-        ome::bioformats::dimension_size_type oldseries = reader->getSeries();
+        ome::files::dimension_size_type oldseries = reader->getSeries();
         reader->setSeries(series);
-        ome::bioformats::dimension_size_type sizeX = reader->getSizeX();
-        ome::bioformats::dimension_size_type sizeY = reader->getSizeY();
+        ome::files::dimension_size_type sizeX = reader->getSizeX();
+        ome::files::dimension_size_type sizeY = reader->getSizeY();
         setSize(glm::vec2(-(sizeX/2.0f), sizeX/2.0f),
                 glm::vec2(-(sizeY/2.0f), sizeY/2.0f));
-        ome::bioformats::dimension_size_type rbpp = reader->getBitsPerPixel();
-        ome::bioformats::dimension_size_type bpp = ome::bioformats::bitsPerPixel(reader->getPixelType());
+        ome::files::dimension_size_type rbpp = reader->getBitsPerPixel();
+        ome::files::dimension_size_type bpp = ome::files::bitsPerPixel(reader->getPixelType());
         texcorr[0] = texcorr[1] = texcorr[2] = (1 << (bpp - rbpp));
         reader->setSeries(oldseries);
 
@@ -418,14 +418,14 @@ namespace ome
       }
 
       void
-      Image2D::setPlane(ome::bioformats::dimension_size_type plane)
+      Image2D::setPlane(ome::files::dimension_size_type plane)
       {
         if (this->plane != plane)
           {
             TextureProperties tprop(*reader, series);
 
-            ome::bioformats::VariantPixelBuffer buf;
-            ome::bioformats::dimension_size_type oldseries = reader->getSeries();
+            ome::files::VariantPixelBuffer buf;
+            ome::files::dimension_size_type oldseries = reader->getSeries();
             reader->setSeries(series);
             reader->openBytes(plane, buf);
             reader->setSeries(oldseries);

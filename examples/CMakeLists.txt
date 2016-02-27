@@ -1,5 +1,5 @@
 # #%L
-# Bio-Formats C++ libraries (cmake build infrastructure)
+# OME Files C++ libraries (cmake build infrastructure)
 # %%
 # Copyright © 2015 Open Microscopy Environment:
 #   - Massachusetts Institute of Technology
@@ -43,25 +43,25 @@ add_executable(model-io "${exampledir}/model-io.cpp")
 target_link_libraries(model-io OME::XML ${CMAKE_THREAD_LIBS_INIT})
 
 add_executable(metadata-io "${exampledir}/metadata-io.cpp")
-target_link_libraries(metadata-io OME::XML OME::BioFormats ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(metadata-io OME::XML OME::Files ${CMAKE_THREAD_LIBS_INIT})
 
 add_executable(metadata-formatreader "${exampledir}/metadata-formatreader.cpp")
-target_link_libraries(metadata-formatreader OME::XML OME::BioFormats ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(metadata-formatreader OME::XML OME::Files ${CMAKE_THREAD_LIBS_INIT})
 
 add_executable(metadata-formatwriter "${exampledir}/metadata-formatwriter.cpp")
-target_link_libraries(metadata-formatwriter OME::XML OME::BioFormats ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(metadata-formatwriter OME::XML OME::Files ${CMAKE_THREAD_LIBS_INIT})
 
 add_executable(metadata-formatwriter2 "${exampledir}/metadata-formatwriter2.cpp")
-target_link_libraries(metadata-formatwriter2 OME::XML OME::BioFormats ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(metadata-formatwriter2 OME::XML OME::Files ${CMAKE_THREAD_LIBS_INIT})
 
 add_executable(pixeldata "${exampledir}/pixeldata.cpp")
-target_link_libraries(pixeldata OME::BioFormats ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(pixeldata OME::Files ${CMAKE_THREAD_LIBS_INIT})
 
 if(BUILD_TESTS)
-  bf_add_test(examples/model-io model-io "${PROJECT_SOURCE_DIR}/test/ome-bioformats/data/18x24y5z5t2c8b-text.ome")
-  bf_add_test(examples/metadata-io metadata-io "${PROJECT_SOURCE_DIR}/test/ome-bioformats/data/18x24y5z5t2c8b-text.ome")
-  bf_add_test(examples/metadata-formatreader metadata-formatreader "${PROJECT_SOURCE_DIR}/test/ome-bioformats/data/2010-06-18x24y5z1t2c8b-text.ome.tiff")
-  bf_add_test(examples/metadata-formatwriter metadata-formatwriter "${CMAKE_CURRENT_BINARY_DIR}/test-write.ome.tiff")
-  bf_add_test(examples/metadata-formatwriter2 metadata-formatwriter2 "${CMAKE_CURRENT_BINARY_DIR}/test-write2.ome.tiff")
-  bf_add_test(examples/pixeldata pixeldata "${PROJECT_SOURCE_DIR}/test/ome-bioformats/data/18x24y5z5t2c8b-text.ome")
+  ome_files_add_test(examples/model-io model-io "${PROJECT_SOURCE_DIR}/test/ome-files/data/18x24y5z5t2c8b-text.ome")
+  ome_files_add_test(examples/metadata-io metadata-io "${PROJECT_SOURCE_DIR}/test/ome-files/data/18x24y5z5t2c8b-text.ome")
+  ome_files_add_test(examples/metadata-formatreader metadata-formatreader "${PROJECT_SOURCE_DIR}/test/ome-files/data/2010-06-18x24y5z1t2c8b-text.ome.tiff")
+  ome_files_add_test(examples/metadata-formatwriter metadata-formatwriter "${CMAKE_CURRENT_BINARY_DIR}/test-write.ome.tiff")
+  ome_files_add_test(examples/metadata-formatwriter2 metadata-formatwriter2 "${CMAKE_CURRENT_BINARY_DIR}/test-write2.ome.tiff")
+  ome_files_add_test(examples/pixeldata pixeldata "${PROJECT_SOURCE_DIR}/test/ome-files/data/18x24y5z5t2c8b-text.ome")
 endif(BUILD_TESTS)

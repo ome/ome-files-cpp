@@ -1,6 +1,6 @@
 /*
  * #%L
- * OME-BIOFORMATS C++ library for image IO.
+ * OME-FILES C++ library for image IO.
  * Copyright © 2015 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
  *   - National Institutes of Health
@@ -37,10 +37,10 @@
 
 #include <iostream>
 
-#include <ome/bioformats/CoreMetadata.h>
-#include <ome/bioformats/MetadataTools.h>
-#include <ome/bioformats/VariantPixelBuffer.h>
-#include <ome/bioformats/out/OMETIFFWriter.h>
+#include <ome/files/CoreMetadata.h>
+#include <ome/files/MetadataTools.h>
+#include <ome/files/VariantPixelBuffer.h>
+#include <ome/files/out/OMETIFFWriter.h>
 #include <ome/xml/meta/OMEXMLMetadata.h>
 
 #include <ome/compat/memory.h>
@@ -50,19 +50,19 @@
 using boost::filesystem::path;
 using ome::compat::make_shared;
 using ome::compat::shared_ptr;
-using ome::bioformats::dimension_size_type;
-using ome::bioformats::fillMetadata;
-using ome::bioformats::CoreMetadata;
-using ome::bioformats::DIM_SPATIAL_X;
-using ome::bioformats::DIM_SPATIAL_Y;
-using ome::bioformats::DIM_SUBCHANNEL;
-using ome::bioformats::FormatWriter;
-using ome::bioformats::MetadataMap;
-using ome::bioformats::out::OMETIFFWriter;
-using ome::bioformats::PixelBuffer;
-using ome::bioformats::PixelBufferBase;
-using ome::bioformats::PixelProperties;
-using ome::bioformats::VariantPixelBuffer;
+using ome::files::dimension_size_type;
+using ome::files::fillMetadata;
+using ome::files::CoreMetadata;
+using ome::files::DIM_SPATIAL_X;
+using ome::files::DIM_SPATIAL_Y;
+using ome::files::DIM_SUBCHANNEL;
+using ome::files::FormatWriter;
+using ome::files::MetadataMap;
+using ome::files::out::OMETIFFWriter;
+using ome::files::PixelBuffer;
+using ome::files::PixelBufferBase;
+using ome::files::PixelProperties;
+using ome::files::VariantPixelBuffer;
 using ome::xml::model::enums::PixelType;
 using ome::xml::model::enums::DimensionOrder;
 
@@ -131,7 +131,7 @@ namespace
             shared_ptr<PixelBuffer<PixelProperties<PixelType::UINT16>::std_type> >
               buffer(make_shared<PixelBuffer<PixelProperties<PixelType::UINT16>::std_type> >
                      (boost::extents[512][512][1][1][1][3][1][1][1],
-                      PixelType::UINT16, ome::bioformats::ENDIAN_NATIVE,
+                      PixelType::UINT16, ome::files::ENDIAN_NATIVE,
                       PixelBufferBase::make_storage_order(DimensionOrder::XYZTC, false)));
 
             // Fill each subchannel with a different intensity ramp in

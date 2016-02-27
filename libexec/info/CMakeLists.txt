@@ -1,5 +1,5 @@
 # #%L
-# Bio-Formats C++ libraries (cmake build infrastructure)
+# OME Files C++ libraries (cmake build infrastructure)
 # %%
 # Copyright © 2006 - 2015 Open Microscopy Environment:
 #   - Massachusetts Institute of Technology
@@ -46,10 +46,10 @@ set(info_SOURCES
     options.cpp)
 
 add_executable(info ${info_SOURCES})
-target_link_libraries(info OME::XML OME::BioFormats Boost::program_options ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(info OME::XML OME::Files Boost::program_options ${CMAKE_THREAD_LIBS_INIT})
 
 install(TARGETS info RUNTIME
-        DESTINATION ${OME_BIOFORMATS_INSTALL_PKGLIBEXECDIR}
+        DESTINATION ${OME_FILES_INSTALL_PKGLIBEXECDIR}
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
                     GROUP_READ GROUP_EXECUTE
                     WORLD_READ WORLD_EXECUTE)
