@@ -49,8 +49,7 @@ list(APPEND CMAKE_MODULE_PATH
 
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/BioFormatsCommon.cmake")
 
-project(bioformats)
-message(STATUS "Configuring Bio-Formats main build")
+project(ome-files)
 
 include(cmake/Version.cmake)
 

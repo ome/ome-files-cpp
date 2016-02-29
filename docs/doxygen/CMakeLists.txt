@@ -38,23 +38,23 @@ if(BUILD_DOXYGEN)
   set(OME_COMMON_TAGFILE "${CMAKE_INSTALL_FULL_DATADIR}/doc/ome-common/api/ome-common.tag")
   set(OME_XML_TAGFILE "${CMAKE_INSTALL_FULL_DATADIR}/doc/ome-xml/api/ome-xml.tag")
 
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bioformats.dox.cmake
-                 ${CMAKE_CURRENT_BINARY_DIR}/bioformats.dox @ONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ome-files.dox.cmake
+                 ${CMAKE_CURRENT_BINARY_DIR}/ome-files.dox @ONLY)
 
-  add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/bioformats.log
-                     COMMAND ${CMAKE_COMMAND} -E remove_directory bioformats
-                     COMMAND ${CMAKE_COMMAND} -E make_directory bioformats
-                     COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/bioformats.dox
-                     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/bioformats.dox)
+  add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/ome-files.log
+                     COMMAND ${CMAKE_COMMAND} -E remove_directory ome-files
+                     COMMAND ${CMAKE_COMMAND} -E make_directory ome-files
+                     COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/ome-files.dox
+                     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/ome-files.dox)
 
   add_custom_target(doc-check
-                    COMMAND ${CMAKE_COMMAND} -Dlogfile=${CMAKE_CURRENT_BINARY_DIR}/bioformats.log -P ${PROJECT_SOURCE_DIR}/cmake/DoxygenCheck.cmake
-                    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/bioformats.log)
+                    COMMAND ${CMAKE_COMMAND} -Dlogfile=${CMAKE_CURRENT_BINARY_DIR}/ome-files.log -P ${PROJECT_SOURCE_DIR}/cmake/DoxygenCheck.cmake
+                    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/ome-files.log)
 
-  add_custom_target(doc-api ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/bioformats.log doc-check)
+  add_custom_target(doc-api ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/ome-files.log doc-check)
   # For backward compatibility
   add_custom_target(doc DEPENDS doc-api)
 
-  install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bioformats/"
+  install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/ome-files/"
           DESTINATION "${CMAKE_INSTALL_DOCDIR}/api")
 endif(BUILD_DOXYGEN)
