@@ -52,6 +52,11 @@ namespace ome
 #  pragma GCC diagnostic ignored "-Wswitch-default"
 #endif
 
+#define INTERNALFORMAT_CASE(maR, maProperty, maType)                    \
+        case ::ome::xml::model::enums::PixelType::maType:               \
+          internal_format = TexelProperties< ::ome::xml::model::enums::PixelType::maType>::internal_format; \
+          break;
+
     GLenum
     textureInternalFormat(::ome::xml::model::enums::PixelType pixeltype)
     {
@@ -59,43 +64,18 @@ namespace ome
 
       switch(pixeltype)
         {
-        case ::ome::xml::model::enums::PixelType::INT8:
-          internal_format = TexelProperties< ::ome::xml::model::enums::PixelType::INT8>::internal_format;
-          break;
-        case ::ome::xml::model::enums::PixelType::INT16:
-          internal_format = TexelProperties< ::ome::xml::model::enums::PixelType::INT16>::internal_format;
-          break;
-        case ::ome::xml::model::enums::PixelType::INT32:
-          internal_format = TexelProperties< ::ome::xml::model::enums::PixelType::INT32>::internal_format;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT8:
-          internal_format = TexelProperties< ::ome::xml::model::enums::PixelType::UINT8>::internal_format;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT16:
-          internal_format = TexelProperties< ::ome::xml::model::enums::PixelType::UINT16>::internal_format;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT32:
-          internal_format = TexelProperties< ::ome::xml::model::enums::PixelType::UINT32>::internal_format;
-          break;
-        case ::ome::xml::model::enums::PixelType::FLOAT:
-          internal_format = TexelProperties< ::ome::xml::model::enums::PixelType::FLOAT>::internal_format;
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLE:
-          internal_format = TexelProperties< ::ome::xml::model::enums::PixelType::DOUBLE>::internal_format;
-          break;
-        case ::ome::xml::model::enums::PixelType::BIT:
-          internal_format = TexelProperties< ::ome::xml::model::enums::PixelType::BIT>::internal_format;
-          break;
-        case ::ome::xml::model::enums::PixelType::COMPLEX:
-          internal_format = TexelProperties< ::ome::xml::model::enums::PixelType::COMPLEX>::internal_format;
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX:
-          internal_format = TexelProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX>::internal_format;
-          break;
+          BOOST_PP_SEQ_FOR_EACH(INTERNALFORMAT_CASE, size, OME_XML_MODEL_ENUMS_PIXELTYPE_VALUES);
         }
 
       return internal_format;
     }
+
+#undef INTERNALFORMAT_CASE
+
+#define EXTERNALFORMAT_CASE(maR, maProperty, maType)                    \
+        case ::ome::xml::model::enums::PixelType::maType:               \
+          external_format = TexelProperties< ::ome::xml::model::enums::PixelType::maType>::external_format; \
+          break;
 
     GLenum
     textureExternalFormat(::ome::xml::model::enums::PixelType pixeltype)
@@ -104,43 +84,18 @@ namespace ome
 
       switch(pixeltype)
         {
-        case ::ome::xml::model::enums::PixelType::INT8:
-          external_format = TexelProperties< ::ome::xml::model::enums::PixelType::INT8>::external_format;
-          break;
-        case ::ome::xml::model::enums::PixelType::INT16:
-          external_format = TexelProperties< ::ome::xml::model::enums::PixelType::INT16>::external_format;
-          break;
-        case ::ome::xml::model::enums::PixelType::INT32:
-          external_format = TexelProperties< ::ome::xml::model::enums::PixelType::INT32>::external_format;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT8:
-          external_format = TexelProperties< ::ome::xml::model::enums::PixelType::UINT8>::external_format;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT16:
-          external_format = TexelProperties< ::ome::xml::model::enums::PixelType::UINT16>::external_format;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT32:
-          external_format = TexelProperties< ::ome::xml::model::enums::PixelType::UINT32>::external_format;
-          break;
-        case ::ome::xml::model::enums::PixelType::FLOAT:
-          external_format = TexelProperties< ::ome::xml::model::enums::PixelType::FLOAT>::external_format;
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLE:
-          external_format = TexelProperties< ::ome::xml::model::enums::PixelType::DOUBLE>::external_format;
-          break;
-        case ::ome::xml::model::enums::PixelType::BIT:
-          external_format = TexelProperties< ::ome::xml::model::enums::PixelType::BIT>::external_format;
-          break;
-        case ::ome::xml::model::enums::PixelType::COMPLEX:
-          external_format = TexelProperties< ::ome::xml::model::enums::PixelType::COMPLEX>::external_format;
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX:
-          external_format = TexelProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX>::external_format;
-          break;
+          BOOST_PP_SEQ_FOR_EACH(EXTERNALFORMAT_CASE, size, OME_XML_MODEL_ENUMS_PIXELTYPE_VALUES);
         }
 
       return external_format;
     }
+
+#undef EXTERNALFORMAT_CASE
+
+#define EXTERNALTYPE_CASE(maR, maProperty, maType)                      \
+        case ::ome::xml::model::enums::PixelType::maType:               \
+          external_type = TexelProperties< ::ome::xml::model::enums::PixelType::maType>::external_type; \
+          break;
 
     GLint
     textureExternalType(::ome::xml::model::enums::PixelType pixeltype)
@@ -149,43 +104,18 @@ namespace ome
 
       switch(pixeltype)
         {
-        case ::ome::xml::model::enums::PixelType::INT8:
-          external_type = TexelProperties< ::ome::xml::model::enums::PixelType::INT8>::external_type;
-          break;
-        case ::ome::xml::model::enums::PixelType::INT16:
-          external_type = TexelProperties< ::ome::xml::model::enums::PixelType::INT16>::external_type;
-          break;
-        case ::ome::xml::model::enums::PixelType::INT32:
-          external_type = TexelProperties< ::ome::xml::model::enums::PixelType::INT32>::external_type;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT8:
-          external_type = TexelProperties< ::ome::xml::model::enums::PixelType::UINT8>::external_type;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT16:
-          external_type = TexelProperties< ::ome::xml::model::enums::PixelType::UINT16>::external_type;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT32:
-          external_type = TexelProperties< ::ome::xml::model::enums::PixelType::UINT32>::external_type;
-          break;
-        case ::ome::xml::model::enums::PixelType::FLOAT:
-          external_type = TexelProperties< ::ome::xml::model::enums::PixelType::FLOAT>::external_type;
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLE:
-          external_type = TexelProperties< ::ome::xml::model::enums::PixelType::DOUBLE>::external_type;
-          break;
-        case ::ome::xml::model::enums::PixelType::BIT:
-          external_type = TexelProperties< ::ome::xml::model::enums::PixelType::BIT>::external_type;
-          break;
-        case ::ome::xml::model::enums::PixelType::COMPLEX:
-          external_type = TexelProperties< ::ome::xml::model::enums::PixelType::COMPLEX>::external_type;
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX:
-          external_type = TexelProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX>::external_type;
-          break;
+          BOOST_PP_SEQ_FOR_EACH(EXTERNALTYPE_CASE, size, OME_XML_MODEL_ENUMS_PIXELTYPE_VALUES);
         }
 
       return external_type;
     }
+
+#undef EXTERNALTYPE_CASE
+
+#define FALLBACKTYPE_CASE(maR, maProperty, maType)                      \
+        case ::ome::xml::model::enums::PixelType::maType:               \
+          fallback_pixeltype = TexelProperties< ::ome::xml::model::enums::PixelType::maType>::fallback_pixeltype; \
+          break;
 
     ::ome::xml::model::enums::PixelType
     texturePixelTypeFallback(::ome::xml::model::enums::PixelType pixeltype)
@@ -194,43 +124,18 @@ namespace ome
 
       switch(pixeltype)
         {
-        case ::ome::xml::model::enums::PixelType::INT8:
-          fallback_pixeltype = TexelProperties< ::ome::xml::model::enums::PixelType::INT8>::fallback_pixeltype;
-          break;
-        case ::ome::xml::model::enums::PixelType::INT16:
-          fallback_pixeltype = TexelProperties< ::ome::xml::model::enums::PixelType::INT16>::fallback_pixeltype;
-          break;
-        case ::ome::xml::model::enums::PixelType::INT32:
-          fallback_pixeltype = TexelProperties< ::ome::xml::model::enums::PixelType::INT32>::fallback_pixeltype;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT8:
-          fallback_pixeltype = TexelProperties< ::ome::xml::model::enums::PixelType::UINT8>::fallback_pixeltype;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT16:
-          fallback_pixeltype = TexelProperties< ::ome::xml::model::enums::PixelType::UINT16>::fallback_pixeltype;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT32:
-          fallback_pixeltype = TexelProperties< ::ome::xml::model::enums::PixelType::UINT32>::fallback_pixeltype;
-          break;
-        case ::ome::xml::model::enums::PixelType::FLOAT:
-          fallback_pixeltype = TexelProperties< ::ome::xml::model::enums::PixelType::FLOAT>::fallback_pixeltype;
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLE:
-          fallback_pixeltype = TexelProperties< ::ome::xml::model::enums::PixelType::DOUBLE>::fallback_pixeltype;
-          break;
-        case ::ome::xml::model::enums::PixelType::BIT:
-          fallback_pixeltype = TexelProperties< ::ome::xml::model::enums::PixelType::BIT>::fallback_pixeltype;
-          break;
-        case ::ome::xml::model::enums::PixelType::COMPLEX:
-          fallback_pixeltype = TexelProperties< ::ome::xml::model::enums::PixelType::COMPLEX>::fallback_pixeltype;
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX:
-          fallback_pixeltype = TexelProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX>::fallback_pixeltype;
-          break;
+          BOOST_PP_SEQ_FOR_EACH(FALLBACKTYPE_CASE, size, OME_XML_MODEL_ENUMS_PIXELTYPE_VALUES);
         }
 
       return fallback_pixeltype;
     }
+
+#undef FALLBACKTYPE_CASE
+
+#define CONVERSION_CASE(maR, maProperty, maType)                        \
+        case ::ome::xml::model::enums::PixelType::maType:               \
+          conversion_required = TexelProperties< ::ome::xml::model::enums::PixelType::maType>::conversion_required; \
+          break;
 
     bool
     textureConversionRequired(::ome::xml::model::enums::PixelType pixeltype)
@@ -239,43 +144,18 @@ namespace ome
 
       switch(pixeltype)
         {
-        case ::ome::xml::model::enums::PixelType::INT8:
-          conversion_required = TexelProperties< ::ome::xml::model::enums::PixelType::INT8>::conversion_required;
-          break;
-        case ::ome::xml::model::enums::PixelType::INT16:
-          conversion_required = TexelProperties< ::ome::xml::model::enums::PixelType::INT16>::conversion_required;
-          break;
-        case ::ome::xml::model::enums::PixelType::INT32:
-          conversion_required = TexelProperties< ::ome::xml::model::enums::PixelType::INT32>::conversion_required;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT8:
-          conversion_required = TexelProperties< ::ome::xml::model::enums::PixelType::UINT8>::conversion_required;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT16:
-          conversion_required = TexelProperties< ::ome::xml::model::enums::PixelType::UINT16>::conversion_required;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT32:
-          conversion_required = TexelProperties< ::ome::xml::model::enums::PixelType::UINT32>::conversion_required;
-          break;
-        case ::ome::xml::model::enums::PixelType::FLOAT:
-          conversion_required = TexelProperties< ::ome::xml::model::enums::PixelType::FLOAT>::conversion_required;
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLE:
-          conversion_required = TexelProperties< ::ome::xml::model::enums::PixelType::DOUBLE>::conversion_required;
-          break;
-        case ::ome::xml::model::enums::PixelType::BIT:
-          conversion_required = TexelProperties< ::ome::xml::model::enums::PixelType::BIT>::conversion_required;
-          break;
-        case ::ome::xml::model::enums::PixelType::COMPLEX:
-          conversion_required = TexelProperties< ::ome::xml::model::enums::PixelType::COMPLEX>::conversion_required;
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX:
-          conversion_required = TexelProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX>::conversion_required;
-          break;
+          BOOST_PP_SEQ_FOR_EACH(CONVERSION_CASE, size, OME_XML_MODEL_ENUMS_PIXELTYPE_VALUES);
         }
 
       return conversion_required;
     }
+
+#undef CONVERSION_CASE
+
+#define NORMALIZATION_CASE(maR, maProperty, maType)                     \
+        case ::ome::xml::model::enums::PixelType::maType:               \
+          normalization_required = TexelProperties< ::ome::xml::model::enums::PixelType::maType>::normalization_required; \
+          break;
 
     bool
     textureNormalizationRequired(::ome::xml::model::enums::PixelType pixeltype)
@@ -284,43 +164,18 @@ namespace ome
 
       switch(pixeltype)
         {
-        case ::ome::xml::model::enums::PixelType::INT8:
-          normalization_required = TexelProperties< ::ome::xml::model::enums::PixelType::INT8>::normalization_required;
-          break;
-        case ::ome::xml::model::enums::PixelType::INT16:
-          normalization_required = TexelProperties< ::ome::xml::model::enums::PixelType::INT16>::normalization_required;
-          break;
-        case ::ome::xml::model::enums::PixelType::INT32:
-          normalization_required = TexelProperties< ::ome::xml::model::enums::PixelType::INT32>::normalization_required;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT8:
-          normalization_required = TexelProperties< ::ome::xml::model::enums::PixelType::UINT8>::normalization_required;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT16:
-          normalization_required = TexelProperties< ::ome::xml::model::enums::PixelType::UINT16>::normalization_required;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT32:
-          normalization_required = TexelProperties< ::ome::xml::model::enums::PixelType::UINT32>::normalization_required;
-          break;
-        case ::ome::xml::model::enums::PixelType::FLOAT:
-          normalization_required = TexelProperties< ::ome::xml::model::enums::PixelType::FLOAT>::normalization_required;
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLE:
-          normalization_required = TexelProperties< ::ome::xml::model::enums::PixelType::DOUBLE>::normalization_required;
-          break;
-        case ::ome::xml::model::enums::PixelType::BIT:
-          normalization_required = TexelProperties< ::ome::xml::model::enums::PixelType::BIT>::normalization_required;
-          break;
-        case ::ome::xml::model::enums::PixelType::COMPLEX:
-          normalization_required = TexelProperties< ::ome::xml::model::enums::PixelType::COMPLEX>::normalization_required;
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX:
-          normalization_required = TexelProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX>::normalization_required;
-          break;
+          BOOST_PP_SEQ_FOR_EACH(NORMALIZATION_CASE, size, OME_XML_MODEL_ENUMS_PIXELTYPE_VALUES);
         }
 
       return normalization_required;
     }
+
+#undef NORMALIZATION_CASE
+
+#define MINIFICATION_CASE(maR, maProperty, maType)                      \
+        case ::ome::xml::model::enums::PixelType::maType:               \
+          minification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::maType>::minification_filter; \
+          break;
 
     GLint
     textureMinificationFilter(::ome::xml::model::enums::PixelType pixeltype)
@@ -328,43 +183,18 @@ namespace ome
       GLint minification_filter = false; 
       switch(pixeltype)
         {
-        case ::ome::xml::model::enums::PixelType::INT8:
-          minification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::INT8>::minification_filter;
-          break;
-        case ::ome::xml::model::enums::PixelType::INT16:
-          minification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::INT16>::minification_filter;
-          break;
-        case ::ome::xml::model::enums::PixelType::INT32:
-          minification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::INT32>::minification_filter;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT8:
-          minification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::UINT8>::minification_filter;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT16:
-          minification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::UINT16>::minification_filter;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT32:
-          minification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::UINT32>::minification_filter;
-          break;
-        case ::ome::xml::model::enums::PixelType::FLOAT:
-          minification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::FLOAT>::minification_filter;
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLE:
-          minification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::DOUBLE>::minification_filter;
-          break;
-        case ::ome::xml::model::enums::PixelType::BIT:
-          minification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::BIT>::minification_filter;
-          break;
-        case ::ome::xml::model::enums::PixelType::COMPLEX:
-          minification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::COMPLEX>::minification_filter;
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX:
-          minification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX>::minification_filter;
-          break;
+          BOOST_PP_SEQ_FOR_EACH(MINIFICATION_CASE, size, OME_XML_MODEL_ENUMS_PIXELTYPE_VALUES);
         }
 
       return minification_filter;
     }
+
+#undef MINIFICATION_CASE
+
+#define MAGNIFICATION_CASE(maR, maProperty, maType)                     \
+        case ::ome::xml::model::enums::PixelType::maType:               \
+          magnification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::maType>::magnification_filter; \
+          break;
 
     GLint
     textureMagnificationFilter(::ome::xml::model::enums::PixelType pixeltype)
@@ -372,43 +202,13 @@ namespace ome
       GLint magnification_filter = false; 
       switch(pixeltype)
         {
-        case ::ome::xml::model::enums::PixelType::INT8:
-          magnification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::INT8>::magnification_filter;
-          break;
-        case ::ome::xml::model::enums::PixelType::INT16:
-          magnification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::INT16>::magnification_filter;
-          break;
-        case ::ome::xml::model::enums::PixelType::INT32:
-          magnification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::INT32>::magnification_filter;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT8:
-          magnification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::UINT8>::magnification_filter;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT16:
-          magnification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::UINT16>::magnification_filter;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT32:
-          magnification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::UINT32>::magnification_filter;
-          break;
-        case ::ome::xml::model::enums::PixelType::FLOAT:
-          magnification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::FLOAT>::magnification_filter;
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLE:
-          magnification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::DOUBLE>::magnification_filter;
-          break;
-        case ::ome::xml::model::enums::PixelType::BIT:
-          magnification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::BIT>::magnification_filter;
-          break;
-        case ::ome::xml::model::enums::PixelType::COMPLEX:
-          magnification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::COMPLEX>::magnification_filter;
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX:
-          magnification_filter = TexelProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX>::magnification_filter;
-          break;
+          BOOST_PP_SEQ_FOR_EACH(MAGNIFICATION_CASE, size, OME_XML_MODEL_ENUMS_PIXELTYPE_VALUES);
         }
 
       return magnification_filter;
     }
+
+#undef MAGNIFICATION_CASE
 
 #ifdef __GNUC__
 #  pragma GCC diagnostic pop

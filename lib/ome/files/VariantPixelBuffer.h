@@ -296,6 +296,11 @@ namespace ome
 #  pragma GCC diagnostic ignored "-Wswitch-default"
 #endif
 
+#define OME_FILES_VARIANTPIXELBUFFER_CREATEEXTENTS_CASE(maR, maProperty, maType) \
+          case ::ome::xml::model::enums::PixelType::maType:                      \
+            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::maType>::std_type>(extents, storage, pixeltype); \
+            break;
+
       /**
        * Create buffer from extents (internal storage).
        *
@@ -317,43 +322,18 @@ namespace ome
 
         switch(pixeltype)
           {
-          case ::ome::xml::model::enums::PixelType::INT8:
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::INT8>::std_type>(extents, storage, pixeltype);
-            break;
-          case ::ome::xml::model::enums::PixelType::INT16:
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::INT16>::std_type>(extents, storage, pixeltype);
-            break;
-          case ::ome::xml::model::enums::PixelType::INT32:
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::INT32>::std_type>(extents, storage, pixeltype);
-            break;
-          case ::ome::xml::model::enums::PixelType::UINT8:
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::UINT8>::std_type>(extents, storage, pixeltype);
-            break;
-          case ::ome::xml::model::enums::PixelType::UINT16:
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::UINT16>::std_type>(extents, storage, pixeltype);
-            break;
-          case :: ome::xml::model::enums::PixelType::UINT32:
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::UINT32>::std_type>(extents, storage, pixeltype);
-            break;
-          case ::ome::xml::model::enums::PixelType::FLOAT:
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::FLOAT>::std_type>(extents, storage, pixeltype);
-            break;
-          case ::ome::xml::model::enums::PixelType::DOUBLE:
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLE>::std_type>(extents, storage, pixeltype);
-            break;
-          case ::ome::xml::model::enums::PixelType::BIT:
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::BIT>::std_type>(extents, storage, pixeltype);
-            break;
-          case ::ome::xml::model::enums::PixelType::COMPLEX:
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::COMPLEX>::std_type>(extents, storage, pixeltype);
-            break;
-          case ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX:
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX>::std_type>(extents, storage, pixeltype);
-            break;
+            BOOST_PP_SEQ_FOR_EACH(OME_FILES_VARIANTPIXELBUFFER_CREATEEXTENTS_CASE, size, OME_XML_MODEL_ENUMS_PIXELTYPE_VALUES);
           }
 
         return buf;
       }
+
+#undef OME_FILES_VARIANTPIXELBUFFER_CREATEEXTENTS_CASE
+
+#define OME_FILES_VARIANTPIXELBUFFER_CREATERANGE_CASE(maR, maProperty, maType) \
+          case ::ome::xml::model::enums::PixelType::maType:                    \
+            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::maType>::std_type>(range, storage, pixeltype); \
+            break;
 
       /**
        * Create buffer from ranges (helper).
@@ -375,43 +355,13 @@ namespace ome
 
         switch(pixeltype)
           {
-          case ::ome::xml::model::enums::PixelType::INT8:
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::INT8>::std_type>(range, storage, pixeltype);
-            break;
-          case ::ome::xml::model::enums::PixelType::INT16:
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::INT16>::std_type>(range, storage, pixeltype);
-            break;
-          case ::ome::xml::model::enums::PixelType::INT32:
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::INT32>::std_type>(range, storage, pixeltype);
-            break;
-          case ::ome::xml::model::enums::PixelType::UINT8:
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::UINT8>::std_type>(range, storage, pixeltype);
-            break;
-          case ::ome::xml::model::enums::PixelType::UINT16:
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::UINT16>::std_type>(range, storage, pixeltype);
-            break;
-          case :: ome::xml::model::enums::PixelType::UINT32:
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::UINT32>::std_type>(range, storage, pixeltype);
-            break;
-          case ::ome::xml::model::enums::PixelType::FLOAT:
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::FLOAT>::std_type>(range, storage, pixeltype);
-            break;
-          case ::ome::xml::model::enums::PixelType::DOUBLE:
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLE>::std_type>(range, storage, pixeltype);
-            break;
-          case ::ome::xml::model::enums::PixelType::BIT:
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::BIT>::std_type>(range, storage, pixeltype);
-            break;
-          case ::ome::xml::model::enums::PixelType::COMPLEX:
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::COMPLEX>::std_type>(range, storage, pixeltype);
-            break;
-          case ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX:
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX>::std_type>(range, storage, pixeltype);
-            break;
+            BOOST_PP_SEQ_FOR_EACH(OME_FILES_VARIANTPIXELBUFFER_CREATERANGE_CASE, size, OME_XML_MODEL_ENUMS_PIXELTYPE_VALUES);
           }
 
         return buf;
       }
+
+#undef OME_FILES_VARIANTPIXELBUFFER_CREATERANGE_CASE
 
 #ifdef __GNUC__
 #  pragma GCC diagnostic pop
