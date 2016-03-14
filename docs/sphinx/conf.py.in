@@ -40,7 +40,7 @@ from datetime import datetime
 extensions = ['sphinx.ext.extlinks', 'edit_on_github']
 
 ## Configuration for the edit_on_github extension
-edit_on_github_project = 'ome/files'
+edit_on_github_project = 'ome/ome-files-cpp'
 edit_on_github_branch = 'develop'
 edit_on_github_prefix = 'docs/sphinx'
 
