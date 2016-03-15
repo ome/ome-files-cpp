@@ -120,10 +120,9 @@ Simplified type names
     pl.at(idx) = ...;
 
 Used in standard container types e.g. :cpp:type:`size_type`,
-:cpp:type:`value_type` and in classes and class templates in
-Bio-Formats.  Consistency is needed for generic programming—use the
-standard type names to enable interoperability with standard
-algorithms.
+:cpp:type:`value_type` and in classes and class templates.
+Consistency is needed for generic programming—use the standard type
+names to enable interoperability with standard algorithms.
 
 Exception handling
 ------------------
@@ -189,7 +188,7 @@ Pointer problems
 ^^^^^^^^^^^^^^^^
 
 Plain (or “dumb”) C++ pointers can be dangerous if used incorrectly.
-The Bio-Formats API make a point of never using them unless absolutely
+The OME-Files API make a point of never using them unless absolutely
 necessary.  For automatic objects allocated on the stack, allocation
 and deallocation is automatic and safe:
 
@@ -262,7 +261,7 @@ and several exceptions to handle--this is easy to get wrong, so a more
 robust approach is needed.
 
 Use of :cpp:class:`new` is not in the general case safe or sensible.
-The Bio-Formats API **never** passes pointers allocated with
+The OME-Files API **never** passes pointers allocated with
 :cpp:class:`new`, nor requires any manual memory management.  Instead,
 “smart” pointers are used throughout to manage memory safely and
 automatically.
@@ -766,7 +765,7 @@ integer, floating point, complex floating point and bitmask cases.
 
     struct TypeCategoryVisitor : public boost::static_visitor<>
     {
-      typedef ::ome::bioformats::PixelProperties< ::ome::xml::model::enums::PixelType::BIT>::std_type bit_type;
+      typedef ::ome::files::PixelProperties< ::ome::xml::model::enums::PixelType::BIT>::std_type bit_type;
 
       TypeCategoryVisitor()
       {}
@@ -776,7 +775,7 @@ integer, floating point, complex floating point and bitmask cases.
       typename boost::enable_if_c<
         boost::is_integral<T>::value, void
         >::type
-      operator() (ome::compat::shared_ptr< ::ome::bioformats::PixelBuffer<T> >& buf)
+      operator() (ome::compat::shared_ptr< ::ome::files::PixelBuffer<T> >& buf)
       {
         // Integer algorithm.
       }
@@ -786,7 +785,7 @@ integer, floating point, complex floating point and bitmask cases.
       typename boost::enable_if_c<
         boost::is_floating_point<T>::value, void
         >::type
-      operator() (ome::compat::shared_ptr< ::ome::bioformats::PixelBuffer<T> >& buf)
+      operator() (ome::compat::shared_ptr< ::ome::files::PixelBuffer<T> >& buf)
       {
         // Floating point algorithm.
       }
@@ -796,7 +795,7 @@ integer, floating point, complex floating point and bitmask cases.
       typename boost::enable_if_c<
         boost::is_complex<T>::value, void
         >::type
-      operator() (ome::compat::shared_ptr< ::ome::bioformats::PixelBuffer<T> >& buf)
+      operator() (ome::compat::shared_ptr< ::ome::files::PixelBuffer<T> >& buf)
       {
         // Complex floating point algorithm.
       }
@@ -804,7 +803,7 @@ integer, floating point, complex floating point and bitmask cases.
       // BIT/bool pixel type.  Note this is a simple overload since it is
       // a simple type, not a category of different types.
       void
-      operator() (ome::compat::shared_ptr< ::ome::bioformats::PixelBuffer<bit_type> >& buf)
+      operator() (ome::compat::shared_ptr< ::ome::files::PixelBuffer<bit_type> >& buf)
       {
         // Boolean algorithm.
       }

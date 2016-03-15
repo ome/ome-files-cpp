@@ -1,6 +1,6 @@
 /*
  * #%L
- * # Bio-Formats C++ libraries (test infrastructure)
+ * # OME Files C++ libraries (test infrastructure)
  * %%
  * Copyright © 2013 - 2015 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology

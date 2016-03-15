@@ -1,6 +1,6 @@
 /*
  * #%L
- * OME-QTWIDGETS C++ library for display of Bio-Formats pixel data and metadata.
+ * OME-QTWIDGETS C++ library for display of OME-Files pixel data and metadata.
  * %%
  * Copyright © 2014 - 2015 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
@@ -52,7 +52,7 @@
 
 #include <QtWidgets/QGridLayout>
 
-using ome::bioformats::dimension_size_type;
+using ome::files::dimension_size_type;
 
 namespace
 {
@@ -136,16 +136,16 @@ namespace ome
     }
 
     void
-    NavigationDock2D::setReader(ome::compat::shared_ptr<ome::bioformats::FormatReader> reader,
-                                ome::bioformats::dimension_size_type                   series,
-                                ome::bioformats::dimension_size_type                   plane)
+    NavigationDock2D::setReader(ome::compat::shared_ptr<ome::files::FormatReader> reader,
+                                ome::files::dimension_size_type                   series,
+                                ome::files::dimension_size_type                   plane)
     {
       this->reader = reader;
       this->series = series;
 
       if (reader)
         {
-          ome::bioformats::dimension_size_type oldseries = reader->getSeries();
+          ome::files::dimension_size_type oldseries = reader->getSeries();
           reader->setSeries(series);
           dimension_size_type imageCount = reader->getImageCount();
           // Full dimension sizes.
@@ -213,7 +213,7 @@ namespace ome
     }
 
     void
-    NavigationDock2D::setPlane(ome::bioformats::dimension_size_type plane)
+    NavigationDock2D::setPlane(ome::files::dimension_size_type plane)
     {
       if (plane != currentPlane)
         {
@@ -221,7 +221,7 @@ namespace ome
 
           if (reader)
             {
-              ome::bioformats::dimension_size_type oldseries = reader->getSeries();
+              ome::files::dimension_size_type oldseries = reader->getSeries();
               reader->setSeries(series);
               // Modulo dimension sizes.
               dimension_size_type mz = reader->getModuloZ().size();
@@ -251,7 +251,7 @@ namespace ome
         }
     }
 
-    ome::bioformats::dimension_size_type
+    ome::files::dimension_size_type
     NavigationDock2D::plane() const
     {
       return currentPlane;
@@ -274,7 +274,7 @@ namespace ome
     {
       if (reader)
         {
-          ome::bioformats::dimension_size_type oldseries = reader->getSeries();
+          ome::files::dimension_size_type oldseries = reader->getSeries();
           reader->setSeries(series);
           // Modulo dimension sizes.
           dimension_size_type mz = reader->getModuloZ().size();
@@ -306,7 +306,7 @@ namespace ome
     {
       if (reader)
         {
-          ome::bioformats::dimension_size_type oldseries = reader->getSeries();
+          ome::files::dimension_size_type oldseries = reader->getSeries();
           reader->setSeries(series);
           // Modulo dimension sizes.
           dimension_size_type mz = reader->getModuloZ().size();

@@ -1,6 +1,6 @@
 /*
  * #%L
- * OME-BIOFORMATS C++ library for image IO.
+ * OME-FILES C++ library for image IO.
  * Copyright © 2014 - 2015 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
  *   - National Institutes of Health
@@ -35,8 +35,8 @@
  * #L%
  */
 
-#include <ome/bioformats/in/TIFFReader.h>
-#include <ome/bioformats/in/OMETIFFReader.h>
+#include <ome/files/in/TIFFReader.h>
+#include <ome/files/in/OMETIFFReader.h>
 
 #include <ome/common/xml/Platform.h>
 #include <ome/common/xml/dom/Document.h>
@@ -50,8 +50,8 @@
 
 #include <info/ImageInfo.h>
 
-using namespace ome::bioformats;
-using ome::bioformats::dimension_size_type;
+using namespace ome::files;
+using ome::files::dimension_size_type;
 using ome::xml::model::primitives::Timestamp;
 
 namespace
@@ -132,7 +132,7 @@ namespace info
       }
 
     /// @todo ImageReader format detection.
-    ome::compat::shared_ptr<ome::bioformats::detail::FormatReader> detail = ome::compat::dynamic_pointer_cast<ome::bioformats::detail::FormatReader>(reader);
+    ome::compat::shared_ptr<ome::files::detail::FormatReader> detail = ome::compat::dynamic_pointer_cast<ome::files::detail::FormatReader>(reader);
     if (detail)
       stream << "Using reader: " << detail->getFormat()
              << " (" << detail->getFormatDescription() << ")\n";
@@ -261,7 +261,7 @@ namespace info
   void
   ImageInfo::readOriginalMetadata(std::ostream& stream)
   {
-    const ome::bioformats::MetadataMap global = reader->getGlobalMetadata().flatten();
+    const ome::files::MetadataMap global = reader->getGlobalMetadata().flatten();
     if (global.empty())
       {
         stream << "No global metadata\n\n";
@@ -269,7 +269,7 @@ namespace info
     else
       {
         stream << "Global metadata:\n";
-        for (ome::bioformats::MetadataMap::const_iterator i = global.begin();
+        for (ome::files::MetadataMap::const_iterator i = global.begin();
              i != global.end();
              ++i)
           {
@@ -283,11 +283,11 @@ namespace info
       {
         reader->setSeries(s);
 
-        const ome::bioformats::MetadataMap series = reader->getSeriesMetadata().flatten();
+        const ome::files::MetadataMap series = reader->getSeriesMetadata().flatten();
         if (!series.empty())
           {
             stream << "Series #" << s << " metadata:\n";
-            for (ome::bioformats::MetadataMap::const_iterator i = series.begin();
+            for (ome::files::MetadataMap::const_iterator i = series.begin();
                  i != series.end();
                  ++i)
               {
@@ -347,9 +347,9 @@ namespace info
   void
   ImageInfo::printDimension(std::ostream&                        stream,
                             const std::string&                   dim,
-                            ome::bioformats::dimension_size_type size,
-                            ome::bioformats::dimension_size_type effectiveSize,
-                            const ome::bioformats::Modulo&       modulo)
+                            ome::files::dimension_size_type size,
+                            ome::files::dimension_size_type effectiveSize,
+                            const ome::files::Modulo&       modulo)
   {
     stream << '\t' << dim << " = " << size;
     if (effectiveSize)

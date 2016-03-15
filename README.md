@@ -1,16 +1,13 @@
-# Bio-Formats
+# OME-Files C++
 
-[![Build Status](https://travis-ci.org/openmicroscopy/bioformats.png)](http://travis-ci.org/openmicroscopy/bioformats)
-
-Bio-Formats is a standalone Java library for reading and writing life sciences
-image file formats. It is capable of parsing both pixels and metadata for a
-large number of formats, as well as writing to several formats.
+OME-Files is a standalone C++ library for reading and writing life sciences
+image file formats.
 
 
 Purpose
 -------
 
-Bio-Formats' primary purpose is to convert proprietary microscopy data into 
+OME-Files' primary purpose is to convert proprietary microscopy data into 
 an open standard called the OME data model, particularly into the OME-TIFF 
 file format. See the [statement of purpose](http://www.openmicroscopy.org/site/support/bio-formats/about/index.html) 
 for a thorough explanation and rationale.
@@ -19,29 +16,26 @@ for a thorough explanation and rationale.
 Supported formats
 -----------------
 
-Bio-Formats supports [more than a hundred file
-formats](http://www.openmicroscopy.org/site/support/bio-formats/supported-formats.html).
-
+OME-TIFF using the OME metadata model.
 
 For users
 ---------
 
 [Many software
 packages](http://www.openmicroscopy.org/site/support/bio-formats/users/index.html)
-use Bio-Formats to read and write microscopy formats.
+use OME-Files to read and write microscopy formats.
 
 
 For developers
 --------------
 
-You can use Bio-Formats to easily [support these formats in your
-software](http://www.openmicroscopy.org/site/support/bio-formats/developers/java-library.html).
+You can use OME-Files C++ to easily support OME-TIFF in your software.
 
 
 More information
 ----------------
 
-For more information, see the [Bio-Formats web
+For more information, see the [OME-Files web
 site](http://www.openmicroscopy.org/site/products/bio-formats).
 
 

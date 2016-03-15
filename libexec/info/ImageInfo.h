@@ -1,6 +1,6 @@
 /*
  * #%L
- * OME-BIOFORMATS C++ library for image IO.
+ * OME-FILES C++ library for image IO.
  * Copyright © 2014 - 2015 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
  *   - National Institutes of Health
@@ -47,8 +47,8 @@
 
 #include <ome/compat/memory.h>
 
-#include <ome/bioformats/FormatReader.h>
-#include <ome/bioformats/Types.h>
+#include <ome/files/FormatReader.h>
+#include <ome/files/Types.h>
 
 #include <info/options.h>
 
@@ -69,7 +69,7 @@ namespace info
     virtual ~ImageInfo ();
 
     void
-    setReader(ome::compat::shared_ptr<ome::bioformats::FormatReader>& reader);
+    setReader(ome::compat::shared_ptr<ome::files::FormatReader>& reader);
 
     void
     testRead(std::ostream& stream);
@@ -126,9 +126,9 @@ namespace info
     void
     printDimension(std::ostream&                        stream,
                    const std::string&                   dim,
-                   ome::bioformats::dimension_size_type size,
-                   ome::bioformats::dimension_size_type effectiveSize,
-                   const ome::bioformats::Modulo&       modulo);
+                   ome::files::dimension_size_type size,
+                   ome::files::dimension_size_type effectiveSize,
+                   const ome::files::Modulo&       modulo);
 
     /// Message logger.
     ome::common::Logger logger;
@@ -137,7 +137,7 @@ namespace info
     /// Command-line options.
     options opts;
     /// FormatReader instance.
-    ome::compat::shared_ptr<ome::bioformats::FormatReader> reader;
+    ome::compat::shared_ptr<ome::files::FormatReader> reader;
   };
 
 }

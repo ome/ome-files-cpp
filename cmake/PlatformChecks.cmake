@@ -1,5 +1,5 @@
 # #%L
-# Bio-Formats C++ libraries (cmake build infrastructure)
+# OME Files C++ libraries (cmake build infrastructure)
 # %%
 # Copyright © 2014 - 2015 Open Microscopy Environment:
 #   - Massachusetts Institute of Technology

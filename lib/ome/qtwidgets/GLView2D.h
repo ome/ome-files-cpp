@@ -1,6 +1,6 @@
 /*
  * #%L
- * OME-QTWIDGETS C++ library for display of Bio-Formats pixel data and metadata.
+ * OME-QTWIDGETS C++ library for display of OME-Files pixel data and metadata.
  * %%
  * Copyright © 2014 - 2015 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
@@ -39,7 +39,7 @@
 #ifndef OME_QTWIDGETS_GLVIEW2D_H
 #define OME_QTWIDGETS_GLVIEW2D_H
 
-#include <ome/bioformats/FormatReader.h>
+#include <ome/files/FormatReader.h>
 
 #include <ome/compat/memory.h>
 
@@ -82,8 +82,8 @@ namespace ome
        * @param series the image series.
        * @param parent the parent of this object.
        */
-      GLView2D(ome::compat::shared_ptr<ome::bioformats::FormatReader>  reader,
-               ome::bioformats::dimension_size_type                    series,
+      GLView2D(ome::compat::shared_ptr<ome::files::FormatReader>  reader,
+               ome::files::dimension_size_type                    series,
                QWidget                                                *parent = 0);
 
       /// Destructor.
@@ -158,7 +158,7 @@ namespace ome
        * @param plane the plane number to render.
        */
       void
-      setPlane(ome::bioformats::dimension_size_type plane);
+      setPlane(ome::files::dimension_size_type plane);
 
       /**
        * Set mouse behaviour mode.
@@ -174,7 +174,7 @@ namespace ome
        *
        * @returns the reader.
        */
-      ome::compat::shared_ptr<ome::bioformats::FormatReader>
+      ome::compat::shared_ptr<ome::files::FormatReader>
       getReader();
 
       /**
@@ -182,7 +182,7 @@ namespace ome
        *
        * @returns the series.
        */
-      ome::bioformats::dimension_size_type
+      ome::files::dimension_size_type
       getSeries();
 
       /**
@@ -238,7 +238,7 @@ namespace ome
        *
        * @returns the plane number to render.
        */
-      ome::bioformats::dimension_size_type
+      ome::files::dimension_size_type
       getPlane() const;
 
       /**
@@ -304,7 +304,7 @@ namespace ome
        * @param plane the new plane.
        */
       void
-      planeChanged(ome::bioformats::dimension_size_type plane);
+      planeChanged(ome::files::dimension_size_type plane);
 
     protected:
       /// Set up GL context and subsidiary objects.
@@ -443,9 +443,9 @@ namespace ome
       /// Maximum level for linear contrast.
       glm::vec3 cmax;
       /// Current plane.
-      ome::bioformats::dimension_size_type plane;
+      ome::files::dimension_size_type plane;
       /// Previous plane.
-      ome::bioformats::dimension_size_type oldplane;
+      ome::files::dimension_size_type oldplane;
       /// Last mouse position.
       QPoint lastPos;
       /// Image to render.
@@ -455,9 +455,9 @@ namespace ome
       /// Grid to render.
       gl::Grid2D *grid;
       /// The image reader.
-      ome::compat::shared_ptr<ome::bioformats::FormatReader> reader;
+      ome::compat::shared_ptr<ome::files::FormatReader> reader;
       /// The image series.
-      ome::bioformats::dimension_size_type series;
+      ome::files::dimension_size_type series;
     };
 
   }

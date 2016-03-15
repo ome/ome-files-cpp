@@ -1,4 +1,4 @@
-.. _bf-maint:
+.. _ome-files-maint:
 
 Maintenance
 ===========

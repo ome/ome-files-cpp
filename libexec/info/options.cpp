@@ -1,6 +1,6 @@
 /*
  * #%L
- * OME-BIOFORMATS C++ library for image IO.
+ * OME-FILES C++ library for image IO.
  * Copyright © 2014 - 2015 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
  *   - National Institutes of Health
@@ -136,9 +136,9 @@ namespace info
       ("no-stitch", "Do not group files with similar names (default)")
       ("separate", "Separate RGB image into separate channels")
       ("no-separate", "Do not separate RGB image into separate channels (default)")
-      ("series", opt::value<ome::bioformats::dimension_size_type>(&this->series),
+      ("series", opt::value<ome::files::dimension_size_type>(&this->series),
        "Use the specified series")
-      ("resolution", opt::value<ome::bioformats::dimension_size_type>(&this->resolution),
+      ("resolution", opt::value<ome::files::dimension_size_type>(&this->resolution),
        "Use the specified subresolution (only if unflattened)")
       ("input-order",
        opt::value<std::string>(&this->inputOrderString),

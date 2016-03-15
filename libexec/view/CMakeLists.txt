@@ -1,5 +1,5 @@
 # #%L
-# Bio-Formats C++ libraries (cmake build infrastructure)
+# OME Files C++ libraries (cmake build infrastructure)
 # %%
 # Copyright © 2006 - 2015 Open Microscopy Environment:
 #   - Massachusetts Institute of Technology
@@ -63,11 +63,11 @@ if (OME_QTOPENGL)
                  ${view_HEADERS_MOC}
                  ${view_RESOURCES})
   qt5_use_modules(view Core Gui Widgets Svg)
-  target_link_libraries(view OME::BioFormats ome-qtwidgets)
+  target_link_libraries(view OME::Files ome-qtwidgets)
 
 
   install(TARGETS view RUNTIME
-          DESTINATION ${OME_BIOFORMATS_INSTALL_PKGLIBEXECDIR}
+          DESTINATION ${OME_FILES_INSTALL_PKGLIBEXECDIR}
           PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
                       GROUP_READ GROUP_EXECUTE
                       WORLD_READ WORLD_EXECUTE)

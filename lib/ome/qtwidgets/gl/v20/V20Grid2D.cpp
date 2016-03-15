@@ -1,6 +1,6 @@
 /*
  * #%L
- * OME-QTWIDGETS C++ library for display of Bio-Formats pixel data and metadata.
+ * OME-QTWIDGETS C++ library for display of OME-Files pixel data and metadata.
  * %%
  * Copyright © 2014 - 2015 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
@@ -50,8 +50,8 @@ namespace ome
       namespace v20
       {
 
-        Grid2D::Grid2D(ome::compat::shared_ptr<ome::bioformats::FormatReader>  reader,
-                       ome::bioformats::dimension_size_type                    series,
+        Grid2D::Grid2D(ome::compat::shared_ptr<ome::files::FormatReader>  reader,
+                       ome::files::dimension_size_type                    series,
                        QObject                                                *parent):
           gl::Grid2D(reader, series, parent),
           grid_shader(new glsl::v110::GLLineShader2D(this))

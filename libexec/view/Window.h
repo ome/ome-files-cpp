@@ -1,6 +1,6 @@
 /*
  * #%L
- * GLVIEW program for display of Bio-Formats pixel data and metadata.
+ * GLVIEW program for display of OME-Files pixel data and metadata.
  * %%
  * Copyright © 2014 - 2015 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology

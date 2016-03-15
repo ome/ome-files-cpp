@@ -1,6 +1,6 @@
 /*
  * #%L
- * OME-QTWIDGETS C++ library for display of Bio-Formats pixel data and metadata.
+ * OME-QTWIDGETS C++ library for display of OME-Files pixel data and metadata.
  * %%
  * Copyright © 2014 - 2015 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
@@ -39,7 +39,7 @@
 #ifndef OME_QTWIDGETS_NAVIGATIONDOCK2D_H
 #define OME_QTWIDGETS_NAVIGATIONDOCK2D_H
 
-#include <ome/bioformats/FormatReader.h>
+#include <ome/files/FormatReader.h>
 
 #include <ome/compat/memory.h>
 
@@ -91,16 +91,16 @@ namespace ome
        * @param plane the image plane.
        */
       void
-      setReader(ome::compat::shared_ptr<ome::bioformats::FormatReader> reader,
-                ome::bioformats::dimension_size_type                   series = 0,
-                ome::bioformats::dimension_size_type                   plane = 0);
+      setReader(ome::compat::shared_ptr<ome::files::FormatReader> reader,
+                ome::files::dimension_size_type                   series = 0,
+                ome::files::dimension_size_type                   plane = 0);
 
       /**
        * Get the current plane for the series.
        *
        * @returns the current plane.
        */
-      ome::bioformats::dimension_size_type
+      ome::files::dimension_size_type
       plane() const;
 
     public slots:
@@ -110,7 +110,7 @@ namespace ome
        * @param plane the image plane.
        */
       void
-      setPlane(ome::bioformats::dimension_size_type plane);
+      setPlane(ome::files::dimension_size_type plane);
 
     signals:
       /**
@@ -119,7 +119,7 @@ namespace ome
        * @param plane the new image plane.
        */
       void
-      planeChanged(ome::bioformats::dimension_size_type plane);
+      planeChanged(ome::files::dimension_size_type plane);
 
     private slots:
       /**
@@ -156,11 +156,11 @@ namespace ome
 
     private:
       /// The image reader.
-      ome::compat::shared_ptr<ome::bioformats::FormatReader> reader;
+      ome::compat::shared_ptr<ome::files::FormatReader> reader;
       /// The image series.
-      ome::bioformats::dimension_size_type series;
+      ome::files::dimension_size_type series;
       /// The image plane.
-      ome::bioformats::dimension_size_type currentPlane;
+      ome::files::dimension_size_type currentPlane;
 
       /// Slider labels [NZTCmZmTmC].
       QLabel *labels[7];

@@ -1,6 +1,6 @@
 /*
  * #%L
- * OME-BIOFORMATS C++ library for image IO.
+ * OME-FILES C++ library for image IO.
  * Copyright © 2014 - 2015 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
  *   - National Institutes of Health
@@ -45,7 +45,7 @@
 
 #include <ome/compat/memory.h>
 
-#include <ome/bioformats/Types.h>
+#include <ome/files/Types.h>
 
 #include <ome/xml/model/enums/DimensionOrder.h>
 
@@ -108,8 +108,8 @@ namespace info
     bool stitch;
     bool separate;
     bool flat;
-    ome::bioformats::dimension_size_type series;
-    ome::bioformats::dimension_size_type resolution;
+    ome::files::dimension_size_type series;
+    ome::files::dimension_size_type resolution;
 
     std::string format;
     std::vector<std::string> files;
