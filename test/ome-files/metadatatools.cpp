@@ -127,7 +127,7 @@ TEST(MetadataToolsTest, ModelVersionFromString)
   std::string xml;
   boost::filesystem::path sample_path(ome::common::module_runtime_path("ome-xml-sample"));
 
-  readFile(sample_path / "2012-06/18x24y5z5t2c8b-text.ome", xml);
+  readFile(sample_path / "2012-06/multi-channel-z-series-time-series.ome.xml", xml);
   ASSERT_EQ(std::string("2012-06"), ome::files::getModelVersion(xml));
 }
 
@@ -138,7 +138,7 @@ TEST(MetadataToolsTest, ModelVersionFromDocument)
   std::string xml;
   boost::filesystem::path sample_path(ome::common::module_runtime_path("ome-xml-sample"));
 
-  readFile(sample_path / "2013-06/18x24y5z5t2c8b-text.ome", xml);
+  readFile(sample_path / "2013-06/multi-channel-z-series-time-series.ome.xml", xml);
 
   ome::common::xml::dom::Document doc = ome::xml::createDocument(xml);
   ASSERT_TRUE(doc);
