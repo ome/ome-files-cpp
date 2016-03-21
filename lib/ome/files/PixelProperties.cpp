@@ -74,7 +74,7 @@ namespace ome
       return size;
     }
 
-#undef BYTE_PT_CASE;
+#undef BYTE_PT_CASE
 
 #define BIT_PT_CASE(maR, maProperty, maType)                                  \
         case PixelType::maType:                                               \
@@ -94,7 +94,7 @@ namespace ome
       return size;
     }
 
-#undef BIT_PT_CASE;
+#undef BIT_PT_CASE
 
 #define SIGBIT_PT_CASE(maR, maProperty, maType)                                                   \
         case PixelType::maType:                                                                   \
@@ -114,7 +114,7 @@ namespace ome
       return size;
     }
 
-#undef SIGBIT_PT_CASE;
+#undef SIGBIT_PT_CASE
 
 #define SIGN_PT_CASE(maR, maProperty, maType)                                 \
         case PixelType::maType:                                               \
@@ -134,7 +134,7 @@ namespace ome
       return is_signed;
     }
 
-#undef SIGN_PT_CASE;
+#undef SIGN_PT_CASE
 
 #define INTEGER_PT_CASE(maR, maProperty, maType)                            \
         case PixelType::maType:                                             \
@@ -154,7 +154,7 @@ namespace ome
       return is_integer;
     }
 
-#undef INTEGER_PT_CASE;
+#undef INTEGER_PT_CASE
 
     bool
     isFloatingPoint(::ome::xml::model::enums::PixelType pixeltype)
@@ -180,7 +180,7 @@ namespace ome
       return is_complex;
     }
 
-#undef COMPLEX_PT_CASE;
+#undef COMPLEX_PT_CASE
 
 #ifdef __GNUC__
 #  pragma GCC diagnostic pop
