@@ -61,17 +61,6 @@ namespace
        OME_FILES_SHLIBDIR,
        module_path);
 
-    static RegisterModule ome_files_icon
-      ("ome-files-icon",
-       "OME_FILES_ICONDIR",
-       "OME_FILES_HOME",
-       "OME_HOME",
-       OME_FILES_INSTALL_FULL_ICONDIR,
-       OME_FILES_INSTALL_ICONDIR,
-       OME_FILES_INSTALL_PREFIX,
-       OME_FILES_SHLIBDIR,
-       module_path);
-
     static RegisterModule ome_files_libexec
       ("ome-files-libexec",
        "OME_FILES_PKGLIBEXECDIR",
