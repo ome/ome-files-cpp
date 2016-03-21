@@ -127,7 +127,7 @@ TEST(MetadataToolsTest, ModelVersionFromString)
   std::string xml;
   boost::filesystem::path sample_path(ome::common::module_runtime_path("ome-xml-sample"));
 
-  readFile(sample_path / "2012-06/18x24y5z5t2c8b-text.ome", xml);
+  readFile(sample_path / "2012-06/multi-channel-z-series-time-series.ome.xml", xml);
   ASSERT_EQ(std::string("2012-06"), ome::files::getModelVersion(xml));
 }
 
@@ -138,7 +138,7 @@ TEST(MetadataToolsTest, ModelVersionFromDocument)
   std::string xml;
   boost::filesystem::path sample_path(ome::common::module_runtime_path("ome-xml-sample"));
 
-  readFile(sample_path / "2013-06/18x24y5z5t2c8b-text.ome", xml);
+  readFile(sample_path / "2013-06/multi-channel-z-series-time-series.ome.xml", xml);
 
   ome::common::xml::dom::Document doc = ome::xml::createDocument(xml);
   ASSERT_TRUE(doc);
@@ -604,33 +604,15 @@ namespace
                     ModelTestParameters p;
                     p.file = *fi;
 
-                    // 2003-FC/Iron-Plate.ome.tiff.xml
-                    if (schemadir.filename() == path("2003-FC") &&
-                        p.file.filename() == path("Iron-Plate.ome.tiff.xml"))
-                      continue;
-                    // 2003-FC/single-channel.ome.tif.xml
-                    if (schemadir.filename() == path("2003-FC") &&
-                        p.file.filename() == path("single-channel.ome.tif.xml"))
-                      continue;
-                    // 2008-09/6x4y1z1t1c8b-swatch-instrument.ome
+                    // 2008-09/instrument.ome.xml
                     if (schemadir.filename() == path("2008-09") &&
-                        p.file.filename() == path("6x4y1z1t1c8b-swatch-instrument.ome"))
+                        p.file.filename() == path("instrument.ome.xml"))
                       continue;
-                    // 2010-06/one-of-everything.xml - parse error
-                    if (schemadir.filename() == path("2010-06") &&
-                        p.file.filename() == path("one-of-everything.xml"))
+                    // timestampannotation.ome.xml - Contains non-POSIX timestamps.
+                    if (p.file.filename() == path("timestampannotation.ome.xml"))
                       continue;
-                    // 2010-06/one-of-everything-no-problems.xml - parse error
-                    if (schemadir.filename() == path("2010-06") &&
-                        p.file.filename() == path("one-of-everything-no-problems.xml"))
-                      continue;
-                    // 2013-06/2013-06-datetests.ome - Contains non-POSIX timestamps.
-                    if (schemadir.filename() == path("2013-06") &&
-                        p.file.filename() == path("2013-06-datetests.ome"))
-                      continue;
-                    // 2015-01/2013-06-datetests.ome - Contains non-POSIX timestamps.
-                    if (schemadir.filename() == path("2015-01") &&
-                        p.file.filename() == path("2013-06-datetests.ome"))
+                    // Map Annotation cannot be converted
+                    if (p.file.filename() == path("mapannotation.ome.xml"))
                       continue;
 
                     if (p.file.extension() == path(".ome") ||
