@@ -39,6 +39,10 @@
 
 #include <stdexcept>
 
+#include <boost/preprocessor.hpp>
+
+using ::ome::xml::model::enums::PixelType;
+
 namespace ome
 {
   namespace files
@@ -52,6 +56,11 @@ namespace ome
 #  pragma GCC diagnostic ignored "-Wswitch-default"
 #endif
 
+#define BYTE_PT_CASE(maR, maProperty, maType)                                           \
+        case PixelType::maType:                                                         \
+          maProperty = PixelProperties< PixelType::maType>::pixel_byte_size();          \
+          break;
+
     pixel_size_type
     bytesPerPixel(::ome::xml::model::enums::PixelType pixeltype)
     {
@@ -59,43 +68,18 @@ namespace ome
 
       switch(pixeltype)
         {
-        case ::ome::xml::model::enums::PixelType::INT8:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::INT8>::pixel_byte_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::INT16:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::INT16>::pixel_byte_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::INT32:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::INT32>::pixel_byte_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT8:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::UINT8>::pixel_byte_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT16:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::UINT16>::pixel_byte_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT32:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::UINT32>::pixel_byte_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::FLOAT:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::FLOAT>::pixel_byte_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLE:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLE>::pixel_byte_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::BIT:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::BIT>::pixel_byte_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::COMPLEX:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::COMPLEX>::pixel_byte_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX>::pixel_byte_size();
-          break;
+          BOOST_PP_SEQ_FOR_EACH(BYTE_PT_CASE, size, OME_XML_MODEL_ENUMS_PIXELTYPE_VALUES);
         }
 
       return size;
     }
+
+#undef BYTE_PT_CASE
+
+#define BIT_PT_CASE(maR, maProperty, maType)                                  \
+        case PixelType::maType:                                               \
+          maProperty = PixelProperties< PixelType::maType>::pixel_bit_size(); \
+          break;
 
     pixel_size_type
     bitsPerPixel(::ome::xml::model::enums::PixelType pixeltype)
@@ -104,43 +88,18 @@ namespace ome
 
       switch(pixeltype)
         {
-        case ::ome::xml::model::enums::PixelType::INT8:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::INT8>::pixel_bit_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::INT16:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::INT16>::pixel_bit_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::INT32:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::INT32>::pixel_bit_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT8:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::UINT8>::pixel_bit_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT16:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::UINT16>::pixel_bit_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT32:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::UINT32>::pixel_bit_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::FLOAT:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::FLOAT>::pixel_bit_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLE:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLE>::pixel_bit_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::BIT:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::BIT>::pixel_bit_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::COMPLEX:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::COMPLEX>::pixel_bit_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX>::pixel_bit_size();
-          break;
+          BOOST_PP_SEQ_FOR_EACH(BIT_PT_CASE, size, OME_XML_MODEL_ENUMS_PIXELTYPE_VALUES);
         }
 
       return size;
     }
+
+#undef BIT_PT_CASE
+
+#define SIGBIT_PT_CASE(maR, maProperty, maType)                                                   \
+        case PixelType::maType:                                                                   \
+          maProperty = PixelProperties< PixelType::maType>::pixel_significant_bit_size();         \
+          break;
 
     pixel_size_type
     significantBitsPerPixel(::ome::xml::model::enums::PixelType pixeltype)
@@ -149,43 +108,18 @@ namespace ome
 
       switch(pixeltype)
         {
-        case ::ome::xml::model::enums::PixelType::INT8:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::INT8>::pixel_significant_bit_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::INT16:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::INT16>::pixel_significant_bit_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::INT32:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::INT32>::pixel_significant_bit_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT8:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::UINT8>::pixel_significant_bit_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT16:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::UINT16>::pixel_significant_bit_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT32:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::UINT32>::pixel_significant_bit_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::FLOAT:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::FLOAT>::pixel_significant_bit_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLE:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLE>::pixel_significant_bit_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::BIT:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::BIT>::pixel_significant_bit_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::COMPLEX:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::COMPLEX>::pixel_significant_bit_size();
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX:
-          size = PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX>::pixel_significant_bit_size();
-          break;
+          BOOST_PP_SEQ_FOR_EACH(SIGBIT_PT_CASE, size, OME_XML_MODEL_ENUMS_PIXELTYPE_VALUES);
         }
 
       return size;
     }
+
+#undef SIGBIT_PT_CASE
+
+#define SIGN_PT_CASE(maR, maProperty, maType)                                 \
+        case PixelType::maType:                                               \
+          maProperty = PixelProperties< PixelType::maType>::is_signed;        \
+          break;
 
     bool
     isSigned(::ome::xml::model::enums::PixelType pixeltype)
@@ -194,43 +128,18 @@ namespace ome
 
       switch(pixeltype)
         {
-        case ::ome::xml::model::enums::PixelType::INT8:
-          is_signed = PixelProperties< ::ome::xml::model::enums::PixelType::INT8>::is_signed;
-          break;
-        case ::ome::xml::model::enums::PixelType::INT16:
-          is_signed = PixelProperties< ::ome::xml::model::enums::PixelType::INT16>::is_signed;
-          break;
-        case ::ome::xml::model::enums::PixelType::INT32:
-          is_signed = PixelProperties< ::ome::xml::model::enums::PixelType::INT32>::is_signed;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT8:
-          is_signed = PixelProperties< ::ome::xml::model::enums::PixelType::UINT8>::is_signed;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT16:
-          is_signed = PixelProperties< ::ome::xml::model::enums::PixelType::UINT16>::is_signed;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT32:
-          is_signed = PixelProperties< ::ome::xml::model::enums::PixelType::UINT32>::is_signed;
-          break;
-        case ::ome::xml::model::enums::PixelType::FLOAT:
-          is_signed = PixelProperties< ::ome::xml::model::enums::PixelType::FLOAT>::is_signed;
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLE:
-          is_signed = PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLE>::is_signed;
-          break;
-        case ::ome::xml::model::enums::PixelType::BIT:
-          is_signed = PixelProperties< ::ome::xml::model::enums::PixelType::BIT>::is_signed;
-          break;
-        case ::ome::xml::model::enums::PixelType::COMPLEX:
-          is_signed = PixelProperties< ::ome::xml::model::enums::PixelType::COMPLEX>::is_signed;
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX:
-          is_signed = PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX>::is_signed;
-          break;
+          BOOST_PP_SEQ_FOR_EACH(SIGN_PT_CASE, is_signed, OME_XML_MODEL_ENUMS_PIXELTYPE_VALUES);
         }
 
       return is_signed;
     }
+
+#undef SIGN_PT_CASE
+
+#define INTEGER_PT_CASE(maR, maProperty, maType)                            \
+        case PixelType::maType:                                             \
+          maProperty = PixelProperties< PixelType::maType>::is_integer;     \
+          break;
 
     bool
     isInteger(::ome::xml::model::enums::PixelType pixeltype)
@@ -239,49 +148,24 @@ namespace ome
 
       switch(pixeltype)
         {
-        case ::ome::xml::model::enums::PixelType::INT8:
-          is_integer = PixelProperties< ::ome::xml::model::enums::PixelType::INT8>::is_integer;
-          break;
-        case ::ome::xml::model::enums::PixelType::INT16:
-          is_integer = PixelProperties< ::ome::xml::model::enums::PixelType::INT16>::is_integer;
-          break;
-        case ::ome::xml::model::enums::PixelType::INT32:
-          is_integer = PixelProperties< ::ome::xml::model::enums::PixelType::INT32>::is_integer;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT8:
-          is_integer = PixelProperties< ::ome::xml::model::enums::PixelType::UINT8>::is_integer;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT16:
-          is_integer = PixelProperties< ::ome::xml::model::enums::PixelType::UINT16>::is_integer;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT32:
-          is_integer = PixelProperties< ::ome::xml::model::enums::PixelType::UINT32>::is_integer;
-          break;
-        case ::ome::xml::model::enums::PixelType::FLOAT:
-          is_integer = PixelProperties< ::ome::xml::model::enums::PixelType::FLOAT>::is_integer;
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLE:
-          is_integer = PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLE>::is_integer;
-          break;
-        case ::ome::xml::model::enums::PixelType::BIT:
-          is_integer = PixelProperties< ::ome::xml::model::enums::PixelType::BIT>::is_integer;
-          break;
-        case ::ome::xml::model::enums::PixelType::COMPLEX:
-          is_integer = PixelProperties< ::ome::xml::model::enums::PixelType::COMPLEX>::is_integer;
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX:
-          is_integer = PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX>::is_integer;
-          break;
+          BOOST_PP_SEQ_FOR_EACH(INTEGER_PT_CASE, is_integer, OME_XML_MODEL_ENUMS_PIXELTYPE_VALUES);
         }
 
       return is_integer;
     }
+
+#undef INTEGER_PT_CASE
 
     bool
     isFloatingPoint(::ome::xml::model::enums::PixelType pixeltype)
     {
       return !isInteger(pixeltype);
     }
+
+#define COMPLEX_PT_CASE(maR, maProperty, maType)                            \
+        case PixelType::maType:                                             \
+          maProperty = PixelProperties< PixelType::maType>::is_complex;     \
+          break;
 
     bool
     isComplex(::ome::xml::model::enums::PixelType pixeltype)
@@ -290,43 +174,13 @@ namespace ome
 
       switch(pixeltype)
         {
-        case ::ome::xml::model::enums::PixelType::INT8:
-          is_complex = PixelProperties< ::ome::xml::model::enums::PixelType::INT8>::is_complex;
-          break;
-        case ::ome::xml::model::enums::PixelType::INT16:
-          is_complex = PixelProperties< ::ome::xml::model::enums::PixelType::INT16>::is_complex;
-          break;
-        case ::ome::xml::model::enums::PixelType::INT32:
-          is_complex = PixelProperties< ::ome::xml::model::enums::PixelType::INT32>::is_complex;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT8:
-          is_complex = PixelProperties< ::ome::xml::model::enums::PixelType::UINT8>::is_complex;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT16:
-          is_complex = PixelProperties< ::ome::xml::model::enums::PixelType::UINT16>::is_complex;
-          break;
-        case ::ome::xml::model::enums::PixelType::UINT32:
-          is_complex = PixelProperties< ::ome::xml::model::enums::PixelType::UINT32>::is_complex;
-          break;
-        case ::ome::xml::model::enums::PixelType::FLOAT:
-          is_complex = PixelProperties< ::ome::xml::model::enums::PixelType::FLOAT>::is_complex;
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLE:
-          is_complex = PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLE>::is_complex;
-          break;
-        case ::ome::xml::model::enums::PixelType::BIT:
-          is_complex = PixelProperties< ::ome::xml::model::enums::PixelType::BIT>::is_complex;
-          break;
-        case ::ome::xml::model::enums::PixelType::COMPLEX:
-          is_complex = PixelProperties< ::ome::xml::model::enums::PixelType::COMPLEX>::is_complex;
-          break;
-        case ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX:
-          is_complex = PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX>::is_complex;
-          break;
+          BOOST_PP_SEQ_FOR_EACH(COMPLEX_PT_CASE, is_complex, OME_XML_MODEL_ENUMS_PIXELTYPE_VALUES);
         }
 
       return is_complex;
     }
+
+#undef COMPLEX_PT_CASE
 
 #ifdef __GNUC__
 #  pragma GCC diagnostic pop
