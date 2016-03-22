@@ -53,6 +53,7 @@
 #include <ome/files/tiff/Exception.h>
 
 #include <ome/compat/regex.h>
+#include <ome/compat/tuple.h>
 
 #include <ome/test/config.h>
 #include <ome/test/test.h>
@@ -835,21 +836,27 @@ public:
   uint32_t iheight;
   ome::files::tiff::PlanarConfiguration planarconfig;
   uint16_t samples;
-  static VariantPixelBuffer pngdata_chunky;
-  static VariantPixelBuffer pngdata_planar;
-  typedef std::map<std::pair<PT,ome::files::tiff::PlanarConfiguration>,VariantPixelBuffer> pngdata_map_type;
+  typedef std::map<ome::compat::tuple<uint32_t,uint32_t,PT,ome::files::tiff::PlanarConfiguration>,VariantPixelBuffer> pngdata_map_type;
   static pngdata_map_type pngdata_map;
-  static bool pngdata_init;
-  static uint32_t pwidth;
-  static uint32_t pheight;
 
   static void
-  readPNGData()
+  readPNGData(uint32_t xsize,
+              uint32_t ysize,
+              bool contiguous,
+              VariantPixelBuffer& output)
   {
     // Sample image to check validity of TIFF reading.
-    const char * const pngfile = PROJECT_SOURCE_DIR "/test/ome-files/data/data-layout.png";
+    std::ostringstream f;
+    f << "data-layout-" << xsize << 'x' << ysize << ".png";
+    path dir(PROJECT_BINARY_DIR "/test/ome-files/data");
+    if (!exists(dir) && !is_directory(dir) && !create_directories(dir))
+      throw std::runtime_error("Image directory unavailable and could not be created");
+    dir /= f.str();
+    if (!exists(dir))
+      throw std::runtime_error("PNG test image unavailable");
+    std::string pngfile = dir.string();
 
-    std::FILE *png = std::fopen(pngfile, "rb");
+    std::FILE *png = std::fopen(pngfile.c_str(), "rb");
     ASSERT_TRUE(png);
     uint8_t header[8];
     std::fread(header, 1, 8, png);
@@ -876,8 +883,8 @@ public:
 
     png_read_info(pngptr, infoptr);
 
-    pwidth = png_get_image_width(pngptr, infoptr);
-    pheight = png_get_image_height(pngptr, infoptr);
+    uint32_t pwidth = png_get_image_width(pngptr, infoptr);
+    uint32_t pheight = png_get_image_height(pngptr, infoptr);
     png_byte color_type = png_get_color_type(pngptr, infoptr);
     ASSERT_EQ(PNG_COLOR_TYPE_RGB, color_type);
     png_byte bit_depth = png_get_bit_depth(pngptr, infoptr);
@@ -896,8 +903,8 @@ public:
     ::ome::files::PixelBufferBase::storage_order_type order_chunky(::ome::files::PixelBufferBase::default_storage_order());
     ::ome::files::PixelBufferBase::storage_order_type order_planar(::ome::files::PixelBufferBase::make_storage_order(::ome::xml::model::enums::DimensionOrder::XYZTC, false));
 
+    VariantPixelBuffer pngdata_chunky;
     pngdata_chunky.setBuffer(shape, PT::UINT8, order_chunky);
-    pngdata_planar.setBuffer(shape, PT::UINT8, order_planar);
 
     ome::compat::shared_ptr<PixelBuffer<PixelProperties<PT::UINT8>::std_type> >& uint8_pngdata_chunky(boost::get<ome::compat::shared_ptr<PixelBuffer<PixelProperties<PT::UINT8>::std_type> > >(pngdata_chunky.vbuffer()));
     std::vector<png_bytep> row_pointers(pheight);
@@ -923,36 +930,28 @@ public:
     std::fclose(png);
     png = 0;
 
-    pngdata_planar = pngdata_chunky;
-    ASSERT_TRUE(pngdata_chunky == pngdata_planar);
-
-    pngdata_init = true;
+    if (contiguous)
+      output.setBuffer(shape, PT::UINT8, order_chunky);
+    else
+      output.setBuffer(shape, PT::UINT8, order_planar);
+    output = pngdata_chunky;
+    ASSERT_TRUE(pngdata_chunky == output);
   }
 
   static const VariantPixelBuffer&
-  getPNGDataChunky()
-  {
-    if (!pngdata_init)
-      readPNGData();
-    return pngdata_chunky;
-  }
-
-  static const VariantPixelBuffer&
-  getPNGDataPlanar()
-  {
-    if (!pngdata_init)
-      readPNGData();
-    return pngdata_planar;
-  }
-
-  static const VariantPixelBuffer&
-  getPNGData(PT pixeltype,
+  getPNGData(uint32_t xsize,
+             uint32_t ysize,
+             PT pixeltype,
              ome::files::tiff::PlanarConfiguration planarconfig)
   {
-    pngdata_map_type::const_iterator found = pngdata_map.find(std::make_pair(pixeltype, planarconfig));
+    pngdata_map_type::const_iterator found = pngdata_map.find(pngdata_map_type::key_type(xsize, ysize, pixeltype, planarconfig));
+
     if (found == pngdata_map.end())
       {
-        const VariantPixelBuffer& src(planarconfig == ome::files::tiff::CONTIG ? getPNGDataChunky() : getPNGDataPlanar());
+        VariantPixelBuffer src;
+        readPNGData(xsize, ysize,
+                    planarconfig == ome::files::tiff::CONTIG,
+                    src);
 
         const VariantPixelBuffer::size_type *shape = src.shape();
 
@@ -961,7 +960,7 @@ public:
         PixelTypeConversionVisitor<PT::UINT8> v(src, dest);
         boost::apply_visitor(v, dest.vbuffer());
 
-        pngdata_map_type::key_type key(pixeltype, planarconfig);
+        pngdata_map_type::key_type key(xsize, ysize, pixeltype, planarconfig);
         std::pair<pngdata_map_type::iterator,bool> ins
           (pngdata_map.insert(pngdata_map_type::value_type(key, dest)));
 
@@ -972,6 +971,13 @@ public:
       }
 
     return found->second;
+  }
+
+  const VariantPixelBuffer&
+  getPNGData(PT pixeltype,
+             ome::files::tiff::PlanarConfiguration planarconfig)
+  {
+    return getPNGData(iwidth, iheight, pixeltype, planarconfig);
   }
 
   virtual void SetUp()
@@ -991,12 +997,7 @@ public:
 
 };
 
-VariantPixelBuffer TIFFTileTest::pngdata_chunky;
-VariantPixelBuffer TIFFTileTest::pngdata_planar;
 TIFFTileTest::pngdata_map_type TIFFTileTest::pngdata_map;
-bool TIFFTileTest::pngdata_init = false;
-uint32_t TIFFTileTest::pwidth = 0;
-uint32_t TIFFTileTest::pheight = 0;
 
 // Check basic tile metadata
 TEST_P(TIFFTileTest, TileInfo)
@@ -1037,8 +1038,22 @@ TEST_P(TIFFTileTest, TilePlaneRegion0)
   PlaneRegion region0 = info.tileRegion(0, full);
   EXPECT_EQ(0U, region0.x);
   EXPECT_EQ(0U, region0.y);
-  EXPECT_EQ(params.tilewidth, region0.w);
-  EXPECT_EQ(params.tilelength, region0.h);
+  if (params.imagewidth < params.tilewidth)
+    {
+      EXPECT_EQ(params.imagewidth, region0.w);
+    }
+  else
+    {
+      EXPECT_EQ(params.tilewidth, region0.w);
+    }
+  if (params.imagelength < params.tilelength)
+    {
+      EXPECT_EQ(params.imagelength, region0.h);
+    }
+  else
+    {
+      EXPECT_EQ(params.tilelength, region0.h);
+    }
 }
 
 // Check tiling of whole image including edge overlaps being correctly
@@ -1138,7 +1153,7 @@ TEST_P(TIFFTileTest, PlaneArea3)
   const TileTestParameters& params = GetParam();
   TileInfo info = ifd->getTileInfo();
 
-  PlaneRegion partial(19U, 31U, iwidth - 39U, iheight - 40U);
+  PlaneRegion partial(7U, 18U, iwidth - 18U, iheight - 21U);
   std::vector<dimension_size_type> tiles = info.tileCoverage(partial);
 
   dimension_size_type area = 0;
@@ -1178,7 +1193,9 @@ TEST_P(TIFFTileTest, PlaneArea3)
 namespace
 {
   void
-  read_test(const std::string& file,
+  read_test(uint32_t xsize,
+            uint32_t ysize,
+            const std::string& file,
             const VariantPixelBuffer& reference)
   {
     ome::compat::shared_ptr<TIFF> tiff;
@@ -1188,8 +1205,8 @@ namespace
     ASSERT_NO_THROW(ifd = tiff->getDirectoryByIndex(0));
     ASSERT_TRUE(static_cast<bool>(ifd));
 
-    EXPECT_EQ(64U, ifd->getImageWidth());
-    EXPECT_EQ(64U, ifd->getImageHeight());
+    EXPECT_EQ(xsize, ifd->getImageWidth());
+    EXPECT_EQ(ysize, ifd->getImageHeight());
 
     VariantPixelBuffer vb;
     ifd->readImage(vb);
@@ -1209,7 +1226,10 @@ TEST_P(TIFFTileTest, PlaneRead)
 {
   const TileTestParameters& params = GetParam();
 
-  read_test(params.file, getPNGDataChunky());
+  const VariantPixelBuffer& buf = TIFFTileTest::getPNGData(iwidth, iheight,
+                                                           PT::UINT8,
+                                                           planarconfig);
+  read_test(iwidth, iheight, params.file, buf);
 }
 
 TEST_P(TIFFTileTest, PlaneReadAlignedTileOrdered)
@@ -1319,17 +1339,36 @@ TEST_P(TIFFTileTest, PlaneReadUnalignedTileRandom)
 class PixelTestParameters
 {
 public:
-  PT pixeltype;
+  dimension_size_type                         imagewidth;
+  dimension_size_type                         imageheight;
+  PT                                          pixeltype;
   ome::files::tiff::TileType                  tiletype;
   ome::files::tiff::PlanarConfiguration       planarconfig;
   ome::files::tiff::PhotometricInterpretation photometricinterp;
-  dimension_size_type                              tilewidth;
-  dimension_size_type                              tileheight;
-  bool                                             optimal;
-  bool                                             ordered;
-  std::string                                      filename;
+  dimension_size_type                         tilewidth;
+  dimension_size_type                         tileheight;
+  bool                                        optimal;
+  bool                                        ordered;
+  std::string                                 filename;
 
-  PixelTestParameters(PT pixeltype,
+  PixelTestParameters():
+    imagewidth(0U),
+    imageheight(0U),
+    pixeltype(PT::UINT8),
+    tiletype(ome::files::tiff::TILE),
+    planarconfig(ome::files::tiff::CONTIG),
+    photometricinterp(ome::files::tiff::MIN_IS_BLACK),
+    tilewidth(0U),
+    tileheight(0U),
+    optimal(true),
+    ordered(true),
+    filename()
+  {
+  }
+
+  PixelTestParameters(dimension_size_type imagewidth,
+                      dimension_size_type imageheight,
+                      PT pixeltype,
                       ome::files::tiff::TileType tiletype,
                       ome::files::tiff::PlanarConfiguration planarconfig,
                       ome::files::tiff::PhotometricInterpretation photometricinterp,
@@ -1337,6 +1376,8 @@ public:
                       dimension_size_type tileheight,
                       bool optimal,
                       bool ordered):
+    imagewidth(imagewidth),
+    imageheight(imageheight),
     pixeltype(pixeltype),
     tiletype(tiletype),
     planarconfig(planarconfig),
@@ -1344,10 +1385,12 @@ public:
     tilewidth(tilewidth),
     tileheight(tileheight),
     optimal(optimal),
-    ordered(ordered)
+    ordered(ordered),
+    filename()
   {
     std::ostringstream f;
     f << "data-layout-" << pixeltype << '-'
+      << imagewidth << 'x' << imageheight
       << (planarconfig == ome::files::tiff::CONTIG ? "chunky" : "planar") << '-'
       << "pi" << photometricinterp << '-'
       << (tiletype == ome::files::tiff::TILE ? "tile" : "strip") << '-';
@@ -1390,12 +1433,47 @@ class PixelTest : public ::testing::TestWithParam<PixelTestParameters>
 TEST_P(PixelTest, WriteTIFF)
 {
   const PixelTestParameters& params = GetParam();
-  const VariantPixelBuffer& pixels(TIFFTileTest::getPNGData(params.pixeltype, params.planarconfig));
+  const VariantPixelBuffer& pixels(TIFFTileTest::getPNGData(params.imagewidth,
+                                                            params.imageheight,
+                                                            params.pixeltype,
+                                                            params.planarconfig));
   const VariantPixelBuffer::size_type *shape = pixels.shape();
 
-  dimension_size_type exp_size = (params.tilewidth * params.tileheight *
-                                  ::ome::files::bytesPerPixel(params.pixeltype) *
-                                  (params.planarconfig == ::ome::files::tiff::CONTIG ? shape[ome::files::DIM_SUBCHANNEL] : 1));
+  dimension_size_type exp_size;
+  if (params.tiletype == ome::files::tiff::STRIP)
+    {
+      dimension_size_type corrected_tilewidth = params.tilewidth;
+      dimension_size_type corrected_tileheight = params.tileheight;
+      if (params.planarconfig == ::ome::files::tiff::CONTIG)
+        corrected_tilewidth *= shape[ome::files::DIM_SUBCHANNEL];
+      if (params.pixeltype == PT::BIT)
+        {
+          dimension_size_type size = corrected_tilewidth / 8;
+          if (corrected_tilewidth % 8)
+            ++size;
+          corrected_tilewidth = size;
+        }
+      if (params.tileheight > params.imageheight)
+        {
+          corrected_tileheight = params.imageheight;
+        }
+      exp_size = (corrected_tilewidth * corrected_tileheight *
+                  ::ome::files::bytesPerPixel(params.pixeltype));
+    }
+  else
+    {
+      dimension_size_type corrected_tilewidth = params.tilewidth;
+      dimension_size_type corrected_tileheight = params.tileheight;
+      if (params.pixeltype == PT::BIT)
+        {
+          corrected_tilewidth = params.tilewidth / 8;
+          if (params.tilewidth % 8)
+            ++corrected_tilewidth;
+        }
+      exp_size = (corrected_tilewidth * corrected_tileheight *
+                  ::ome::files::bytesPerPixel(params.pixeltype) *
+                  (params.planarconfig == ::ome::files::tiff::CONTIG ? shape[ome::files::DIM_SUBCHANNEL] : 1));
+    }
 
   // Write TIFF
   {
@@ -1430,14 +1508,6 @@ TEST_P(PixelTest, WriteTIFF)
     EXPECT_EQ(params.planarconfig, wifd->getPlanarConfiguration());
 
     // Make sure our expectations about buffer size are correct
-    if (params.pixeltype == PT::BIT)
-      {
-        dimension_size_type size;
-        size = exp_size / 8;
-        if (exp_size % 8)
-          ++size;
-        exp_size = size;
-      }
     ASSERT_EQ(exp_size,
               wifd->getTileInfo().bufferSize());
 
@@ -1544,6 +1614,16 @@ namespace
   {
     std::vector<PixelTestParameters> ret;
 
+    std::vector<dimension_size_type> imagexsizes;
+    imagexsizes.push_back(32);
+    imagexsizes.push_back(43);
+    imagexsizes.push_back(64);
+
+    std::vector<dimension_size_type> imageysizes;
+    imageysizes.push_back(32);
+    imageysizes.push_back(37);
+    imageysizes.push_back(64);
+
     std::vector<dimension_size_type> tilesizes;
 #ifdef EXTENDED_TESTS
     tilesizes.push_back(16);
@@ -1575,38 +1655,44 @@ namespace
 
     std::vector<bool> optimal;
     optimal.push_back(true);
-#ifdef EXTENDED_TESTS
     optimal.push_back(false);
-#endif // EXTENDED_TESTS
 
     std::vector<bool> ordered;
     ordered.push_back(true);
-#ifdef EXTENDED_TESTS
     ordered.push_back(false);
-#endif // EXTENDED_TESTS
 
     const PT::value_map_type& pixeltypemap = PT::values();
     std::vector<PT> pixeltypes;
     std::transform(pixeltypemap.begin(), pixeltypemap.end(), std::back_inserter(pixeltypes), ptkey);
 
-    for (std::vector<PT>::const_iterator pt = pixeltypes.begin(); pt != pixeltypes.end(); ++pt)
-      for (std::vector<ome::files::tiff::PlanarConfiguration>::const_iterator pc = planarconfigs.begin(); pc != planarconfigs.end(); ++pc)
-        for (std::vector<ome::files::tiff::PhotometricInterpretation>::const_iterator pi = photometricinterps.begin(); pi != photometricinterps.end(); ++pi)
-          {
-            for(std::vector<dimension_size_type>::const_iterator wid = tilesizes.begin(); wid != tilesizes.end(); ++wid)
-              for(std::vector<dimension_size_type>::const_iterator ht = tilesizes.begin(); ht != tilesizes.end(); ++ht)
-                {
-                  for(std::vector<bool>::const_iterator opt = optimal.begin(); opt != optimal.end(); ++opt)
-                    for(std::vector<bool>::const_iterator ord = ordered.begin(); ord != ordered.end(); ++ord)
-                    ret.push_back(PixelTestParameters(*pt, ome::files::tiff::TILE, *pc, *pi, *wid, *ht, *opt, *ord));
-                }
-            for(std::vector<dimension_size_type>::const_iterator rows = stripsizes.begin(); rows != stripsizes.end(); ++rows)
+    for(std::vector<dimension_size_type>::const_iterator imwid = imagexsizes.begin(); imwid != imagexsizes.end(); ++imwid)
+      for(std::vector<dimension_size_type>::const_iterator imht = imageysizes.begin(); imht != imageysizes.end(); ++imht)
+        for (std::vector<PT>::const_iterator pt = pixeltypes.begin(); pt != pixeltypes.end(); ++pt)
+          for (std::vector<ome::files::tiff::PlanarConfiguration>::const_iterator pc = planarconfigs.begin(); pc != planarconfigs.end(); ++pc)
+            for (std::vector<ome::files::tiff::PhotometricInterpretation>::const_iterator pi = photometricinterps.begin(); pi != photometricinterps.end(); ++pi)
               {
-                for(std::vector<bool>::const_iterator opt = optimal.begin(); opt != optimal.end(); ++opt)
-                  for(std::vector<bool>::const_iterator ord = ordered.begin(); ord != ordered.end(); ++ord)
-                    ret.push_back(PixelTestParameters(*pt, ome::files::tiff::STRIP, *pc, *pi, 64, *rows, *opt, *ord));
+                for(std::vector<dimension_size_type>::const_iterator wid = tilesizes.begin(); wid != tilesizes.end(); ++wid)
+                  for(std::vector<dimension_size_type>::const_iterator ht = tilesizes.begin(); ht != tilesizes.end(); ++ht)
+                    {
+                      for(std::vector<bool>::const_iterator opt = optimal.begin(); opt != optimal.end(); ++opt)
+                        for(std::vector<bool>::const_iterator ord = ordered.begin(); ord != ordered.end(); ++ord)
+                          ret.push_back(PixelTestParameters(*imwid, *imht, *pt, ome::files::tiff::TILE, *pc, *pi, *wid, *ht, *opt, *ord));
+                    }
+                for(std::vector<dimension_size_type>::const_iterator rows = stripsizes.begin(); rows != stripsizes.end(); ++rows)
+                  {
+                    for(std::vector<bool>::const_iterator opt = optimal.begin(); opt != optimal.end(); ++opt)
+                      for(std::vector<bool>::const_iterator ord = ordered.begin(); ord != ordered.end(); ++ord)
+                        ret.push_back(PixelTestParameters(*imwid, *imht, *pt, ome::files::tiff::STRIP, *pc, *pi, *imwid, *rows, *opt, *ord));
+                  }
               }
-          }
+
+#ifndef EXTENDED_TESTS
+    if (ret.size() > 200)
+      {
+        std::random_shuffle(ret.begin(), ret.end());
+        ret.resize(200);
+      }
+#endif // EXTENDED_TESTS
 
     return ret;
   }

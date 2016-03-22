@@ -79,29 +79,45 @@ if(GRAPHICSMAGICK_EXECUTABLE)
       if(planarconfig STREQUAL planar)
         set(interlace plane)
       endif()
-      foreach(tilewidth 16 32 48 64)
-        foreach(tileheight 16 32 48 64)
-          set(gen "${CMAKE_CURRENT_BINARY_DIR}/${image}-64x64-${planarconfig}-tiles-${tilewidth}x${tileheight}.tiff")
-          add_custom_command(OUTPUT "${gen}"
+      foreach(imagewidth 32 43 64)
+        foreach(imageheight 32 37 64)
+          # Generate different reference PNG image sizes
+          set(genpng "${CMAKE_CURRENT_BINARY_DIR}/${image}-${imagewidth}x${imageheight}.png")
+          add_custom_command(OUTPUT "${genpng}"
                              DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${image}.png"
                              COMMAND "${GRAPHICSMAGICK_EXECUTABLE}" convert
                                      "${CMAKE_CURRENT_SOURCE_DIR}/${image}.png"
-                                     -interlace "${interlace}"
-                                     -define "tiff:tile-geometry=${tilewidth}x${tileheight}"
-                                     "${gen}")
-          list(APPEND images "${gen}")
+                                     -resize "${imagewidth}x${imageheight}!"
+                                     "${genpng}")
+
+          # Generate TIFF tile variants for each image size
+          foreach(tilewidth 16 32 48 64)
+            foreach(tileheight 16 32 48 64)
+              set(gentiff "${CMAKE_CURRENT_BINARY_DIR}/${image}-${imagewidth}x${imageheight}-${planarconfig}-tiles-${tilewidth}x${tileheight}.tiff")
+              add_custom_command(OUTPUT "${gentiff}"
+                                 DEPENDS "${genpng}"
+                                 COMMAND "${GRAPHICSMAGICK_EXECUTABLE}" convert
+                                         "${genpng}"
+                                         -interlace "${interlace}"
+                                         -define "tiff:tile-geometry=${tilewidth}x${tileheight}"
+                                         "${gentiff}")
+              list(APPEND images "${gentiff}")
+            endforeach()
+          endforeach()
+
+          # Generate TIFF strip variants for each image size
+          foreach(striprows 01 02 05 14 32 60 64)
+            set(gentiff "${CMAKE_CURRENT_BINARY_DIR}/${image}-${imagewidth}x${imageheight}-${planarconfig}-strips-${striprows}.tiff")
+            add_custom_command(OUTPUT "${gentiff}"
+                               DEPENDS "${genpng}"
+                               COMMAND "${GRAPHICSMAGICK_EXECUTABLE}" convert
+                               "${genpng}"
+                                         -interlace "${interlace}"
+                                         -define "tiff:rows-per-strip=${striprows}"
+                                         "${gentiff}")
+            list(APPEND images "${gentiff}")
+          endforeach()
         endforeach()
-      endforeach()
-      foreach(striprows 01 02 05 14 32 60 64)
-        set(gen "${CMAKE_CURRENT_BINARY_DIR}/${image}-64x64-${planarconfig}-strips-${striprows}.tiff")
-        add_custom_command(OUTPUT "${gen}"
-                           DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${image}.png"
-                           COMMAND "${GRAPHICSMAGICK_EXECUTABLE}" convert
-                           "${CMAKE_CURRENT_SOURCE_DIR}/${image}.png"
-                           -interlace "${interlace}"
-                           -define "tiff:rows-per-strip=${striprows}"
-                           "${gen}")
-        list(APPEND images "${gen}")
       endforeach()
     endforeach()
   endforeach()
