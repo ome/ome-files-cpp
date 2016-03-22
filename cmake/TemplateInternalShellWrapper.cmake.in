@@ -2,7 +2,6 @@
 
 set -e
 
-export OME_FILES_ICONDIR="@PROJECT_SOURCE_DIR@/cpp/share/icons"
 export OME_FILES_MANDIR="@PROJECT_BINARY_DIR@/cpp/man"
 
 cmd=$1

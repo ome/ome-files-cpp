@@ -76,7 +76,6 @@ include(ThreadChecks)
 include(XercesChecks)
 include(XalanChecks)
 include(ImageLibraries)
-include(QtGLChecks)
 include(GTest)
 include(Doxygen)
 include(HeaderTest)
@@ -105,25 +104,16 @@ if(CMAKE_INSTALL_PREFIX)
     set(OME_FILES_INSTALL_PKGLIBEXECDIR "${CMAKE_INSTALL_LIBEXECDIR}/ome/files"
         CACHE PATH "OME Files-specific libexecdir")
   endif()
-  if (NOT DEFINED OME_FILES_INSTALL_ICONDIR)
-    set(OME_FILES_INSTALL_ICONDIR "${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable"
-        CACHE PATH "Icon directory")
-  endif()
 else()
   if (NOT DEFINED OME_FILES_INSTALL_PKGLIBEXECDIR)
     set(OME_FILES_INSTALL_PKGLIBEXECDIR "${CMAKE_INSTALL_LIBEXECDIR}"
         CACHE PATH "OME Files-specific libexecdir")
-  endif()
-  if (NOT DEFINED OME_FILES_INSTALL_ICONDIR)
-    set(OME_FILES_INSTALL_ICONDIR "${CMAKE_INSTALL_DATADIR}/icons"
-        CACHE PATH "Icon directory")
   endif()
 endif()
 
 foreach(dir
     PKGDATADIR
     PKGLIBEXECDIR
-    ICONDIR
   )
   mark_as_advanced(OME_FILES_INSTALL_${dir})
 endforeach()
@@ -143,7 +133,6 @@ endfunction()
 
 add_subdirectory(lib)
 add_subdirectory(libexec)
-add_subdirectory(share/icons)
 add_subdirectory(test)
 add_subdirectory(examples)
 

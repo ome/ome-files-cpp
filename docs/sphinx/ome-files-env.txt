@@ -76,10 +76,10 @@ basic paths, above.
 
 :envvar:`OME_FILES_DATADIR`
   OME-Files data files
-:envvar:`OME_FILES_ICONDIR`
-  OME-Files icons
 :envvar:`OME_FILES_LIBEXECDIR`
   OME-Files program executables
+:envvar:`OME_QTWIDGETS_ICONDIR`
+  OME-QtWidgets icons
 :envvar:`OME_XML_SCHEMADIR`
   OME-XML model schemas
 :envvar:`OME_XML_TRANSFORMDIR`

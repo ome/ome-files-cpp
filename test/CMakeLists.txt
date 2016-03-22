@@ -35,4 +35,3 @@
 # #L%
 
 add_subdirectory(ome-files)
-add_subdirectory(ome-qtwidgets)

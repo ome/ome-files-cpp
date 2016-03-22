@@ -1,6 +1,5 @@
 @echo off
 
-set "OME_FILES_ICONDIR=@PROJECT_SOURCE_DIR@/cpp/share/icons"
 set "OME_FILES_MANDIR=@PROJECT_SOURCE_DIR@/cpp/man"
 
 %*
