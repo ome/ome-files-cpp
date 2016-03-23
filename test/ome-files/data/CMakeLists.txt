@@ -89,6 +89,7 @@ if(GRAPHICSMAGICK_EXECUTABLE)
                                      "${CMAKE_CURRENT_SOURCE_DIR}/${image}.png"
                                      -resize "${imagewidth}x${imageheight}!"
                                      "${genpng}")
+          list(APPEND images "${genpng}")
 
           # Generate TIFF tile variants for each image size
           foreach(tilewidth 16 32 48 64)
@@ -120,6 +121,16 @@ if(GRAPHICSMAGICK_EXECUTABLE)
         endforeach()
       endforeach()
     endforeach()
+  endforeach()
+else()
+  foreach(image data-layout)
+    set(genpng "${CMAKE_CURRENT_BINARY_DIR}/${image}-64x64.png")
+    add_custom_command(OUTPUT "${genpng}"
+                       DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${image}.png"
+                       COMMAND "${CMAKE_COMMAND}" -E copy
+                               "${CMAKE_CURRENT_SOURCE_DIR}/${image}.png"
+                               "${genpng}")
+    list(APPEND images "${genpng}")
   endforeach()
 endif()
 add_custom_target(gentestimages DEPENDS ${images})

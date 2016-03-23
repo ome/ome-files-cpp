@@ -1670,13 +1670,33 @@ namespace
                     {
                       for(std::vector<bool>::const_iterator opt = optimal.begin(); opt != optimal.end(); ++opt)
                         for(std::vector<bool>::const_iterator ord = ordered.begin(); ord != ordered.end(); ++ord)
-                          ret.push_back(PixelTestParameters(*imwid, *imht, *pt, ome::files::tiff::TILE, *pc, *pi, *wid, *ht, *opt, *ord));
+                          {
+                            try
+                              {
+                                // Check PNG reference exists.
+                                TIFFTileTest::getPNGData(*imwid, *imht, *pt, *pc);
+                                ret.push_back(PixelTestParameters(*imwid, *imht, *pt, ome::files::tiff::TILE, *pc, *pi, *wid, *ht, *opt, *ord));
+                              }
+                            catch(const std::exception&)
+                              {
+                              }
+                          }
                     }
                 for(std::vector<dimension_size_type>::const_iterator rows = stripsizes.begin(); rows != stripsizes.end(); ++rows)
                   {
                     for(std::vector<bool>::const_iterator opt = optimal.begin(); opt != optimal.end(); ++opt)
                       for(std::vector<bool>::const_iterator ord = ordered.begin(); ord != ordered.end(); ++ord)
-                        ret.push_back(PixelTestParameters(*imwid, *imht, *pt, ome::files::tiff::STRIP, *pc, *pi, *imwid, *rows, *opt, *ord));
+                        {
+                          try
+                            {
+                              // Check PNG reference exists.
+                              TIFFTileTest::getPNGData(*imwid, *imht, *pt, *pc);
+                              ret.push_back(PixelTestParameters(*imwid, *imht, *pt, ome::files::tiff::STRIP, *pc, *pi, *imwid, *rows, *opt, *ord));
+                            }
+                          catch(const std::exception&)
+                            {
+                            }
+                        }
                   }
               }
 
