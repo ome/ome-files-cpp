@@ -212,10 +212,8 @@ namespace
            row != rclip.y + rclip.h;
            ++row)
         {
-          dimension_size_type row_width = rfull.w * copysamples;
-          if (row_width % 8U)
-            row_width += 8U - (row_width % 8U); // pad to next full byte
-          dimension_size_type yoffset = (row - rfull.y) * row_width;
+          const dimension_size_type full_row_width = rfull.w * copysamples;
+          dimension_size_type yoffset = (row - rfull.y) * full_row_width;
 
           destidx[ome::files::DIM_SPATIAL_X] = rclip.x - region.x;
           destidx[ome::files::DIM_SPATIAL_Y] = row - region.y;
@@ -464,10 +462,8 @@ namespace
            row != rclip.y + rclip.h;
            ++row)
         {
-          dimension_size_type row_width = rfull.w * copysamples;
-          if (row_width % 8)
-            row_width += 8 - (row_width % 8); // pad to next full byte
-          dimension_size_type yoffset = (row - rfull.y) * row_width;
+          const dimension_size_type full_row_width = rfull.w * copysamples;
+          dimension_size_type yoffset = (row - rfull.y) * full_row_width;
 
           srcidx[ome::files::DIM_SPATIAL_X] = rclip.x - region.x;
           srcidx[ome::files::DIM_SPATIAL_Y] = row - region.y;
