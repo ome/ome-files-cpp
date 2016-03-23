@@ -1625,23 +1625,17 @@ namespace
     imageysizes.push_back(64);
 
     std::vector<dimension_size_type> tilesizes;
-#ifdef EXTENDED_TESTS
     tilesizes.push_back(16);
-#endif // EXTENDED_TESTS
     tilesizes.push_back(32);
     tilesizes.push_back(48);
-#ifdef EXTENDED_TESTS
     tilesizes.push_back(64);
-#endif // EXTENDED_TESTS
 
     std::vector<dimension_size_type> stripsizes;
     stripsizes.push_back(1);
     stripsizes.push_back(2);
-#ifdef EXTENDED_TESTS
     stripsizes.push_back(5);
     stripsizes.push_back(14);
     stripsizes.push_back(32);
-#endif // EXTENDED_TESTS
     stripsizes.push_back(60);
     stripsizes.push_back(64);
 
@@ -1686,13 +1680,12 @@ namespace
                   }
               }
 
-#ifndef EXTENDED_TESTS
-    if (ret.size() > 200)
-      {
-        std::random_shuffle(ret.begin(), ret.end());
-        ret.resize(200);
-      }
-#endif // EXTENDED_TESTS
+    std::random_shuffle(ret.begin(), ret.end());
+#ifdef EXTENDED_TESTS
+    ret.resize(4000);
+#else
+    ret.resize(200);
+#endif
 
     return ret;
   }
