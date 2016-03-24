@@ -52,8 +52,7 @@ if __name__ == "__main__":
     options.target = os.path.abspath(options.target)
 
     # Get data from git for the specified tag.
-    vcsshortrevision = check_output(['git', 'log', '-1', options.tag, '--pretty=%h'])
-    vcsshortrevision.rstrip()
+    vcsshortrevision = check_output(['git', 'log', '-1', options.tag, '--pretty=%h']).rstrip()
     vcsrevision = check_output(['git', 'log', '-1', options.tag, '--pretty=%H']).rstrip()
     vcsdate = check_output(['git', 'log', '-1', options.tag, '--pretty=%ai']).rstrip()
     vcsdate_unix = check_output(['git', 'log', '-1', options.tag, '--pretty=%at']).rstrip()
