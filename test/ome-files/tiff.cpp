@@ -827,6 +827,29 @@ TEST(TIFFCodec, ListCodecs)
     }
 }
 
+typedef ome::compat::tuple<uint32_t,uint32_t,PT,ome::files::tiff::PlanarConfiguration> plane_configuration;
+
+struct compare_tuple
+{
+  bool
+  operator() (const plane_configuration& lhs,
+              const plane_configuration& rhs) const
+  {
+    if (ome::compat::get<0>(lhs) < ome::compat::get<0>(rhs)) return true;
+    if (ome::compat::get<0>(lhs) > ome::compat::get<0>(rhs)) return false;
+
+    if (ome::compat::get<1>(lhs) < ome::compat::get<1>(rhs)) return true;
+    if (ome::compat::get<1>(lhs) > ome::compat::get<1>(rhs)) return false;
+
+    if (static_cast<PT::enum_value>(ome::compat::get<2>(lhs)) <
+        static_cast<PT::enum_value>(ome::compat::get<2>(rhs))) return true;
+    if (static_cast<PT::enum_value>(ome::compat::get<2>(lhs)) >
+        static_cast<PT::enum_value>(ome::compat::get<2>(rhs))) return false;
+
+    return ome::compat::get<3>(lhs) < ome::compat::get<3>(rhs);
+  }
+};
+
 class TIFFTileTest : public ::testing::TestWithParam<TileTestParameters>
 {
 public:
@@ -836,7 +859,7 @@ public:
   uint32_t iheight;
   ome::files::tiff::PlanarConfiguration planarconfig;
   uint16_t samples;
-  typedef std::map<ome::compat::tuple<uint32_t,uint32_t,PT,ome::files::tiff::PlanarConfiguration>,VariantPixelBuffer> pngdata_map_type;
+  typedef std::map<plane_configuration,VariantPixelBuffer, compare_tuple> pngdata_map_type;
   static pngdata_map_type pngdata_map;
 
   static void
