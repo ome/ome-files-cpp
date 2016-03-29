@@ -80,7 +80,9 @@ include(GTest)
 include(Doxygen)
 include(HeaderTest)
 
-find_package(OME 5.2.0 REQUIRED Compat Common XML)
+find_package(OMECompat REQUIRED)
+find_package(OMECommon REQUIRED)
+find_package(OMEXML REQUIRED)
 
 if(MSVC)
   # Debug library suffix.
@@ -139,7 +141,7 @@ add_subdirectory(examples)
 set(LIBRARY_PREFIX OME)
 file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 configure_file(${PROJECT_SOURCE_DIR}/cmake/TemplateShellConfig.cmake.in
-               ${PROJECT_BINARY_DIR}/config @ONLY)
+               ${PROJECT_BINARY_DIR}/config @ONLY NEWLINE_STYLE UNIX)
 configure_file(${PROJECT_SOURCE_DIR}/cmake/TemplateInternalShellWrapper.cmake.in
                ${PROJECT_BINARY_DIR}/cmake/ome-files @ONLY)
 configure_file(${PROJECT_SOURCE_DIR}/cmake/TemplateShellWrapper.cmake.in
