@@ -312,9 +312,9 @@ man_pages = [
     ('overview', 'ome-files-cpp-overview', 'C++ implementation overview', author, 7),
     ('conversion', 'ome-files-cpp-conversion', 'C++ conventions for Java programmers switching to the C++ implementation', author, 7),
     ('ome-files-env', 'ome-files-env', 'OME-Files environment variables', author, 7),
-    ('commands/ome-files', 'ome-files-test', 'run OME-Files (C++) test tools', author, 1),
-    ('commands/ome-files-info', 'ome-files-test-info', 'display and validate image metadata', author, 1),
-    ('commands/ome-files-view', 'ome-files-test-view', 'view image pixel data', author, 1)
+    ('commands/ome-files', 'ome-files', 'run OME-Files (C++) test tools', author, 1),
+    ('commands/ome-files-info', 'ome-files-info', 'display and validate image metadata', author, 1),
+    ('commands/ome-files-view', 'ome-files-view', 'view image pixel data', author, 1)
 ]
 
 # If true, show URL addresses after external links.
