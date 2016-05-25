@@ -1031,8 +1031,8 @@ VariantPixelBufferTestParameters variant_params[] =
     VariantPixelBufferTestParameters(PT::FLOAT),
     VariantPixelBufferTestParameters(PT::DOUBLE),
     VariantPixelBufferTestParameters(PT::BIT),
-    VariantPixelBufferTestParameters(PT::COMPLEX),
-    VariantPixelBufferTestParameters(PT::DOUBLECOMPLEX)
+    VariantPixelBufferTestParameters(PT::COMPLEXFLOAT),
+    VariantPixelBufferTestParameters(PT::COMPLEXDOUBLE)
   };
 
 // Disable missing-prototypes warning for INSTANTIATE_TEST_CASE_P;

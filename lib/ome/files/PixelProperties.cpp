@@ -215,10 +215,10 @@ namespace ome
               if (is_integer)
                 throw std::logic_error("Complex pixel types must be floating point");
 
-              if (size == bytesPerPixel(::ome::xml::model::enums::PixelType::COMPLEX))
-                type = ::ome::xml::model::enums::PixelType::COMPLEX;
-              else if (size == bytesPerPixel(::ome::xml::model::enums::PixelType::DOUBLECOMPLEX))
-                type = ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX;
+              if (size == bytesPerPixel(::ome::xml::model::enums::PixelType::COMPLEXFLOAT))
+                type = ::ome::xml::model::enums::PixelType::COMPLEXFLOAT;
+              else if (size == bytesPerPixel(::ome::xml::model::enums::PixelType::COMPLEXDOUBLE))
+                type = ::ome::xml::model::enums::PixelType::COMPLEXDOUBLE;
               else
                 throw std::runtime_error("No suitable complex pixel type found");
             }

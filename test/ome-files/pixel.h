@@ -66,45 +66,45 @@ pixel_value_complex(uint32_t value)
 
 template<>
 inline
-::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEX,
+::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXFLOAT,
                                           ::ome::files::ENDIAN_BIG>::type
-pixel_value< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEX,
+pixel_value< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXFLOAT,
                                                        ::ome::files::ENDIAN_BIG>::type>(uint32_t value)
 {
-  return pixel_value_complex< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEX,
+  return pixel_value_complex< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXFLOAT,
                                                                         ::ome::files::ENDIAN_BIG>::type>(value);
 }
 
 template<>
 inline
-::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEX,
+::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXFLOAT,
                                           ::ome::files::ENDIAN_LITTLE>::type
-pixel_value< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEX,
+pixel_value< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXFLOAT,
                                                        ::ome::files::ENDIAN_LITTLE>::type>(uint32_t value)
 {
-  return pixel_value_complex< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEX,
+  return pixel_value_complex< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXFLOAT,
                                                                         ::ome::files::ENDIAN_LITTLE>::type>(value);
 }
 
 template<>
 inline
-::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX,
+::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXDOUBLE,
                                           ::ome::files::ENDIAN_BIG>::type
-pixel_value< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX,
+pixel_value< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXDOUBLE,
                                                        ::ome::files::ENDIAN_BIG>::type>(uint32_t value)
 {
-  return pixel_value_complex< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX,
+  return pixel_value_complex< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXDOUBLE,
                                                                         ::ome::files::ENDIAN_BIG>::type>(value);
 }
 
 template<>
 inline
-::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX,
+::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXDOUBLE,
                                           ::ome::files::ENDIAN_LITTLE>::type
-pixel_value< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX,
+pixel_value< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXDOUBLE,
                                                        ::ome::files::ENDIAN_LITTLE>::type>(uint32_t value)
 {
-  return pixel_value_complex< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX,
+  return pixel_value_complex< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXDOUBLE,
                                                                         ::ome::files::ENDIAN_LITTLE>::type>(value);
 }
 
