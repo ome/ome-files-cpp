@@ -39,8 +39,8 @@
 #include "pixelbuffer.h"
 
 typedef ::testing::Types<
-  PixelEndianProperties<PT::COMPLEX,          ome::files::ENDIAN_BIG   >::type,
-  PixelEndianProperties<PT::COMPLEX,          ome::files::ENDIAN_LITTLE>::type,
-  PixelEndianProperties<PT::COMPLEX,          ome::files::ENDIAN_NATIVE>::type> TestTypes;
+  PixelEndianProperties<PT::COMPLEXFLOAT,     ome::files::ENDIAN_BIG   >::type,
+  PixelEndianProperties<PT::COMPLEXFLOAT,     ome::files::ENDIAN_LITTLE>::type,
+  PixelEndianProperties<PT::COMPLEXFLOAT,     ome::files::ENDIAN_NATIVE>::type> TestTypes;
 
 INSTANTIATE_TYPED_TEST_CASE_P(PixelBufferComplexTest, PixelBufferType, TestTypes);

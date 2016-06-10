@@ -1108,11 +1108,11 @@ FormatReaderTestParameters variant_params[] =
     FormatReaderTestParameters(PT::BIT,           ome::files::ENDIAN_BIG),
     FormatReaderTestParameters(PT::BIT,           ome::files::ENDIAN_LITTLE),
 
-    FormatReaderTestParameters(PT::COMPLEX,       ome::files::ENDIAN_BIG),
-    FormatReaderTestParameters(PT::COMPLEX,       ome::files::ENDIAN_LITTLE),
+    FormatReaderTestParameters(PT::COMPLEXFLOAT,  ome::files::ENDIAN_BIG),
+    FormatReaderTestParameters(PT::COMPLEXFLOAT,  ome::files::ENDIAN_LITTLE),
 
-    FormatReaderTestParameters(PT::DOUBLECOMPLEX, ome::files::ENDIAN_BIG),
-    FormatReaderTestParameters(PT::DOUBLECOMPLEX, ome::files::ENDIAN_LITTLE),
+    FormatReaderTestParameters(PT::COMPLEXDOUBLE, ome::files::ENDIAN_BIG),
+    FormatReaderTestParameters(PT::COMPLEXDOUBLE, ome::files::ENDIAN_LITTLE),
   };
 
 // Disable missing-prototypes warning for INSTANTIATE_TEST_CASE_P;

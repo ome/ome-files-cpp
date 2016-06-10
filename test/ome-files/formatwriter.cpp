@@ -154,7 +154,7 @@ namespace
   ome::xml::model::enums::PixelType init_adv_pt[] =
     {
       ome::xml::model::enums::PixelType::DOUBLE,
-      ome::xml::model::enums::PixelType::DOUBLECOMPLEX,
+      ome::xml::model::enums::PixelType::COMPLEXDOUBLE,
       ome::xml::model::enums::PixelType::BIT
     };
 
@@ -579,7 +579,7 @@ TEST_P(FormatWriterTest, SupportedPixelTypeDefault)
   EXPECT_TRUE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT16));
   EXPECT_TRUE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT32));
   EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::DOUBLE));
-  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::DOUBLECOMPLEX));
+  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::COMPLEXDOUBLE));
   EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::BIT));
   EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::INT16));
 }
@@ -590,7 +590,7 @@ TEST_P(FormatWriterTest, SupportedPixelTypeByCodec)
   EXPECT_TRUE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT16, "default"));
   EXPECT_TRUE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT32, "default"));
   EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::DOUBLE, "default"));
-  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::DOUBLECOMPLEX, "default"));
+  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::COMPLEXDOUBLE, "default"));
   EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::BIT, "default"));
   EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::INT16, "default"));
 
@@ -598,7 +598,7 @@ TEST_P(FormatWriterTest, SupportedPixelTypeByCodec)
   EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT16, "advanced"));
   EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT32, "advanced"));
   EXPECT_TRUE(w.isSupportedType(ome::xml::model::enums::PixelType::DOUBLE, "advanced"));
-  EXPECT_TRUE(w.isSupportedType(ome::xml::model::enums::PixelType::DOUBLECOMPLEX, "advanced"));
+  EXPECT_TRUE(w.isSupportedType(ome::xml::model::enums::PixelType::COMPLEXDOUBLE, "advanced"));
   EXPECT_TRUE(w.isSupportedType(ome::xml::model::enums::PixelType::BIT, "advanced"));
   EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::INT16, "advanced"));
 
@@ -606,7 +606,7 @@ TEST_P(FormatWriterTest, SupportedPixelTypeByCodec)
   EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT16, "invalid"));
   EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT32, "invalid"));
   EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::DOUBLE, "invalid"));
-  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::DOUBLECOMPLEX, "invalid"));
+  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::COMPLEXDOUBLE, "invalid"));
   EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::BIT, "invalid"));
   EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::INT16, "invalid"));
 }
@@ -667,11 +667,11 @@ FormatWriterTestParameters variant_params[] =
     FormatWriterTestParameters(PT::BIT,           ome::files::ENDIAN_BIG),
     FormatWriterTestParameters(PT::BIT,           ome::files::ENDIAN_LITTLE),
 
-    FormatWriterTestParameters(PT::COMPLEX,       ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::COMPLEX,       ome::files::ENDIAN_LITTLE),
+    FormatWriterTestParameters(PT::COMPLEXFLOAT,  ome::files::ENDIAN_BIG),
+    FormatWriterTestParameters(PT::COMPLEXFLOAT,  ome::files::ENDIAN_LITTLE),
 
-    FormatWriterTestParameters(PT::DOUBLECOMPLEX, ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::DOUBLECOMPLEX, ome::files::ENDIAN_LITTLE),
+    FormatWriterTestParameters(PT::COMPLEXDOUBLE, ome::files::ENDIAN_BIG),
+    FormatWriterTestParameters(PT::COMPLEXDOUBLE, ome::files::ENDIAN_LITTLE),
   };
 
 // Disable missing-prototypes warning for INSTANTIATE_TEST_CASE_P;

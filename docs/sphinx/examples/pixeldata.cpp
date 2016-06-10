@@ -174,8 +174,8 @@ namespace
       return std::real(lhs) > std::real(rhs);
     }
 
-    // Get min and max for complex pixel types (COMPLEX and
-    // DOUBLECOMPLEX)
+    // Get min and max for complex pixel types (COMPLEXFLOAT and
+    // COMPLEXDOUBLE)
     // This is the same as for simple pixel types, except for the
     // addition of custom comparison functions and conversion of the
     // result to the real part.

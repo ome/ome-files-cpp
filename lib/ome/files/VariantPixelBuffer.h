@@ -103,8 +103,8 @@ namespace ome
       /// Floating-point pixel types.
       typedef boost::mpl::vector< PixelProperties< ::ome::xml::model::enums::PixelType::FLOAT>,
                                   PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLE>,
-                                  PixelProperties< ::ome::xml::model::enums::PixelType::COMPLEX>,
-                                  PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX> > float_pixel_types;
+                                  PixelProperties< ::ome::xml::model::enums::PixelType::COMPLEXFLOAT>,
+                                  PixelProperties< ::ome::xml::model::enums::PixelType::COMPLEXDOUBLE> > float_pixel_types;
 
       /// Aggregate view of all numeric types.
       typedef boost::mpl::joint_view<integer_pixel_types,

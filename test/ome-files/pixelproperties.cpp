@@ -95,8 +95,8 @@ typedef ::testing::Types<PixelTypeParam<PT::INT8,         int8_t>,
                          PixelTypeParam<PT::BIT,          bool>,
                          PixelTypeParam<PT::FLOAT,        float>,
                          PixelTypeParam<PT::DOUBLE,       double>,
-                         PixelTypeParam<PT::COMPLEX,      std::complex<float> >,
-                         PixelTypeParam<PT::DOUBLECOMPLEX,std::complex<double> > > TestTypes;
+                         PixelTypeParam<PT::COMPLEXFLOAT, std::complex<float> >,
+                         PixelTypeParam<PT::COMPLEXDOUBLE,std::complex<double> > > TestTypes;
 INSTANTIATE_TYPED_TEST_CASE_P(PixelPropertiesTypeTest, PixelPropertiesType, TestTypes);
 
 class PixelPropertiesTestParameters
@@ -202,8 +202,8 @@ PixelPropertiesTestParameters property_params[] =
     PixelPropertiesTestParameters(PT::BIT,           sizeof(bool),                 sizeof(bool)*8,                 false, true,   false),
     PixelPropertiesTestParameters(PT::FLOAT,         sizeof(float),                sizeof(float)*8,                true,  false,  false),
     PixelPropertiesTestParameters(PT::DOUBLE,        sizeof(double),               sizeof(double)*8,               true,  false,  false),
-    PixelPropertiesTestParameters(PT::COMPLEX,       sizeof(std::complex<float>),  sizeof(std::complex<float>)*8,  true,  false,  true),
-    PixelPropertiesTestParameters(PT::DOUBLECOMPLEX, sizeof(std::complex<double>), sizeof(std::complex<double>)*8, true,  false,  true)
+    PixelPropertiesTestParameters(PT::COMPLEXFLOAT,  sizeof(std::complex<float>),  sizeof(std::complex<float>)*8,  true,  false,  true),
+    PixelPropertiesTestParameters(PT::COMPLEXDOUBLE, sizeof(std::complex<double>), sizeof(std::complex<double>)*8, true,  false,  true)
   };
 
 class FindPixelTypeTestParameters
@@ -284,8 +284,8 @@ FindPixelTypeTestParameters find_params[] =
     FindPixelTypeTestParameters(PT::UINT32,        sizeof(uint32_t),             sizeof(uint32_t)*8,             false, true,   false,  false),
     FindPixelTypeTestParameters(PT::FLOAT,         sizeof(float),                sizeof(float)*8,                true,  false,  false,  false),
     FindPixelTypeTestParameters(PT::DOUBLE,        sizeof(double),               sizeof(double)*8,               true,  false,  false,  false),
-    FindPixelTypeTestParameters(PT::COMPLEX,       sizeof(std::complex<float>),  sizeof(std::complex<float>)*8,  true,  false,  true,   false),
-    FindPixelTypeTestParameters(PT::DOUBLECOMPLEX, sizeof(std::complex<double>), sizeof(std::complex<double>)*8, true,  false,  true,   false),
+    FindPixelTypeTestParameters(PT::COMPLEXFLOAT,  sizeof(std::complex<float>),  sizeof(std::complex<float>)*8,  true,  false,  true,   false),
+    FindPixelTypeTestParameters(PT::COMPLEXDOUBLE, sizeof(std::complex<double>), sizeof(std::complex<double>)*8, true,  false,  true,   false),
     FindPixelTypeTestParameters(PT::INT8,          0,                            0,                              true,  true,   false,  true),
     FindPixelTypeTestParameters(PT::INT8,          0,                            3,                              true,  true,   false,  true),
     FindPixelTypeTestParameters(PT::INT8,          0,                            3,                              true,  true,   true,   true),

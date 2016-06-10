@@ -330,10 +330,10 @@ namespace ome
       }
     };
 
-    /// Properties of COMPLEX pixels.
+    /// Properties of COMPLEXFLOAT pixels.
     template<>
-    struct PixelProperties< ::ome::xml::model::enums::PixelType::COMPLEX> :
-      public PixelPropertiesBase<PixelProperties< ::ome::xml::model::enums::PixelType::COMPLEX> >
+    struct PixelProperties< ::ome::xml::model::enums::PixelType::COMPLEXFLOAT> :
+      public PixelPropertiesBase<PixelProperties< ::ome::xml::model::enums::PixelType::COMPLEXFLOAT> >
     {
       /// Pixel type (standard language type).
       typedef std::complex<float> std_type;
@@ -353,10 +353,10 @@ namespace ome
       static const bool is_complex = true;
     };
 
-    /// Properties of DOUBLECOMPLEX pixels.
+    /// Properties of COMPLEXDOUBLE pixels.
     template<>
-    struct PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX> :
-      public PixelPropertiesBase<PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLECOMPLEX> >
+    struct PixelProperties< ::ome::xml::model::enums::PixelType::COMPLEXDOUBLE> :
+      public PixelPropertiesBase<PixelProperties< ::ome::xml::model::enums::PixelType::COMPLEXDOUBLE> >
     {
       /// Pixel type (standard language type).
       typedef std::complex<double> std_type;

@@ -1031,9 +1031,9 @@ namespace ome
               case COMPLEX_FLOAT:
                 {
                   if (bits == 64)
-                    pt = PixelType::COMPLEX;
+                    pt = PixelType::COMPLEXFLOAT;
                   else if (bits == 128)
-                    pt = PixelType::DOUBLECOMPLEX;
+                    pt = PixelType::COMPLEXDOUBLE;
                   else
                     {
                       boost::format fmt("Bit depth %1% unsupported for complex floating point pixel type");
@@ -1079,8 +1079,8 @@ namespace ome
             fmt = FLOAT;
             break;
 
-          case PixelType::COMPLEX:
-          case PixelType::DOUBLECOMPLEX:
+          case PixelType::COMPLEXFLOAT:
+          case PixelType::COMPLEXDOUBLE:
             fmt = COMPLEX_FLOAT;
             break;
 
