@@ -37,8 +37,10 @@
 set(BUILD_SPHINX ${sphinx})
 set(BUILD_SPHINX_PDF ${sphinx-pdf})
 
+set(_ome_sphinx_list_dir "${CMAKE_CURRENT_LIST_DIR}")
+
 function(sphinx_manpages srcdir confdir mandir manvar)
-  execute_process(COMMAND python -B ${PROJECT_SOURCE_DIR}/cmake/list-manpages.py
+  execute_process(COMMAND python -B ${_ome_sphinx_list_dir}/list-manpages.py
                           "${confdir}" "${srcdir}" "${mandir}"
                   RESULT_VARIABLE sphinx_man_fail
                   OUTPUT_VARIABLE MAN_PAGES)
@@ -50,7 +52,7 @@ function(sphinx_manpages srcdir confdir mandir manvar)
 endfunction(sphinx_manpages)
 
 function(sphinx_manpage_dependencies srcdir confdir depvar)
-  execute_process(COMMAND python -B ${PROJECT_SOURCE_DIR}/cmake/list-manpage-dependencies.py
+  execute_process(COMMAND python -B ${_ome_sphinx_list_dir}/list-manpage-dependencies.py
                           "${confdir}"
                           "${srcdir}"
                   RESULT_VARIABLE sphinx_dep_fail

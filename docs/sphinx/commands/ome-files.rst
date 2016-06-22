@@ -44,4 +44,4 @@ view (or glview)
 See also
 --------
 
-:ref:`ome-files-env`, :ref:`ome-files-info`, :ref:`ome-files-test-view`.
+:ref:`ome-files-env`, :ref:`ome-files-info`, :ref:`ome-files-view`.
