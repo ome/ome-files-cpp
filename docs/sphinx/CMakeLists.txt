@@ -73,7 +73,8 @@ if (BUILD_SPHINX AND SPHINX_BUILD)
   foreach (man ${MAN_PAGES})
     string(REGEX REPLACE ".*(.)\$" "\\1" man_section "${man}")
     install(FILES "${man}"
-            DESTINATION "${CMAKE_INSTALL_MANDIR}/man${man_section}")
+            DESTINATION "${CMAKE_INSTALL_MANDIR}/man${man_section}"
+            COMPONENT "runtime")
   endforeach()
 
   # Generate and install HTML manual
@@ -95,7 +96,8 @@ if (BUILD_SPHINX AND SPHINX_BUILD)
   add_custom_target(doc-html ALL DEPENDS "${sphinx_builddir}/html/index.html")
 
   install(DIRECTORY "${sphinx_builddir}/html"
-          DESTINATION "${CMAKE_INSTALL_DOCDIR}/manual")
+          DESTINATION "${CMAKE_INSTALL_DOCDIR}/manual"
+          COMPONENT "runtime")
 
   add_custom_target(doc-linkcheck
                     COMMAND ${CMAKE_COMMAND} -E make_directory "${sphinx_builddir}/cache"
@@ -140,7 +142,8 @@ if (BUILD_SPHINX AND SPHINX_BUILD)
     add_custom_target(doc-pdf ALL DEPENDS "${sphinx_builddir}/latex/OME-Files.pdf")
 
     install(FILES "${sphinx_builddir}/latex/OME-Files.pdf"
-            DESTINATION "${CMAKE_INSTALL_DOCDIR}/manual")
+            DESTINATION "${CMAKE_INSTALL_DOCDIR}/manual"
+            COMPONENT "runtime")
   endif (BUILD_SPHINX_PDF AND XELATEX AND MAKEINDEX)
 else()
   message(WARNING "Manual pages and HTML manual will not be generated or installed")

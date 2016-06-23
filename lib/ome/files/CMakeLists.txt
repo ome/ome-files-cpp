@@ -190,28 +190,55 @@ set_target_properties(ome-files PROPERTIES VERSION ${OME_VERSION_SHORT})
 
 add_library(OME::Files ALIAS ome-files)
 
+if(WIN32)
+  set(ome_files_config_dir "cmake")
+else()
+  set(ome_files_config_dir "${CMAKE_INSTALL_LIBDIR}/cmake/OMEFiles")
+endif()
+
 install(TARGETS ome-files
         EXPORT OMEFilesInternal
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        COMPONENT "runtime"
+        INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
 install(EXPORT OMEFilesInternal
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/OMEFiles)
-install(FILES OMEFilesConfig.cmake
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/OMEFiles)
+        DESTINATION "${ome_files_config_dir}"
+        NAMESPACE "ome_files_"
+        COMPONENT "development")
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/OMEFilesConfig.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/OMEFilesConfig.cmake"
+  INSTALL_DESTINATION "${ome_files_config_dir}")
+write_basic_package_version_file(
+  ${CMAKE_CURRENT_BINARY_DIR}/OMEFilesConfigVersion.cmake
+  VERSION "${PROJECT_VERSION}"
+  COMPATIBILITY SameMajorVersion)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/OMEFilesConfig.cmake
+              ${CMAKE_CURRENT_BINARY_DIR}/OMEFilesConfigVersion.cmake
+        DESTINATION "${ome_files_config_dir}"
+        COMPONENT "development")
 
 set(ome_files_includedir "${CMAKE_INSTALL_INCLUDEDIR}/ome/files")
 
 install(FILES ${OME_FILES_HEADERS} ${OME_FILES_GENERATED_HEADERS}
-        DESTINATION ${ome_files_includedir})
+        DESTINATION ${ome_files_includedir}
+        COMPONENT "development")
 install(FILES ${OME_FILES_DETAIL_HEADERS}
-        DESTINATION ${ome_files_includedir}/detail)
+        DESTINATION ${ome_files_includedir}/detail
+        COMPONENT "development")
 install(FILES ${OME_FILES_IN_HEADERS}
-        DESTINATION ${ome_files_includedir}/in)
+        DESTINATION ${ome_files_includedir}/in
+        COMPONENT "development")
 install(FILES ${OME_FILES_OUT_HEADERS}
-        DESTINATION ${ome_files_includedir}/out)
+        DESTINATION ${ome_files_includedir}/out
+        COMPONENT "development")
 install(FILES ${OME_FILES_TIFF_HEADERS} ${OME_FILES_TIFF_GENERATED_HEADERS}
-        DESTINATION ${ome_files_includedir}/tiff)
+        DESTINATION ${ome_files_includedir}/tiff
+        COMPONENT "development")
 
 # Dump header list for testing
 header_include_list_write(OME_FILES_ALL_STATIC_HEADERS OME_FILES_ALL_GENERATED_HEADERS ome/files ${PROJECT_BINARY_DIR}/test/ome-files)

@@ -34,10 +34,6 @@
 # policies, either expressed or implied, of any organization.
 # #L%
 
-include_directories(${OME_TOPLEVEL_INCLUDES}
-                    ${OME_LIBEXEC_INCLUDES}
-                    ${XercesC_INCLUDE_DIRS})
-
 set(info_SOURCES
     ImageInfo.h
     ImageInfo.cpp
@@ -46,11 +42,16 @@ set(info_SOURCES
     options.cpp)
 
 add_executable(info ${info_SOURCES})
-target_link_libraries(info OME::XML OME::Files Boost::program_options ${CMAKE_THREAD_LIBS_INIT})
+
+target_include_directories(info PUBLIC
+                           $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/libexec>
+                           $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/libexec>)
+
+target_link_libraries(info OME::XML OME::Files Boost::program_options Threads::Threads)
 
 install(TARGETS info RUNTIME
         DESTINATION ${OME_FILES_INSTALL_PKGLIBEXECDIR}
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
                     GROUP_READ GROUP_EXECUTE
-                    WORLD_READ WORLD_EXECUTE)
-
+                    WORLD_READ WORLD_EXECUTE
+        COMPONENT "runtime")
