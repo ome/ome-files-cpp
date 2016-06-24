@@ -87,15 +87,16 @@ fi
 # Determine installation prefix if unset, then determine paths for
 # programs, libraries, manpages etc.
 
+realpath() {
+  echo "$(cd "$(dirname "$1")"; pwd)/$(basename "$1")"
+}
+
 if [ -n "$INSTALL_PREFIX" ] && [ -d "$INSTALL_PREFIX" ]; then
     :
 else
-    INSTALL_PREFIX="$(dirname "$prog")"
-    BINPATH="$INSTALL_BINDIR"
-    while [ "$BINPATH" != "." ]; do
-        INSTALL_PREFIX="$INSTALL_PREFIX/.."
-        BINPATH="$(dirname "$BINPATH")"
-    done
+    INSTALL_PREFIX="$(dirname "$(realpath "$prog")")"
+    INSTALL_PREFIX="${INSTALL_PREFIX%/${INSTALL_BINDIR}}"
+    BINPATH="${INSTALL_PREFIX}/${INSTALL_BINDIR}"
 fi
 
 case "$(uname -s)" in
