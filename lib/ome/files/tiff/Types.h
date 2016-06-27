@@ -42,6 +42,11 @@
 
 #include <ome/compat/cstdint.h>
 
+#ifdef _MSC_VER
+#pragra push_macro("VOID")
+#undef VOID
+#endif
+
 namespace ome
 {
   namespace files
@@ -214,6 +219,10 @@ namespace ome
     }
   }
 }
+
+#ifdef _MSC_VER
+#pragra pop_macro("VOID")
+#endif
 
 #endif // OME_FILES_TIFF_TYPES_H
 
