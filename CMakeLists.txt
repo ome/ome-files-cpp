@@ -49,10 +49,12 @@ list(APPEND CMAKE_MODULE_PATH
 
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/BioFormatsCommon.cmake")
 
-project(ome-files)
-
 include(cmake/Version.cmake)
 ome_project_version("OME Files C++" "${CMAKE_CURRENT_SOURCE_DIR}")
+
+project(ome-files
+        VERSION "${OME_VERSION_MAJOR}.${OME_VERSION_MINOR}.${OME_VERSION_PATCH}"
+        LANGUAGES CXX)
 
 if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
   message(FATAL_ERROR "In-tree builds are not supported; please run cmake from a separate build directory.")
@@ -80,9 +82,9 @@ include(GTest)
 include(Doxygen)
 include(HeaderTest)
 
-find_package(OMECompat REQUIRED)
-find_package(OMECommon REQUIRED)
-find_package(OMEXML REQUIRED)
+find_package(OMECompat 5.2.0 REQUIRED)
+find_package(OMECommon 5.2.0 REQUIRED)
+find_package(OMEXML 5.2.0 REQUIRED)
 
 if(MSVC)
   # Debug library suffix.
