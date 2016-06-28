@@ -43,8 +43,12 @@
 #include <ome/compat/cstdint.h>
 
 #ifdef _MSC_VER
-#pragra push_macro("VOID")
+#pragma push_macro("VOID")
 #undef VOID
+#pragma push_macro("BILEVEL")
+#undef BILEVEL
+#pragma push_macro("HALFTONE")
+#undef HALFTONE
 #endif
 
 namespace ome
@@ -221,7 +225,9 @@ namespace ome
 }
 
 #ifdef _MSC_VER
-#pragra pop_macro("VOID")
+#pragma pop_macro("VOID")
+#pragma pop_macro("BILEVEL")
+#pragma pop_macro("HALFTONE")
 #endif
 
 #endif // OME_FILES_TIFF_TYPES_H
