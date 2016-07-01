@@ -34,14 +34,26 @@
 # policies, either expressed or implied, of any organization.
 # #L%
 
+cmake_minimum_required(VERSION 3.2.0)
+
+# For building standalone
+if(NOT PROJECT_NAME)
+  project(ome-files)
+# Add our own modules to the include path
+list(APPEND CMAKE_MODULE_PATH
+     "${CMAKE_CURRENT_LIST_DIR}/../../cmake")
+include(Options)
+endif()
+
+
 include(Sphinx)
 
 if (BUILD_SPHINX AND SPHINX_BUILD)
   message(STATUS "Checking manual page dependencies")
 
   # Create build directory and conf.py
-  set(sphinx_srcdir "${PROJECT_SOURCE_DIR}/docs/sphinx")
-  set(sphinx_builddir "${PROJECT_BINARY_DIR}/docs/sphinx")
+  set(sphinx_srcdir "${CMAKE_CURRENT_SOURCE_DIR}")
+  set(sphinx_builddir "${CMAKE_CURRENT_BINARY_DIR}")
   file(MAKE_DIRECTORY "${sphinx_builddir}")
   configure_file("${sphinx_srcdir}/conf.py.in"
                  "${sphinx_builddir}/conf.py"

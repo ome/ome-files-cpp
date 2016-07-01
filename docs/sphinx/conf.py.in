@@ -48,7 +48,7 @@ edit_on_github_prefix = 'docs/sphinx'
 templates_path = [os.path.join(srcdir, '_templates')]
 
 # The suffix of source filenames.
-source_suffix = '.txt'
+source_suffix = '.rst'
 
 # The encoding of source files.
 #source_encoding = 'utf-8-sig'
@@ -57,7 +57,7 @@ source_suffix = '.txt'
 master_doc = 'index'
 
 # General information about the project.
-project = u'OME-Files'
+project = u'OME Files'
 title = u'%s Documentation' % project
 author = u'The Open Microscopy Environment'
 now = datetime.now()
@@ -83,7 +83,7 @@ release = 'UNKNOWN'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build', 'CMakeLists.txt']
+exclude_patterns = ['_build']
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 #default_role = None
@@ -167,8 +167,8 @@ extlinks = {
     'omerodoc' : (omerodoc_uri + '/%s', ''),
     'devs_doc' : (oo_site_root + '/support/contributing/%s', ''),
     # Downloads
-    'downloads_cpp' : (downloads_root + '/latest/ome-files-cpp5.2/%s', ''),
-    'doxygen' : (downloads_root + '/latest/ome-files-cpp5.2/api/%s', ''),
+    'downloads_cpp' : (downloads_root + '/latest/ome-files-cpp/%s', ''),
+    'doxygen' : (downloads_root + '/latest/ome-files-cpp/api/%s', ''),
     # Miscellaneous links
     'doi' : ('http://dx.doi.org/%s', ''),
     'schema' : (oo_root + '/Schemas/Documentation/Generated/%s', '')
@@ -278,7 +278,7 @@ latex_elements = {
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
-target = project + '.tex'
+target = 'OME-Files.tex'
 latex_documents = [
   (master_doc, target, title, author, 'manual'),
 ]
@@ -289,7 +289,7 @@ latex_logo = os.path.join(srcdir, 'images/bio-formats-logo.pdf')
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
-latex_use_parts = True
+latex_use_parts = False
 
 # If true, show page references after internal links.
 #latex_show_pagerefs = False

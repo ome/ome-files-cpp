@@ -7,6 +7,7 @@ OME-Files C++ Documentation
     :titlesonly:
 
     overview
+    building
     conversion
     tutorial
     ome-files-env
@@ -14,4 +15,3 @@ OME-Files C++ Documentation
     commands/ome-files
     commands/ome-files-info
     commands/ome-files-view
-    maintenance
