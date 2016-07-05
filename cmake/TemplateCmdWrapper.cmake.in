@@ -1,5 +1,194 @@
 @echo off
+REM #%L
+REM OME Files C++ libraries (shell wrapper)
+REM %%
+REM Copyright © 2015-2016 Open Microscopy Environment:
+REM   - Massachusetts Institute of Technology
+REM   - National Institutes of Health
+REM   - University of Dundee
+REM   - Board of Regents of the University of Wisconsin-Madison
+REM   - Glencoe Software, Inc.
+REM %%
+REM Redistribution and use in source and binary forms, with or without
+REM modification, are permitted provided that the following conditions are met:
+REM
+REM 1. Redistributions of source code must retain the above copyright notice,
+REM    this list of conditions and the following disclaimer.
+REM 2. Redistributions in binary form must reproduce the above copyright notice,
+REM    this list of conditions and the following disclaimer in the documentation
+REM    and/or other materials provided with the distribution.
+REM
+REM THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+REM AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+REM IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+REM ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+REM LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+REM CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+REM SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+REM INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+REM CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+REM ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+REM POSSIBILITY OF SUCH DAMAGE.
+REM
+REM The views and conclusions contained in the software and documentation are
+REM those of the authors and should not be interpreted as representing official
+REM policies, either expressed or implied, of any organization.
+REM #L%
 
-set "OME_FILES_MANDIR=@PROJECT_SOURCE_DIR@/cpp/man"
+REM Installation prefix (if any)
 
-%*
+set "INSTALL_PREFIX=@OME_INSTALL_PREFIX@"
+
+REM Relative installation paths
+
+set "INSTALL_BINDIR=@WIN_INSTALL_BINDIR@"
+set "INSTALL_SBINDIR=@WIN_INSTALL_SBINDIR@"
+set "INSTALL_LIBEXECDIR=@WIN_INSTALL_LIBEXECDIR@"
+set "INSTALL_SYSCONFDIR=@WIN_INSTALL_SYSCONFDIR@"
+set "INSTALL_SHAREDSTATEDIR=@WIN_INSTALL_SHAREDSTATEDIR@"
+set "INSTALL_LOCALSTATEDIR=@WIN_INSTALL_LOCALSTATEDIR@"
+set "INSTALL_LIBDIR=@WIN_INSTALL_LIBDIR@"
+set "INSTALL_INCLUDEDIR=@WIN_INSTALL_INCLUDEDIR@"
+set "INSTALL_OLDINCLUDEDIR=@WIN_INSTALL_OLDINCLUDEDIR@"
+set "INSTALL_DATAROOTDIR=@WIN_INSTALL_DATAROOTDIR@"
+set "INSTALL_DATADIR=@WIN_INSTALL_DATADIR@"
+set "INSTALL_INFODIR=@WIN_INSTALL_INFODIR@"
+set "INSTALL_LOCALEDIR=@WIN_INSTALL_LOCALEDIR@"
+set "INSTALL_MANDIR=@WIN_INSTALL_MANDIR@"
+set "INSTALL_DOCDIR=@WIN_INSTALL_DOCDIR@"
+
+set "OME_FILES_INSTALL_DATADIR=@WIN_OME_FILES_INSTALL_DATADIR@"
+set "OME_FILES_INSTALL_PKGLIBEXECDIR=@WIN_OME_FILES_INSTALL_PKGLIBEXECDIR@"
+
+REM Release version
+
+set "VERSION_MAJOR=@OME_VERSION_MAJOR@"
+set "VERSION_MINOR=@OME_VERSION_MINOR@"
+set "VERSION_PATCH=@OME_VERSION_PATCH@"
+set "VERSION_EXTRA=@OME_VERSION_EXTRA@"
+set "RELEASE_DATE=@OME_VCS_DATE_S@"
+
+REM Program invoked as and command requested (if any)
+
+set "prog=%0"
+set "bindir=%~dp0"
+set "root=%bindir%@bin_to_root@"
+
+IF NOT [%1]==[] (
+  set "cmd=%1"
+  shift
+)
+
+REM Determine installation prefix if unset, then determine paths for
+REM programs, libraries, manpages etc.
+
+if NOT [%INSTALL_PREFIX%]==[] (
+  if EXIST "%INSTALL_PREFIX%" (
+    set "BINPATH=%INSTALL_PREFIX%\%INSTALL_BINDIR%"
+    goto :prefix_set
+  )
+)
+
+set "INSTALL_PREFIX=%root%"
+set "OME_HOME=%INSTALL_PREFIX%"
+set "BINPATH=%bindir%"
+
+:prefix_set
+
+set "PATH=%BINPATH%;%PATH%"
+set "LIBEXECDIR=%INSTALL_PREFIX%\%OME_FILES_INSTALL_PKGLIBEXECDIR%"
+set "MANDIR=%INSTALL_PREFIX%\%INSTALL_MANDIR%"
+set "HTMLDIR=%INSTALL_PREFIX%\%INSTALL_DOCDIR%\manual\html"
+
+goto main
+
+:usage
+
+call :heredoc usagetext && goto usageexit:
+Usage: !prog! [--help] [--usage] <cmd> [<args>]
+
+available ome-files commands in '!OME_FILES_INSTALL_PKGLIBEXECDIR!'
+:usageexit
+for %%a in ("%LIBEXECDIR%\*") do @echo     %%~na
+exit /b
+
+:version
+
+call :heredoc versiontext && goto versionexit:
+ome-files (OME Files) !VERSION_MAJOR!.!VERSION_MINOR!.!VERSION_PATCH!!VERSION_EXTRA! (!RELEASE_DATE!)
+Copyright (c) 2006-2016 Open Microscopy Environment
+
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+:versionexit
+exit /b
+
+:help
+echo Opening documentation in web browser
+start "" "%HTMLDIR%\commands\ome-files.html"
+exit /b
+
+
+:main
+
+
+REM Special case options
+
+if [%cmd%]==[] goto usage
+if [%cmd%]==[--help] goto help
+if [%cmd%]==[-h] goto help
+if [%cmd%]==[--version] goto version
+if [%cmd%]==[-V] goto version
+if [%cmd%]==[--usage] goto usage
+if [%cmd%]==[-u] goto usage
+
+REM Run subcommand
+set "realcmd=%cmd%"
+if "%realcmd%"=="showinf" set "realcmd=info"
+if "%realcmd%"=="glview" set "realcmd=view"
+set "realcmd=%LIBEXECDIR%\%realcmd%"
+
+
+for %%e in (%PATHEXT%) do (
+    if EXIST "%realcmd%%%e" (
+        set "foundcmd=%realcmd%%%e"
+    )
+)
+if [%foundcmd%]==[] (
+  echo ome-files: '%realcmd%' is not a ome-files-test command.  See 'ome-files --help'" >&2
+  exit /b 1
+)
+
+rem throw the first parameter away
+set params=%1
+:argloop
+shift
+if [%1]==[] goto afterargloop
+set params=%params% %1
+goto argloop
+:afterargloop
+
+echo With home=%OME_HOME%
+
+
+"%realcmd%" %params%
+exit /b
+
+:: See http://stackoverflow.com/a/15032476/2647431
+:heredoc
+setlocal enabledelayedexpansion
+set go=
+for /f "delims=" %%A in ('findstr /n "^" "%~f0"') do (
+    set "line=%%A" && set "line=!line:*:=!"
+    if defined go (if #!line:~1!==#!go::=! (goto :EOF) else echo(!line!)
+    if "!line:~0,13!"=="call :heredoc" (
+        for /f "tokens=3 delims=>^ " %%i in ("!line!") do (
+            if #%%i==#%1 (
+                for /f "tokens=2 delims=&" %%I in ("!line!") do (
+                    for /f "tokens=2" %%x in ("%%I") do set "go=%%x"
+                )
+            )
+        )
+    )
+)
+goto :EOF
