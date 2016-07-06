@@ -42,6 +42,13 @@
 
 #include <ome/xml/model/enums/PixelType.h>
 
+#ifdef _MSC_VER
+#pragma push_macro("min")
+#undef min
+#pragma push_macro("max")
+#undef max
+#endif
+
 namespace ome
 {
   namespace files
@@ -223,6 +230,11 @@ namespace ome
 
   }
 }
+
+#ifdef _MSC_VER
+#pragma pop_macro("min")
+#pragma pop_macro("max")
+#endif
 
 #endif // OME_FILES_PLANEREGION_H
 
