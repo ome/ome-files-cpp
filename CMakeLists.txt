@@ -144,14 +144,8 @@ set(LIBRARY_PREFIX OME)
 file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 configure_file(${PROJECT_SOURCE_DIR}/cmake/TemplateShellConfig.cmake.in
                ${PROJECT_BINARY_DIR}/config @ONLY NEWLINE_STYLE UNIX)
-configure_file(${PROJECT_SOURCE_DIR}/cmake/TemplateInternalShellWrapper.cmake.in
-               ${PROJECT_BINARY_DIR}/cmake/ome-files @ONLY NEWLINE_STYLE UNIX)
 configure_file(${PROJECT_SOURCE_DIR}/cmake/TemplateShellWrapper.cmake.in
                ${PROJECT_BINARY_DIR}/bin/ome-files @ONLY NEWLINE_STYLE UNIX)
-file(COPY ${PROJECT_BINARY_DIR}/cmake/ome-files
-     DESTINATION ${PROJECT_BINARY_DIR}
-     FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
-     GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 install(PROGRAMS ${PROJECT_BINARY_DIR}/bin/ome-files
         DESTINATION ${CMAKE_INSTALL_BINDIR})
 if(WIN32)
@@ -180,8 +174,6 @@ if(WIN32)
 
   configure_file(${PROJECT_SOURCE_DIR}/cmake/TemplateCmdConfig.cmake.in
                  ${PROJECT_BINARY_DIR}/config.bat @ONLY NEWLINE_STYLE CRLF)
-  configure_file(${PROJECT_SOURCE_DIR}/cmake/TemplateInternalCmdWrapper.cmake.in
-                 ${PROJECT_BINARY_DIR}/ome-files.bat @ONLY NEWLINE_STYLE CRLF)
   configure_file(${PROJECT_SOURCE_DIR}/cmake/TemplateCmdWrapper.cmake.in
                  ${PROJECT_BINARY_DIR}/bin/ome-files.bat @ONLY NEWLINE_STYLE CRLF)
   install(PROGRAMS ${PROJECT_BINARY_DIR}/bin/ome-files.bat
