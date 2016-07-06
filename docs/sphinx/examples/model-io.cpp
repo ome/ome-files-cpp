@@ -81,7 +81,7 @@ namespace
   {
     /* write-example-start */
     // Schema version to use
-    const std::string schema("http://www.openmicroscopy.org/Schemas/OME/2013-06");
+    const std::string schema("http://www.openmicroscopy.org/Schemas/OME/2016-06");
     // XML DOM tree (initially containing an empty OME root element)
     xml::dom::Document outputdoc(xml::dom::createEmptyDocument(schema, "OME"));
     // Fill output DOM document from OME-XML model

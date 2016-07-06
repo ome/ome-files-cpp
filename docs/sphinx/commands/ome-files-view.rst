@@ -19,8 +19,8 @@ Open an image using :menuselection:`File --> Open`.
 .. note::
 
   Viewing is currently restricted to the first series of an OME-TIFF
-  file using the 2013-06 schema.  Future releases will extend this to
-  multiple series, all schema versions and additional file formats.
+  file.  Future releases will extend this to multiple series, and
+  additional file formats.
 
 .. note::
 
