@@ -61,6 +61,18 @@ namespace
        OME_FILES_SHLIBDIR,
        module_path);
 
+    // OME-Files package-specific paths.
+    static RegisterModule ome_files_doc
+      ("ome-files-doc",
+       "OME_FILES_DOCDIR",
+       "OME_FILES_HOME",
+       "OME_HOME",
+       OME_FILES_INSTALL_FULL_DOCDIR,
+       OME_FILES_INSTALL_DOCDIR,
+       OME_FILES_INSTALL_PREFIX,
+       OME_FILES_SHLIBDIR,
+       module_path);
+
     static RegisterModule ome_files_libexec
       ("ome-files-libexec",
        "OME_FILES_PKGLIBEXECDIR",
