@@ -15,12 +15,6 @@ Description
 including the :emphasis:`core` and :emphasis:`original` metadata, and
 can optionally display and validate the :emphasis:`OME-XML` metadata.
 
-.. note::
-
-  Viewing is currently restricted to the first series of an OME-TIFF
-  file using the 2013-06 schema.  Future releases will extend this to
-  multiple series, all schema versions and additional file formats.
-
 Options
 -------
 

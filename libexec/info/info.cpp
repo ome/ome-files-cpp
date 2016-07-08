@@ -39,8 +39,10 @@
 
 #include <boost/format.hpp>
 
+#include <ome/files/module.h>
 #include <ome/files/Version.h>
 
+#include <ome/common/filesystem.h>
 #include <ome/common/log.h>
 #include <ome/common/module.h>
 
@@ -91,16 +93,17 @@ namespace
                   const std::string& section)
   {
 #ifdef _MSC_VER
-    boost::filesystem::path docpath(ome::common::module_runtime_path("doc"));
-    docpath = docpath / "manual" / "html" / "developers" / "cpp" / "commands";
-    std::string htmlpage = "ome-files-";
-    htmlpage += name;
+    boost::filesystem::path docpath(ome::common::module_runtime_path("ome-files-doc"));
+    docpath = docpath / "manual" / "html" / "commands";
+    std::string htmlpage = name;
     htmlpage += ".html";
     docpath /= htmlpage;
+    docpath = ome::common::canonical(docpath);
+    std::cout << "Opening documentation in web browser";
     CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
-    ShellExecute(NULL, "open", htmlpage.c_str(),
+    ShellExecute(NULL, "open", docpath.string().c_str(),
 		 NULL, NULL, SW_SHOWNORMAL);
-    std::exit(EXIT_FAILURE);
+    std::exit(EXIT_SUCCESS);
 #else
     boost::filesystem::path mandir(ome::common::module_runtime_path("man"));
     execlp("man", "man", "-M", mandir.generic_string().c_str(), section.c_str(), name.c_str(), static_cast<char *>(0));
@@ -129,6 +132,8 @@ int
 main(int argc, char *argv[])
 {
   int status = 0;
+
+  ome::files::register_module_paths();
 
   try
     {

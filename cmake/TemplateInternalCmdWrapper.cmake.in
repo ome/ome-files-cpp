@@ -1,5 +1,0 @@
-@echo off
-
-set "OME_FILES_MANDIR=@PROJECT_SOURCE_DIR@/cpp/man"
-
-%*
