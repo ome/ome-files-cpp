@@ -65,7 +65,7 @@ function(sphinx_manpage_dependencies srcdir confdir depvar)
 endfunction(sphinx_manpage_dependencies)
 
 function(sphinx_dependencies srcdir depvar)
-  file(GLOB_RECURSE CRUDE_SPHINX_DEPENDENCIES "${srcdir}/*.txt")
+  file(GLOB_RECURSE CRUDE_SPHINX_DEPENDENCIES "${srcdir}/*.rst")
   foreach(file ${CRUDE_SPHINX_DEPENDENCIES})
     string(FIND "${file}" "_build" FILE_MATCH)
     if(FILE_MATCH EQUAL -1)

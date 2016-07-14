@@ -111,7 +111,11 @@ if (BUILD_SPHINX AND SPHINX_BUILD)
           DESTINATION "${CMAKE_INSTALL_DOCDIR}/manual"
           COMPONENT "runtime")
 
-  add_custom_target(doc-linkcheck
+  if(sphinx-linkcheck)
+    set(sphinx_linkcheck_all ALL)
+  endif()
+
+  add_custom_target(doc-linkcheck ${sphinx_linkcheck_all}
                     COMMAND ${CMAKE_COMMAND} -E make_directory "${sphinx_builddir}/cache"
                     COMMAND ${CMAKE_COMMAND} -E make_directory "${sphinx_builddir}/linkcheck"
                     COMMAND ${SPHINX_BUILD}
@@ -121,8 +125,20 @@ if (BUILD_SPHINX AND SPHINX_BUILD)
                             -d "${sphinx_builddir}/cache"
                             -b linkcheck
                             "${sphinx_srcdir}" "${sphinx_builddir}/linkcheck"
+                     COMMENT "Checking remote links in sphinx documentation"
                      WORKING_DIRECTORY "${sphinx_srcdir}"
                      DEPENDS man ${SPHINX_DEPENDENCIES})
+
+  add_custom_target(doc-locallinkcheck ${sphinx_linkcheck_all}
+                    COMMAND ${CMAKE_COMMAND}
+                            "-DOUTPUT=${sphinx_builddir}/linkcheck/output.txt"
+                            "-DINTERNAL_REFERENCE=${sphinx_builddir}/html"
+                            "-DEXTERNAL_REFERENCE=${CMAKE_INSTALL_FULL_DATAROOTDIR}/doc"
+                            "-DINSTALL_PATH=${PROJECT_NAME}/manual/html"
+                            -P "${PROJECT_SOURCE_DIR}/cmake/SphinxCheckInternalLinks.cmake"
+                     COMMENT "Checking local links in sphinx documentation"
+                     WORKING_DIRECTORY "${sphinx_srcdir}"
+                     DEPENDS doc-linkcheck)
 
   # Generate and install PDF manual
   # Depends on man to allow sharing of cache with parallel build.
