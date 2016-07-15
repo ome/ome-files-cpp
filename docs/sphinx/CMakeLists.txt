@@ -127,14 +127,16 @@ if (BUILD_SPHINX AND SPHINX_BUILD)
                             "${sphinx_srcdir}" "${sphinx_builddir}/linkcheck"
                      COMMENT "Checking remote links in sphinx documentation"
                      WORKING_DIRECTORY "${sphinx_srcdir}"
-                     DEPENDS man ${SPHINX_DEPENDENCIES})
+                     DEPENDS doc-api man ${SPHINX_DEPENDENCIES})
 
   add_custom_target(doc-locallinkcheck ${sphinx_linkcheck_all}
                     COMMAND ${CMAKE_COMMAND}
                             "-DOUTPUT=${sphinx_builddir}/linkcheck/output.txt"
+                            "-DSPHINX_INSTALL_PATH=${PROJECT_NAME}/manual/html"
                             "-DINTERNAL_REFERENCE=${sphinx_builddir}/html"
                             "-DEXTERNAL_REFERENCE=${CMAKE_INSTALL_FULL_DATAROOTDIR}/doc"
-                            "-DINSTALL_PATH=${PROJECT_NAME}/manual/html"
+                            "-DDOXYGEN_REFERENCE=${PROJECT_BINARY_DIR}/docs/doxygen/${PROJECT_NAME}/html"
+                            "-DDOXYGEN_INSTALL_PATH=${PROJECT_NAME}/api/html"
                             -P "${PROJECT_SOURCE_DIR}/cmake/SphinxCheckInternalLinks.cmake"
                      COMMENT "Checking local links in sphinx documentation"
                      WORKING_DIRECTORY "${sphinx_srcdir}"
