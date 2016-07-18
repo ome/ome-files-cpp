@@ -168,7 +168,9 @@ extlinks = {
     'devs_doc' : (oo_site_root + '/support/contributing/%s', ''),
     # Downloads
     'downloads_cpp' : (downloads_root + '/latest/ome-files-cpp/%s', ''),
-    'doxygen' : (downloads_root + '/latest/ome-files-cpp/api/%s', ''),
+    'ome_common_api' : ('../../../ome-common/api/html/%s', ''),
+    'ome_xml_api' : ('../../../ome-xml/api/html/%s', ''),
+    'ome_files_api' : ('../../../ome-files/api/html/%s', ''),
     # Miscellaneous links
     'doi' : ('http://dx.doi.org/%s', ''),
     'schema' : (oo_root + '/Schemas/Documentation/Generated/%s', '')

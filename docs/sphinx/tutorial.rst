@@ -52,7 +52,7 @@ certain modifications to the data model may only be made via direct
 access to the model objects, otherwise the higher-level metadata store
 interface should be preferred.
 
-The header file :doxygen:`ome/files/MetadataTools.h
+The header file :ome_files_api:`ome/files/MetadataTools.h
 <MetadataTools_8h_source.html>` provides several convenience functions
 to work with and manipulate the various forms of metadata, including
 conversion of Core metadata to and from a metadata store.
@@ -76,7 +76,7 @@ themselves are more of an implementation detail at present.
 If implementing a reader, it is fairly typical to set the basic image
 metadata in :cpp:class:`CoreMetadata` objects, and then use the
 :cpp:func:`fillMetadata` function in
-:doxygen:`ome/files/MetadataTools.h
+:ome_files_api:`ome/files/MetadataTools.h
 <MetadataTools_8h_source.html>` to fill the reader's metadata store
 with this information, before filling the metadata store with
 additional (non-core) metadata as required.  When writing an image, a
@@ -97,8 +97,8 @@ Full example source: :download:`metadata-formatreader.cpp
 
 .. seealso::
 
-  - :doxygen:`CoreMetadata <classome_1_1files_1_1CoreMetadata.html>`
-  - :doxygen:`FormatReader <classome_1_1files_1_1FormatReader.html>`
+  - :ome_files_api:`CoreMetadata <classome_1_1files_1_1CoreMetadata.html>`
+  - :ome_files_api:`FormatReader <classome_1_1files_1_1FormatReader.html>`
 
 
 Original metadata
@@ -129,9 +129,9 @@ Full example source: :download:`metadata-formatreader.cpp <examples/metadata-for
 
 .. seealso::
 
-  - :doxygen:`MetadataMap <classome_1_1files_1_1MetadataMap.html>`
-  - :doxygen:`FormatReader <classome_1_1files_1_1FormatReader.html>`
-  - :doxygen:`OriginalMetadataAnnotation <classome_1_1xml_1_1model_1_1OriginalMetadataAnnotation.html>`
+  - :ome_files_api:`MetadataMap <classome_1_1files_1_1MetadataMap.html>`
+  - :ome_files_api:`FormatReader <classome_1_1files_1_1FormatReader.html>`
+  - :ome_xml_api:`OriginalMetadataAnnotation <classome_1_1xml_1_1model_1_1OriginalMetadataAnnotation.html>`
 
 Metadata store
 ^^^^^^^^^^^^^^
@@ -236,10 +236,10 @@ Full example source: :download:`metadata-io.cpp <examples/metadata-io.cpp>`
 
 .. seealso::
 
-  - :doxygen:`Metadata classes <namespaceome_1_1xml_1_1meta.html>`
-  - :doxygen:`createID <namespaceome_1_1files.html#ab3bf80ec03bcf20b199ce2761d48fe01>`
-  - :doxygen:`createOMEXMLMetadata <namespaceome_1_1files.html#ae61f12958973765e8328348874a85731>`
-  - :doxygen:`getOMEXML <namespaceome_1_1files.html#a32e5424991ce09b857ddc0d5be37c4f1>`
+  - :ome_xml_api:`Metadata classes <namespaceome_1_1xml_1_1meta.html>`
+  - :ome_files_api:`createID <namespaceome_1_1files.html#ab7922c8cadf5f821ee7059ccb5f406f0>`
+  - :ome_files_api:`createOMEXMLMetadata <namespaceome_1_1files.html#ae61f12958973765e8328348874a85731>`
+  - :ome_files_api:`getOMEXML <namespaceome_1_1files.html#a32e5424991ce09b857ddc0d5be37c4f1>`
 
 
 OME-XML data model objects
@@ -281,8 +281,8 @@ Full example source: :download:`model-io.cpp <examples/model-io.cpp>`
 
 .. seealso::
 
-  - :doxygen:`OME model classes <namespaceome_1_1xml_1_1model.html>`
-  - :doxygen:`OME <classome_1_1xml_1_1model_1_1OME.html>`
+  - :ome_xml_api:`OME model classes <namespaceome_1_1xml_1_1model.html>`
+  - :ome_xml_api:`OME <classome_1_1xml_1_1model_1_1OME.html>`
 
 
 Pixel data
@@ -344,13 +344,13 @@ without unnecessary code duplication.
 The 9D pixel buffer makes a distinction between the logical dimension
 order (used by the API) and the storage order (the layout of the pixel
 data in memory).  The logical order is defined by the values in the
-:doxygen:`Dimensions
+:ome_files_api:`Dimensions
 <namespaceome_1_1files.html#ad9ebb405a4815c189fa788325f68a91a>`
 enum.  The storage order is specified by the programmer when creating
 a pixel buffer.
 
 The following example shows creation of a pixel buffer with a defined
-size, and :doxygen:`default storage order
+size, and :ome_files_api:`default storage order
 <classome_1_1files_1_1PixelBufferBase.html#a419ad49f2ea90937a57b81a74b56380b>`:
 
 .. literalinclude:: examples/pixeldata.cpp
@@ -359,7 +359,7 @@ size, and :doxygen:`default storage order
    :end-before: create-example-end
 
 The storage order may be set explicitly.  The order may be created by
-hand, or with a :doxygen:`helper function
+hand, or with a :ome_files_api:`helper function
 <classome_1_1files_1_1PixelBufferBase.html#ac7e922610bf561f311d13c3d7fcaeb69>`.
 While the helper function is limited to supporting the ordering
 defined by the data model, specifying the order by hand allows
@@ -432,7 +432,7 @@ This example demonstrates several features:
 - The operator is expanded once for each pixel type
 - The operators can be special-cased for individual pixel types; here
   we use the `SFINAE rule
-  <http://en.cppreference.com/w/language/sfinae>`_ to implement a
+  <http://en.cppreference.com/w/cpp/language/sfinae>`_ to implement a
   specialization for an entire category of pixel types (complex
   numbers), but standard function overloading and templates will also
   work for more common cases
@@ -457,7 +457,7 @@ not required to use the above features.  Simply use the
 :cpp:func:`data` method on the buffer to get a pointer to the raw
 data.  Note that you will need to multiply the buffer size obtained
 with :cpp:func:`num_elements` by the size of the pixel type (use
-:cpp:func:`bytesPerPixel` or :cpp:func:`sizeof` on the buffer
+:cpp:func:`bytesPerPixel` or ``sizeof`` on the buffer
 :cpp:type:`value_type`).
 
 Alternatively, it is also possible to access the underlying
@@ -469,13 +469,13 @@ Full example source: :download:`pixeldata.cpp <examples/pixeldata.cpp>`
 
 .. seealso::
 
-  - :doxygen:`PixelType <classome_1_1xml_1_1model_1_1enums_1_1PixelType.html>`
-  - :doxygen:`PixelBuffer <classome_1_1files_1_1PixelBuffer.html>`
-  - :doxygen:`VariantPixelBuffer <classome_1_1files_1_1VariantPixelBuffer.html>`
-  - :doxygen:`FormatReader::getLookupTable <classome_1_1files_1_1FormatReader.html#a9b69e3612f0ad4c945d1c0f111242cc2>`
-  - :doxygen:`FormatReader::openBytes <classome_1_1files_1_1FormatReader.html#a5bfa86b4b68b03b63d76bb050cbe7101>`
-  - :doxygen:`FormatWriter::setLookupTable <classome_1_1files_1_1FormatWriter.html#a00ae3dc46c205e64f782c7b6f47bd5ab>`
-  - :doxygen:`FormatWriter::saveBytes <classome_1_1files_1_1FormatWriter.html#ad1e8b427214f7cfd19ce2251d38e24f5>`
+  - :ome_xml_api:`PixelType <classome_1_1xml_1_1model_1_1enums_1_1PixelType.html>`
+  - :ome_files_api:`PixelBuffer <classome_1_1files_1_1PixelBuffer.html>`
+  - :ome_files_api:`VariantPixelBuffer <classome_1_1files_1_1VariantPixelBuffer.html>`
+  - :ome_files_api:`FormatReader::getLookupTable <classome_1_1files_1_1FormatReader.html#a9b69e3612f0ad4c945d1c0f111242cc2>`
+  - :ome_files_api:`FormatReader::openBytes <classome_1_1files_1_1FormatReader.html#a5bfa86b4b68b03b63d76bb050cbe7101>`
+  - :ome_files_api:`FormatWriter::setLookupTable <classome_1_1files_1_1FormatWriter.html#a00ae3dc46c205e64f782c7b6f47bd5ab>`
+  - :ome_files_api:`FormatWriter::saveBytes <classome_1_1files_1_1FormatWriter.html#ad1e8b427214f7cfd19ce2251d38e24f5>`
 
 Reading images
 --------------
@@ -526,9 +526,9 @@ Full example source: :download:`metadata-formatreader.cpp <examples/metadata-for
 
 .. seealso::
 
-  - :doxygen:`FormatReader <classome_1_1files_1_1FormatReader.html>`
-  - :doxygen:`TIFFReader <classome_1_1files_1_1in_1_1TIFFReader.html>`
-  - :doxygen:`OMETIFFReader <classome_1_1files_1_1in_1_1OMETIFFReader.html>`
+  - :ome_files_api:`FormatReader <classome_1_1files_1_1FormatReader.html>`
+  - :ome_files_api:`TIFFReader <classome_1_1files_1_1in_1_1TIFFReader.html>`
+  - :ome_files_api:`OMETIFFReader <classome_1_1files_1_1in_1_1OMETIFFReader.html>`
 
 Writing images
 --------------
@@ -583,6 +583,6 @@ Full example source: :download:`metadata-formatwriter.cpp <examples/metadata-for
 
 .. seealso::
 
-  - :doxygen:`FormatWriter <classome_1_1files_1_1FormatWriter.html>`
-  - :doxygen:`TIFFWriter <classome_1_1files_1_1out_1_1MinimalTIFFWriter.html>`
-  - :doxygen:`OMETIFFWriter <classome_1_1files_1_1out_1_1OMETIFFWriter.html>`
+  - :ome_files_api:`FormatWriter <classome_1_1files_1_1FormatWriter.html>`
+  - :ome_files_api:`TIFFWriter <classome_1_1files_1_1out_1_1MinimalTIFFWriter.html>`
+  - :ome_files_api:`OMETIFFWriter <classome_1_1files_1_1out_1_1OMETIFFWriter.html>`

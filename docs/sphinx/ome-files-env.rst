@@ -29,7 +29,7 @@ Basic paths
 
 These may be shared with other packages if configured to do so
 (e.g. if using :file:`/usr/local`).  See `GNUInstallDirs
-<http://www.cmake.org/cmake/help/v3.0/module/GNUInstallDirs.html>`_
+<https://cmake.org/cmake/help/latest/module/GNUInstallDirs.html>`_
 for more details.  Not all of these paths are currently used, but may
 be used in the future.
 

@@ -43,7 +43,7 @@ Java has primitive types and classes.
 
 - All classes are derived from root :cpp:class:`Object`
 - Objects are by reference only
-- Objects and arrays are always allocated with :cpp:class:`new`
+- Objects and arrays are always allocated with ``new``
 - Destruction is non-deterministic
 - All passing is by value (primitives and object references)
 
@@ -84,8 +84,8 @@ C++ has primitive types, structures and classes.
 
 - Classes have no common root
 - All types may be instances, pointers or references
-- Object construction may be on the stack, on the heap using
-  :cpp:class:`new` or in place using placement :cpp:class:`new`.
+- Object construction may be on the stack, on the heap using ``new``
+  or in place using placement ``new``.
 - Pointers and references may refer to :c:type:`const` type
 - Pointers may be :c:type:`const`
 - References are implicitly :c:type:`const` (similar to :c:type:`final`)
@@ -165,15 +165,15 @@ C++ interfaces are classes with:
 
 - No instance variables
 - Pure virtual methods
-- :cpp:type:`protected` default constructor
-- :c:type:`public virtual` destructor
+- `protected`` default constructor
+- ``public virtual`` destructor
 - Deleted copy constructor and assignment operator
 
 C++ classes implementing interfaces:
 
-- Use :cpp:type:`public` inheritance for parent class
-- Use :c:type:`virtual public` inheritance for implemented interfaces
-- Have a :cpp:type:`virtual` destructor
+- Use ``public`` inheritance for parent class
+- Use ``virtual public`` inheritance for implemented interfaces
+- Have a ``virtual`` destructor
 
 When compiled with optimization enabled, the interface classes should
 have zero storage overhead.  If implementing classes do not use
@@ -260,11 +260,10 @@ variables with different lifetimes and scopes, multiple return points
 and several exceptions to handle--this is easy to get wrong, so a more
 robust approach is needed.
 
-Use of :cpp:class:`new` is not in the general case safe or sensible.
-The OME-Files API **never** passes pointers allocated with
-:cpp:class:`new`, nor requires any manual memory management.  Instead,
-“smart” pointers are used throughout to manage memory safely and
-automatically.
+Use of ``new`` is not in the general case safe or sensible.  The
+OME-Files API **never** passes pointers allocated with ``new``, nor
+requires any manual memory management.  Instead, “smart” pointers are
+used throughout to manage memory safely and automatically.
 
 :cpp:class:`ome::compat::shared_ptr` as a “smart” pointer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -298,7 +297,7 @@ destructor which is run at the end of the block scope, on explicit
     respectively.
 
 - :cpp:class:`shared_ptr` object lifetime manages the resource
-- :cpp:class:`new` replaced with :cpp:class:`ome::compat::make_shared`
+- ``new`` replaced with :cpp:class:`ome::compat::make_shared`
 - May be used as class members; lifetime is tied to class instance
 - Clean up for all exit points is automatic and safe
 - Allows ownership transfer and sharing
@@ -707,9 +706,9 @@ This is implemented using an overloaded equality operator:
 
 As before, this is implemented in terms of a
 :cpp:class:`boost::static_visitor`, but note that this time it is
-specialized for :cpp:type:`bool`, meaning that the return type of
-:cpp:func:`apply_visitor` will also be :cpp:type:`bool`, and the
-operator methods must also return this type.
+specialized for ``bool``, meaning that the return type of
+:cpp:func:`apply_visitor` will also be ``bool``, and the operator
+methods must also return this type.
 
 .. code-block:: cpp
 
@@ -814,12 +813,12 @@ manner to the previously demonstrated visitors.
 
 :cpp:class:`enable_if` has two parameters, the first being a
 conditional, the second being the return type (in this example, all
-the methods return :cpp:type:`void`).  If the conditional is true,
-then the type expands to the return type and the template is
-successfully substituted.  If the conditional is false (types do not
-match), then the substitution fails and the template will not be used.
-Note that the conditional is itself a type, which can be confusing,
-since all this logic is driven by conditional template expansion.
+the methods return ``void``).  If the conditional is true, then the
+type expands to the return type and the template is successfully
+substituted.  If the conditional is false (types do not match), then
+the substitution fails and the template will not be used.  Note that
+the conditional is itself a type, which can be confusing, since all
+this logic is driven by conditional template expansion.
 
 Normal templates are specialized for a type.  This approach allows
 specialization for different *categories* of type.  Without this
