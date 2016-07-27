@@ -328,32 +328,6 @@ namespace ome
          */
         void
         fixDimensions(ome::xml::meta::BaseMetadata::index_type series);
-
-      public:
-        /**
-         * Get a MetadataStore suitable for writing.
-         *
-         * @note This will be suitable for use with FormatWriter, but
-         * will likely not generate valid OME-XML due to the
-         * likelihood of containing both BinData and TiffData
-         * elements.
-         *
-         * @returns the metadata store.
-         */
-        ome::compat::shared_ptr< ome::xml::meta::MetadataStore>
-        getMetadataStoreForConversion();
-
-        /**
-         * Get a MetadataStore suitable for display.
-         *
-         * @note This will not be suitable for use with FormatWriter
-         * due to not containing required BinData BigEndian
-         * attributes.
-         *
-         * @returns the metadata store.
-         */
-        ome::compat::shared_ptr< ome::xml::meta::MetadataStore>
-        getMetadataStoreForDisplay();
       };
 
 
