@@ -548,7 +548,7 @@ namespace ome
           try
             {
               OMEXMLMetadata& omexml(dynamic_cast<OMEXMLMetadata&>(store));
-              if (omexml.getTiffDataCount(s) == 0 ||
+              if (omexml.getTiffDataCount(s) == 0 &&
                   omexml.getPixelsBinDataCount(s) == 0)
                 addMetadataOnly(omexml, s);
             }
@@ -593,7 +593,7 @@ namespace ome
           try
             {
               OMEXMLMetadata& omexml(dynamic_cast<OMEXMLMetadata&>(store));
-              if (omexml.getTiffDataCount(s) == 0 ||
+              if (omexml.getTiffDataCount(s) == 0 &&
                   omexml.getPixelsBinDataCount(s) == 0)
                 addMetadataOnly(omexml, s);
             }
