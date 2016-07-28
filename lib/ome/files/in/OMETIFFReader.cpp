@@ -961,17 +961,25 @@ namespace ome
 
         // Set the metadata store Pixels.BigEndian attribute to match
         // the values we set in the core metadata
-        ome::compat::shared_ptr<ome::xml::meta::MetadataRetrieve> metadataRetrieve
-          (ome::compat::dynamic_pointer_cast<ome::xml::meta::MetadataRetrieve>(getMetadataStore()));
+        try
+          {
+            ome::compat::shared_ptr<ome::xml::meta::MetadataRetrieve> metadataRetrieve
+              (ome::compat::dynamic_pointer_cast<ome::xml::meta::MetadataRetrieve>(getMetadataStore()));
 
-        for (index_type i = 0; i < metadataRetrieve->getImageCount(); ++i)
-        {
+            for (index_type i = 0; i < metadataRetrieve->getImageCount(); ++i)
+              {
 #ifdef BOOST_BIG_ENDIAN
-          metadataStore->setPixelsBigEndian(1, i);
+                metadataStore->setPixelsBigEndian(1, i);
 #else // Little endian
-          metadataStore->setPixelsBigEndian(0, i);
+                metadataStore->setPixelsBigEndian(0, i);
 #endif
-        }
+              }
+          }
+        catch(const std::exception&)
+          {
+            // The metadata store doesn't support getImageCount so we
+            // can't meaningfully set anything.
+          }
       }
 
       void
