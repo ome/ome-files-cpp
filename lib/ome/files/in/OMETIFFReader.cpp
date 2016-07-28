@@ -959,6 +959,8 @@ namespace ome
               }
           }
 
+        // Set the metadata store Pixels.BigEndian attribute to match
+        // the values we set in the core metadata
         ome::compat::shared_ptr<ome::xml::meta::MetadataRetrieve> metadataRetrieve
           (ome::compat::dynamic_pointer_cast<ome::xml::meta::MetadataRetrieve>(getMetadataStore()));
 
