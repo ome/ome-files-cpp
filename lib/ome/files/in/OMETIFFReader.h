@@ -333,12 +333,17 @@ namespace ome
         /**
          * Get a MetadataStore suitable for writing.
          *
-         * @note This will be suitable for use with FormatWriter, but
-         * will likely not generate valid OME-XML due to the
-         * likelihood of containing both BinData and TiffData
-         * elements.
+         * @note Historically, this method created metadata suitable
+         * for use with FormatWriter, but would possibly not generate
+         * valid OME-XML if both BinData and TiffData elements were
+         * present.  This is no longer the case; the general
+         * FormatReader::getMetadataStore() method will always create
+         * valid metadata which is suitable for use with FormatWriter,
+         * and so should be used instead.
          *
          * @returns the metadata store.
+         * @deprecated Use the general FormatReader::getMetadataStore() method.
+         * @todo Remove in 0.3
          */
         ome::compat::shared_ptr< ome::xml::meta::MetadataStore>
         getMetadataStoreForConversion();
@@ -346,11 +351,19 @@ namespace ome
         /**
          * Get a MetadataStore suitable for display.
          *
-         * @note This will not be suitable for use with FormatWriter
-         * due to not containing required BinData BigEndian
-         * attributes.
+         * @note Historically, this method removed certain elements
+         * for display purposes and was not be suitable for use with
+         * FormatWriter due to not containing required BinData
+         * BigEndian attributes pthis requirement has long been
+         * unnecessary].  This is no longer the case, and has never
+         * been the case for the C++ implementation; the general
+         * FormatReader::getMetadataStore() method will always create
+         * valid metadata which is suitable for both display and use
+         * with FormatWriter, and so should be used instead.
          *
          * @returns the metadata store.
+         * @deprecated Use the general FormatReader::getMetadataStore() method.
+         * @todo Remove in 0.3
          */
         ome::compat::shared_ptr< ome::xml::meta::MetadataStore>
         getMetadataStoreForDisplay();

@@ -959,7 +959,27 @@ namespace ome
               }
           }
 
-        metadataStore = getMetadataStoreForConversion();
+        // Set the metadata store Pixels.BigEndian attribute to match
+        // the values we set in the core metadata
+        try
+          {
+            ome::compat::shared_ptr<ome::xml::meta::MetadataRetrieve> metadataRetrieve
+              (ome::compat::dynamic_pointer_cast<ome::xml::meta::MetadataRetrieve>(getMetadataStore()));
+
+            for (index_type i = 0; i < metadataRetrieve->getImageCount(); ++i)
+              {
+#ifdef BOOST_BIG_ENDIAN
+                metadataStore->setPixelsBigEndian(1, i);
+#else // Little endian
+                metadataStore->setPixelsBigEndian(0, i);
+#endif
+              }
+          }
+        catch(const std::exception&)
+          {
+            // The metadata store doesn't support getImageCount so we
+            // can't meaningfully set anything.
+          }
       }
 
       void
@@ -1346,55 +1366,13 @@ namespace ome
       ome::compat::shared_ptr<ome::xml::meta::MetadataStore>
       OMETIFFReader::getMetadataStoreForConversion()
       {
-        SaveSeries sentry(*this);
-
-        ome::compat::shared_ptr<ome::xml::meta::MetadataStore> store = getMetadataStore();
-
-        if (store)
-          {
-            for (dimension_size_type i = 0; i < getSeriesCount(); ++i)
-              {
-                setSeries(i);
-                store->setPixelsBinDataBigEndian(!isLittleEndian(), i, 0);
-              }
-          }
-
-        return store;
+        return getMetadataStore();
       }
 
       ome::compat::shared_ptr<ome::xml::meta::MetadataStore>
       OMETIFFReader::getMetadataStoreForDisplay()
       {
-        ome::compat::shared_ptr<ome::xml::meta::OMEXMLMetadata> omexml;
-        ome::compat::shared_ptr<ome::xml::meta::MetadataStore> store = getMetadataStore();
-
-        if (store)
-          {
-            omexml = ome::compat::dynamic_pointer_cast<ome::xml::meta::OMEXMLMetadata>(store);
-            if (omexml)
-              {
-                removeBinData(*omexml);
-                for (dimension_size_type i = 0;
-                     i < getSeriesCount();
-                     ++i)
-                  {
-                    try
-                      {
-                        if (omexml->getTiffDataCount(i) == 0)
-                          addMetadataOnly(*omexml, i);
-                      }
-                    catch (const std::exception& e)
-                      {
-                        boost::format fmt("Failed to add MetadataOnly for series %1%: %2%");
-                        fmt % i % e.what();
-
-                        BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
-                      }
-                  }
-              }
-          }
-
-        return omexml;
+        return getMetadataStore();
       }
 
     }
