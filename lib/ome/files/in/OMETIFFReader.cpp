@@ -1363,6 +1363,18 @@ namespace ome
           }
       }
 
+      ome::compat::shared_ptr<ome::xml::meta::MetadataStore>
+      OMETIFFReader::getMetadataStoreForConversion()
+      {
+        return getMetadataStore();
+      }
+
+      ome::compat::shared_ptr<ome::xml::meta::MetadataStore>
+      OMETIFFReader::getMetadataStoreForDisplay()
+      {
+        return getMetadataStore();
+      }
+
     }
   }
 }
