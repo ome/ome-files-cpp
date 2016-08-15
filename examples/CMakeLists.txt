@@ -57,6 +57,9 @@ target_link_libraries(metadata-formatwriter2 OME::XML OME::Files ${CMAKE_THREAD_
 add_executable(pixeldata "${exampledir}/pixeldata.cpp")
 target_link_libraries(pixeldata OME::Files ${CMAKE_THREAD_LIBS_INIT})
 
+add_executable(units "${exampledir}/units.cpp")
+target_link_libraries(units OME::Files ${CMAKE_THREAD_LIBS_INIT})
+
 if(BUILD_TESTS)
   ome_files_add_test(examples/model-io model-io "${PROJECT_SOURCE_DIR}/test/ome-files/data/18x24y5z5t2c8b-text.ome")
   ome_files_add_test(examples/metadata-io metadata-io "${PROJECT_SOURCE_DIR}/test/ome-files/data/18x24y5z5t2c8b-text.ome")
@@ -64,4 +67,5 @@ if(BUILD_TESTS)
   ome_files_add_test(examples/metadata-formatwriter metadata-formatwriter "${CMAKE_CURRENT_BINARY_DIR}/test-write.ome.tiff")
   ome_files_add_test(examples/metadata-formatwriter2 metadata-formatwriter2 "${CMAKE_CURRENT_BINARY_DIR}/test-write2.ome.tiff")
   ome_files_add_test(examples/pixeldata pixeldata "${PROJECT_SOURCE_DIR}/test/ome-files/data/18x24y5z5t2c8b-text.ome")
+  ome_files_add_test(examples/units units)
 endif(BUILD_TESTS)
