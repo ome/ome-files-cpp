@@ -33,7 +33,7 @@ unit
 base unit
   The primary unit for a given unit system; all other units are scaled
   relative to this unit.  Automatic conversion between unit systems is
-  defined in conversion of base units
+  defined in conversion of base units.
 
 quantity
   A measured value with an associated unit.
