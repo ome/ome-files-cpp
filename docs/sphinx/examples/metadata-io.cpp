@@ -65,6 +65,8 @@ namespace meta = ome::xml::meta;
 namespace model = ome::xml::model;
 typedef meta::OMEXMLMetadata::index_type index_type;
 
+typedef model::primitives::Quantity<model::enums::UnitsLength, model::primitives::PositiveFloat> PositiveLength;
+
 namespace
 {
 
@@ -109,8 +111,30 @@ namespace
                << "\n\tY = " << meta.getPixelsSizeY(i)
                << "\n\tZ = " << meta.getPixelsSizeZ(i)
                << "\n\tT = " << meta.getPixelsSizeT(i)
-               << "\n\tC = " << meta.getPixelsSizeC(i)
-               << '\n';
+               << "\n\tC = " << meta.getPixelsSizeC(i);
+        // These are optional, so handle failure gracefully.
+        try
+          {
+            stream << "\n\tPhysicalX = " << meta.getPixelsPhysicalSizeX(i);
+          }
+        catch (const meta::MetadataException&)
+          {
+          }
+        try
+          {
+            stream << "\n\tPhysicalY = " << meta.getPixelsPhysicalSizeY(i);
+          }
+        catch (const meta::MetadataException&)
+          {
+          }
+        try
+          {
+            stream << "\n\tPhysicalZ = " << meta.getPixelsPhysicalSizeZ(i);
+          }
+        catch (const meta::MetadataException&)
+          {
+          }
+        stream<< '\n';
 
         // Get total number of planes (for this image index)
         index_type pc = meta.getPlaneCount(i);
@@ -147,6 +171,12 @@ namespace
         meta.setPixelsSizeZ(6, i);
         meta.setPixelsSizeT(30, i);
         meta.setPixelsSizeC(4, i);
+        meta.setPixelsPhysicalSizeX
+          (PositiveLength(118.2, model::enums::UnitsLength::MICROMETER), i);
+        meta.setPixelsPhysicalSizeY
+          (PositiveLength(118.2, model::enums::UnitsLength::MICROMETER), i);
+        meta.setPixelsPhysicalSizeZ
+          (PositiveLength(26.5, model::enums::UnitsLength::MICROMETER), i);
       }
   }
   /* update-example-end */

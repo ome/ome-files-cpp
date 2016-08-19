@@ -40,6 +40,9 @@
 
 #include <stdexcept>
 
+/**
+ * Open Microscopy Environment C++.
+ */
 namespace ome
 {
   /**

@@ -3,6 +3,152 @@
 Tutorial
 ========
 
+.. _tutorial_units:
+
+Units of measurement
+--------------------
+
+Many of the metadata interfaces provide methods to get or set values
+with an associated unit of measurement.  The reason for this is to
+ensure that values are always associated with an appropriate unit, and
+to enforce compile-time or run-time sanity checks to ensure that the
+correct unit type is used, and that any unit conversions performed are
+legal.  The following terminology is used:
+
+dimension
+  A measured property, for example length, pressure, temperature or
+  time.
+
+unit system
+  A system of units for a given dimension, for example the SI units
+  for the length dimension are metre and its derived units.  For the
+  pressure, temperature and time dimensions, pascal, celsius and
+  second are used respectively, along with any derived units.
+  Multiple systems may be provided for a given dimension, such as
+  Imperial length units, bar or Torr for pressure or Fahrenheit for
+  temperature.  Different unit systems for the same dimension will
+  typically be inter-convertible, but this is not a requirement.
+
+unit
+  A unit of measure within a given unit system, for example cm, µm and
+  nm are all scaled units derived from m.
+
+base unit
+  The primary unit for a given unit system; all other units are scaled
+  relative to this unit.  Automatic conversion between unit systems is
+  defined in conversion of base units.  For example, m is the base
+  unit for the SI length unit system.
+
+quantity
+  A measured value with an associated unit.  For example, 3.5 mm.
+
+.. _tutorial_model_units:
+
+Model units
+^^^^^^^^^^^
+
+The metadata interfaces make use of these unit types, which are based upon
+
+- Unit type enumerations
+- The :ome_xml_api:`Quantity class
+  <classome_1_1xml_1_1model_1_1primitives_1_1Quantity.html>`
+
+The :cpp:class:`Quantity` class is the user-visible part of the units
+support.  It trades compile-time correctness for run-time flexibility.
+It is templated, specialized for a given unit type enumeration, for
+example ``Quantity<UnitLength>`` for length quantities.  It may
+represent any valid unit from the enumeration.
+
+A :cpp:class:`Quantity` is constructed using a numerical value and a
+unit enumeration value.  Basic arithmetic operations such as
+assignment, multiplication, subtraction, division and multiplication
+are supported.  Note however that complex arithmetic with different
+unit types is not supported; if this is required, please use the basic
+units directly (see below).  Also note that multiplication and
+division are permitted only with scalars, and addition and subtraction
+require operands to be of the same type; the unit of the left-hand
+operand will be preserved, and the value of the right-hand operand
+will be implicitly converted to match.
+
+Unit conversion is performed by using the free :cpp:func:`convert`
+function, which requires a quantity and destination unit.  If
+conversion is not supported, an exception will be thrown.  The
+conversion operations are all performed in terms of the basic
+quantities, described below.
+
+The following example demonstrates these concepts:
+
+.. literalinclude:: examples/units.cpp
+   :language: cpp
+   :start-after: model-example-start
+   :end-before: model-example-end
+
+Model units are also used in the following examples such as the
+:ref:`tutorial_metadatastore`.
+
+The model units are implemented using a lower-level units interface,
+which we term "basic units".
+
+.. _tutorial_basic_units:
+
+Basic units
+^^^^^^^^^^^
+
+Unlike the model units, which provide run-time checking, the basic
+units enforce correctness during compilation.  Basic units are
+provided by a static compile-time type-safe unit system based upon
+Boost.Units.  All the data types provided are simply typedefs or
+specializations of the Boost.Units library unit types.  See the
+`Boost.Units documentation
+<http://www.boost.org/doc/libs/1_61_0/doc/html/boost_units/Units.html>`__
+for further information.
+
+As a user of the library, quantity types are the primary type which
+you will use.  The other types are implementation details which will
+not be needed unless you have a need to add additional custom units to
+the existing set of registered units.  However, a comprehensive set of
+SI, Imperial and other customary units are provided, so most of the
+conceivable usage should be fully catered for.  A full list of
+quantity types is listed in the :ome_common_api:`units namespace
+<namespaceome_1_1common_1_1units.html>`.  Should you wish to add your
+own quantities, units, unit systems and even entirely new dimensions,
+this is all possible using Boost.Units.
+
+To create a quantity, use the :cpp:func:`quantity::from_value` method,
+which will return a :cpp:class:`quantity` of the desired type.  Since
+the unit is encoded in the type name, the unit type is immutable and
+correctness is enforced at compile time.  This differs from the model
+units where the unit type is passed to the constructor.  Once
+constructed, the quantity may be used in a similar manner to the model
+quantities: a quantity is assignable to any quantity of the same type,
+and arithmetic operations with scalar quantities or other units are
+permitted.  Note that a quantity is not assignable to other quantities
+in the same unit system which are not of exactly the same type;
+implicit unit conversions are not allowed, even between scaled units
+in the same unit system.  Also note that multiplication and division
+with quantities may change the unit type, such as squaring when
+multiplying the same unit type, and that adding and subtracting scalar
+values is not permitted since there is no associated unit.
+
+Explicit conversion is as simple as instantiating a quantity type with
+a different quantity as the construction parameter.  If the conversion
+is not permitted, this will result in a compilation failure, enforcing
+correctness.
+
+The following example demonstrates these concepts:
+
+.. literalinclude:: examples/units.cpp
+   :language: cpp
+   :start-after: basic-example-start
+   :end-before: basic-example-end
+
+As a general rule, the user-facing API will not use basic units, but
+they are available should you wish to make use of strict unit type
+checking and unit type conversion in your own code.  They are also
+potentially more performant when performing conversions since there is
+much greater scope for optimization.
+
+.. _tutorial_metadata:
 
 Metadata
 --------
@@ -57,6 +203,8 @@ The header file :ome_files_api:`ome/files/MetadataTools.h
 to work with and manipulate the various forms of metadata, including
 conversion of Core metadata to and from a metadata store.
 
+.. _tutorial_core_metadata:
+
 Core metadata
 ^^^^^^^^^^^^^
 
@@ -100,6 +248,7 @@ Full example source: :download:`metadata-formatreader.cpp
   - :ome_files_api:`CoreMetadata <classome_1_1files_1_1CoreMetadata.html>`
   - :ome_files_api:`FormatReader <classome_1_1files_1_1FormatReader.html>`
 
+.. _tutorial_original_metadata:
 
 Original metadata
 ^^^^^^^^^^^^^^^^^
@@ -132,6 +281,8 @@ Full example source: :download:`metadata-formatreader.cpp <examples/metadata-for
   - :ome_files_api:`MetadataMap <classome_1_1files_1_1MetadataMap.html>`
   - :ome_files_api:`FormatReader <classome_1_1files_1_1FormatReader.html>`
   - :ome_xml_api:`OriginalMetadataAnnotation <classome_1_1xml_1_1model_1_1OriginalMetadataAnnotation.html>`
+
+.. _tutorial_metadatastore:
 
 Metadata store
 ^^^^^^^^^^^^^^
@@ -242,6 +393,8 @@ Full example source: :download:`metadata-io.cpp <examples/metadata-io.cpp>`
   - :ome_files_api:`getOMEXML <namespaceome_1_1files.html#a32e5424991ce09b857ddc0d5be37c4f1>`
 
 
+.. _tutorial_model:
+
 OME-XML data model objects
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -284,6 +437,8 @@ Full example source: :download:`model-io.cpp <examples/model-io.cpp>`
   - :ome_xml_api:`OME model classes <namespaceome_1_1xml_1_1model.html>`
   - :ome_xml_api:`OME <classome_1_1xml_1_1model_1_1OME.html>`
 
+
+.. _tutorial_pixeldata:
 
 Pixel data
 ----------
