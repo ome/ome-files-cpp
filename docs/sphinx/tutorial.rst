@@ -25,9 +25,9 @@ unit system
   pressure, temperature and time dimensions, pascal, celsius and
   second are used respectively, along with any derived units.
   Multiple systems may be provided for a given dimension, such as
-  Imperial length units, bar or Torr for pressure or fahrenheit for
+  Imperial length units, bar or Torr for pressure or Fahrenheit for
   temperature.  Different unit systems for the same dimension will
-  typically be interconvertible, but this is not a requirement.
+  typically be inter-convertible, but this is not a requirement.
 
 unit
   A unit of measure within a given unit system, for example cm, µm and
@@ -61,14 +61,14 @@ represent any valid unit from the enumeration.
 
 A :cpp:class:`Quantity` is constructed using a numerical value and a
 unit enumeration value.  Basic arithmetic operations such as
-assignment, multiplication, substraction, division and multiplication
+assignment, multiplication, subtraction, division and multiplication
 are supported.  Note however that complex arithmetic with different
 unit types is not supported; if this is required, please use the basic
 units directly (see below).  Also note that multiplication and
 division are permitted only with scalars, and addition and subtraction
 require operands to be of the same type; the unit of the left-hand
 operand will be preserved, and the value of the right-hand operand
-will be implictly converted to match.
+will be implicitly converted to match.
 
 Unit conversion is performed by using the free :cpp:func:`convert`
 function, which requires a quantity and destination unit.  If
@@ -98,7 +98,10 @@ Unlike the model units, which provide run-time checking, the basic
 units enforce correctness during compilation.  Basic units are
 provided by a static compile-time type-safe unit system based upon
 Boost.Units.  All the data types provided are simply typedefs or
-specialisations of the Boost.Units library unit types.
+specializations of the Boost.Units library unit types.  See the
+`Boost.Units documentation
+<http://www.boost.org/doc/libs/1_61_0/doc/html/boost_units/Units.html>`__
+for further information.
 
 As a user of the library, quantity types are the primary type which
 you will use.  The other types are implementation details which will
@@ -127,7 +130,7 @@ with quantities may change the unit type, such as squaring when
 multiplying the same unit type, and that adding and subtracting scalar
 values is not permitted since there is no associated unit.
 
-Explicit conversion is as simple as instatiating a quantity type with
+Explicit conversion is as simple as instantiating a quantity type with
 a different quantity as the construction parameter.  If the conversion
 is not permitted, this will result in a compilation failure, enforcing
 correctness.
