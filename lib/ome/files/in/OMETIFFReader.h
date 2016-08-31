@@ -39,7 +39,7 @@
 #define OME_FILES_IN_OMETIFFREADER_H
 
 #include <ome/files/in/MinimalTIFFReader.h>
-#include <ome/files/tiff/ImageJMetadata.h>
+#include <ome/files/tiff/TIFF.h>
 
 #include <ome/common/log.h>
 
@@ -180,7 +180,26 @@ namespace ome
         void
         closeTIFF(const boost::filesystem::path& tiff);
 
-      public:
+        /**
+         * Read metadata into metadata store from an open TIFF.
+         *
+         * @param tiff the TIFF from which to read the metadata.
+         * @returns the parsed metadata as a metadata store.
+         */
+        ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
+        readMetadata(const ome::files::tiff::TIFF& tiff) const;
+
+        /**
+         * Read metadata into metadata store from a TIFF or companion
+         * XML file.
+         *
+         * @param id the file from which to read the metadata.
+         * @returns the parsed metadata as a metadata store.
+         */
+        ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
+        readMetadata(const boost::filesystem::path& id) const;
+
+        public:
         // Documented in superclass.
         void
         close(bool fileOnly = false);

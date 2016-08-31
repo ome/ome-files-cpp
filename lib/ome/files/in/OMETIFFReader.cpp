@@ -92,7 +92,11 @@ namespace ome
       namespace
       {
 
-        const char *suffixes[] = {"ome.tif", "ome.tiff", };
+        const char *suffixes[] = {"ome.tif",
+                                  "ome.tiff",
+                                  "ome.tf2",
+                                  "ome.tf8",
+                                  "ome.btf"};
         const char *companion_suffixes_array[] = {"companion.ome"};
 
         ReaderProperties
@@ -115,15 +119,18 @@ namespace ome
         std::vector<path> companion_suffixes(companion_suffixes_array,
                                              companion_suffixes_array + boost::size(companion_suffixes_array));
 
-        void
-        getComment(const TIFF&  tiff,
-                   std::string& omexml)
+        std::string
+        getImageDescription(const TIFF& tiff)
         {
           try
             {
               ome::compat::shared_ptr<tiff::IFD> ifd (tiff.getDirectoryByIndex(0));
               if (ifd)
-                ifd->getField(ome::files::tiff::IMAGEDESCRIPTION).get(omexml);
+                {
+                  std::string omexml;
+                  ifd->getField(ome::files::tiff::IMAGEDESCRIPTION).get(omexml);
+                  return omexml;
+                }
               else
                 throw tiff::Exception("No TIFF IFDs found");
             }
@@ -225,10 +232,7 @@ namespace ome
             throw FormatException(fmt.str());
           }
 
-        std::string omexml;
-        getComment(*tiff, omexml);
-
-        ome::compat::shared_ptr< ::ome::xml::meta::Metadata> meta(createOMEXMLMetadata(omexml));
+        ome::compat::shared_ptr< ::ome::xml::meta::Metadata> meta(readMetadata(*tiff));
 
         dimension_size_type nImages = 0U;
         for (dimension_size_type i = 0U;
@@ -271,8 +275,7 @@ namespace ome
             throw FormatException(fmt.str());
           }
 
-        std::string omexml;
-        getComment(*tiff, omexml);
+        std::string omexml(getImageDescription(*tiff));
 
         // Basic sanity check before parsing.
         if (omexml.size() == 0 || omexml[0] != '<' || omexml[omexml.size()-1] != '>')
@@ -419,16 +422,14 @@ namespace ome
 
         // Get the OME-XML from the first TIFF, and create OME-XML
         // metadata from it.
-        std::string omexml;
-        getComment(*tiff, omexml);
-        ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta(createOMEXMLMetadata(omexml));
+        ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta(readMetadata(*tiff));
 
         // Is there an associated binary-only metadata file?
         try
           {
             metadataFile = canonical(path(meta->getBinaryOnlyMetadataFile()), dir);
             if (!metadataFile.empty() && boost::filesystem::exists(metadataFile))
-              meta = createOMEXMLMetadata(metadataFile);
+              meta = readMetadata(metadataFile);
           }
         catch (const std::exception&)
           {
@@ -1360,6 +1361,26 @@ namespace ome
           {
             i->second->close();
             i->second = ome::compat::shared_ptr<ome::files::tiff::TIFF>();
+          }
+      }
+
+      ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
+      OMETIFFReader::readMetadata(const ome::files::tiff::TIFF& tiff) const
+      {
+        return createOMEXMLMetadata(getImageDescription(tiff));
+      }
+
+      ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
+      OMETIFFReader::readMetadata(const boost::filesystem::path& id) const
+      {
+        if (checkSuffix(id, companion_suffixes))
+          {
+            const ome::compat::shared_ptr<const TIFF> tiff(getTIFF(id));
+            return createOMEXMLMetadata(getImageDescription(*tiff));
+          }
+        else
+          {
+            return createOMEXMLMetadata(id);
           }
       }
 
