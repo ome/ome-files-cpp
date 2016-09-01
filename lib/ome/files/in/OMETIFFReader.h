@@ -81,7 +81,7 @@ namespace ome
         typedef std::map<boost::filesystem::path, boost::filesystem::path> invalid_file_map;
 
         /// Map filename to open TIFF handle.
-        typedef std::map<boost::filesystem::path, ome::compat::shared_ptr<ome::files::tiff::TIFF> > tiff_map;
+        typedef std::map<boost::filesystem::path, std::pair<ome::compat::shared_ptr<ome::files::tiff::TIFF>, bool> > tiff_map;
 
         /// UUID to filename mapping.
         uuid_file_map files;
@@ -178,6 +178,15 @@ namespace ome
          */
         const ome::compat::shared_ptr<const ome::files::tiff::TIFF>
         getTIFF(const boost::filesystem::path& tiff) const;
+
+        /**
+         * Check if a cached TIFF is valid (can be opened).
+         *
+         * @param tiff the TIFF file to get.
+         * @returns @c true if valid, @c false if invalid.
+         */
+        bool
+        validTIFF(const boost::filesystem::path& tiff) const;
 
         /**
          * Close an open TIFF file from the internal TIFF map.

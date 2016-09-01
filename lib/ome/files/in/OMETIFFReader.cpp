@@ -1326,7 +1326,7 @@ namespace ome
       void
       OMETIFFReader::addTIFF(const boost::filesystem::path& tiff)
       {
-        tiffs.insert(std::make_pair(tiff, ome::compat::shared_ptr<tiff::TIFF>()));
+        tiffs.insert(std::make_pair(tiff, std::pair<ome::compat::shared_ptr<tiff::TIFF>, bool>(ome::compat::shared_ptr<tiff::TIFF>(), false)));
       }
 
       const ome::compat::shared_ptr<const ome::files::tiff::TIFF>
@@ -1341,27 +1341,47 @@ namespace ome
             throw FormatException(fmt.str());
           }
 
-        if (!i->second)
-          i->second = tiff::TIFF::open(i->first, "r");
+        // second.second is the validity if the TIFF is null.  false
+        // is uninitialised; true is invalid.  Used to prevent
+        // repeated initialisation when the file is broken or
+        // nonexistent.
+        if (!i->second.first || !i->second.second)
+          {
+            try
+              {
+                i->second.first = tiff::TIFF::open(i->first, "r");
+              }
+            catch (const ome::files::tiff::Exception&)
+              {
+                i->second.second = true;
+              }
+          }
 
-        if (!i->second)
+        if (!i->second.first)
           {
             boost::format fmt("Failed to open ‘%1%’");
             fmt % i->first.string();
             throw FormatException(fmt.str());
           }
 
-        return i->second;
+        return i->second.first;
+      }
+
+      bool
+      OMETIFFReader::validTIFF(const boost::filesystem::path& tiff) const
+      {
+        const ome::compat::shared_ptr<const ome::files::tiff::TIFF> valid(getTIFF(tiff));
+        return valid;
       }
 
       void
       OMETIFFReader::closeTIFF(const boost::filesystem::path& tiff)
       {
         tiff_map::iterator i = tiffs.find(tiff);
-        if (i->second)
+        if (i->second.first)
           {
-            i->second->close();
-            i->second = ome::compat::shared_ptr<ome::files::tiff::TIFF>();
+            i->second.first->close();
+            i->second.first = ome::compat::shared_ptr<ome::files::tiff::TIFF>();
           }
       }
 
@@ -1421,6 +1441,8 @@ namespace ome
             cachedMetadata = meta;
             cachedMetadataFile = canonical(id, dir);
           }
+
+        return meta;
       }
 
       ome::compat::shared_ptr<ome::xml::meta::MetadataStore>
