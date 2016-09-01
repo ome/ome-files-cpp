@@ -424,9 +424,14 @@ namespace ome
         if (!suffixSufficient && !open)
           return false;
 
+        path cname(ome::common::canonical(name));
+
+        if (!boost::filesystem::exists(cname))
+          return false;
+
         if (suffixNecessary || suffixSufficient) {
           // it's worth checking the file extension
-          bool suffixMatch = checkSuffix(name,
+          bool suffixMatch = checkSuffix(cname,
                                          readerProperties.suffixes,
                                          readerProperties.compression_suffixes);
 
@@ -443,7 +448,7 @@ namespace ome
         if (!open)
           return false; // not allowed to open any files
 
-        return isFilenameThisTypeImpl(name);
+        return isFilenameThisTypeImpl(cname);
       }
 
       bool

@@ -102,6 +102,15 @@ namespace ome
         /// Has screen-plate-well metadata.
         bool hasSPW;
 
+        /// Cached metadata (for re-using parsed metadata).
+        mutable ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> cachedMetadata;
+
+        /**
+         * Cached metadata file location (for re-using parsed
+         * metadata).
+         */
+        mutable boost::filesystem::path cachedMetadataFile;
+
       public:
         /// Constructor.
         OMETIFFReader();
@@ -198,6 +207,21 @@ namespace ome
          */
         ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
         readMetadata(const boost::filesystem::path& id) const;
+
+        /**
+         * Read and cache metadata.
+         *
+         * Optimisation to allow sharing of previously parsed
+         * metadata.  The metadata will be cached in the @c meta
+         * member, but will not be cached if the reader has been fully
+         * initialised.  If the metadata was previously read and
+         * cached, the cached copy will be returned.
+         *
+         * @param id the file from which to read the metadata.
+         * @returns the parsed metadata as a metadata store.
+         */
+        ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
+        cacheMetadata(const boost::filesystem::path& id) const;
 
         public:
         // Documented in superclass.
