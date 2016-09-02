@@ -961,7 +961,7 @@ namespace ome
             ms0->sizeT = 1U;
           }
 
-        fillMetadata(*metadataStore, *this, false, false);
+        fillMetadata(*metadataStore, *this, true, false);
 
         for (std::vector<boost::optional<Timestamp> >::const_iterator ts = acquiredDates.begin();
              ts != acquiredDates.end();
