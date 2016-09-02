@@ -1338,6 +1338,8 @@ namespace ome
 
         if (i == tiffs.end())
           {
+            BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
+              << "Failed to find cached TIFF " << i->first.string();
             boost::format fmt("Failed to find cached TIFF ‘%1%’");
             fmt % i->first.string();
             throw FormatException(fmt.str());
@@ -1359,6 +1361,8 @@ namespace ome
               }
           }
 
+        BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
+          << "Failed to open TIFF " << i->first.string();
         if (!i->second.first)
           {
             boost::format fmt("Failed to open ‘%1%’");

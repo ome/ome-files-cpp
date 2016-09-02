@@ -72,7 +72,7 @@ namespace ome
 
       protected:
         /// Message logger.
-        ome::common::Logger logger;
+        mutable ome::common::Logger logger;
 
         /// Map UUID to filename.
         typedef std::map<std::string, boost::filesystem::path> uuid_file_map;
