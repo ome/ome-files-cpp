@@ -652,6 +652,8 @@ namespace ome
                         exists = usedFiles.size() == 1;
                       }
                   }
+                if (exists) // check it's really a valid TIFF
+                  exists = validTIFF(*filename);
 
                 // Fill plane index → IFD mapping
                 for (dimension_size_type q = 0;
