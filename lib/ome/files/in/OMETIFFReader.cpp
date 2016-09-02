@@ -280,7 +280,9 @@ namespace ome
           {
             ome::compat::shared_ptr< ::ome::xml::meta::Metadata> test_meta(cacheMetadata(name));
             std::string metadataFile = test_meta->getBinaryOnlyMetadataFile();
-            if (metadataFile.empty())
+            // check the suffix to make sure that the MetadataFile is
+            // not referencing the current OME-TIFF
+            if (metadataFile.empty() || checkSuffix(metadataFile, getSuffixes()))
               {
                 valid = false;
               }
