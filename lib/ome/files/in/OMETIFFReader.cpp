@@ -280,22 +280,30 @@ namespace ome
           {
             ome::compat::shared_ptr< ::ome::xml::meta::Metadata> test_meta(cacheMetadata(name));
             std::string metadataFile = test_meta->getBinaryOnlyMetadataFile();
-            // check the suffix to make sure that the MetadataFile is
-            // not referencing the current OME-TIFF
-            if (metadataFile.empty() || checkSuffix(metadataFile, getSuffixes()))
+            if (!metadataFile.empty())
               {
-                valid = false;
+                // check the suffix to make sure that the MetadataFile is
+                // not referencing the current OME-TIFF
+                if (checkSuffix(metadataFile, getSuffixes()))
+                  {
+                    valid = false;
+                  }
+                else
+                  {
+                    test_meta = cacheMetadata(metadataFile);
+                  }
               }
-            else{
-              for (::ome::xml::meta::Metadata::index_type i = 0;
-                   i < test_meta->getImageCount();
-                   ++i)
-                {
-                  verifyMinimum(*test_meta, i);
-                }
-              if (test_meta->getImageCount() == 0)
-                valid = false;
-            }
+            if (valid)
+              {
+                for (::ome::xml::meta::Metadata::index_type i = 0;
+                     i < test_meta->getImageCount();
+                     ++i)
+                  {
+                    verifyMinimum(*test_meta, i);
+                  }
+                if (test_meta->getImageCount() == 0)
+                  valid = false;
+              }
           }
         catch (const std::exception&)
           {
