@@ -275,25 +275,44 @@ namespace ome
       bool
       OMETIFFReader::isFilenameThisTypeImpl(const boost::filesystem::path& name) const
       {
+        bool valid = true;
         try
           {
             ome::compat::shared_ptr< ::ome::xml::meta::Metadata> test_meta(cacheMetadata(name));
             std::string metadataFile = test_meta->getBinaryOnlyMetadataFile();
-            if (!metadataFile.empty())
-              return true;
-
-            for (::ome::xml::meta::Metadata::index_type i = 0;
-                 i < test_meta->getImageCount();
-                 ++i)
+            if (metadataFile.empty())
               {
-                verifyMinimum(*test_meta, i);
+                valid = false;
               }
-            return test_meta->getImageCount() > 0;
+            else{
+              for (::ome::xml::meta::Metadata::index_type i = 0;
+                   i < test_meta->getImageCount();
+                   ++i)
+                {
+                  verifyMinimum(*test_meta, i);
+                }
+              if (test_meta->getImageCount() == 0)
+                valid = false;
+            }
           }
         catch (const std::exception&)
           {
-            return FormatReader::isFilenameThisTypeImpl(name);
+            valid = FormatReader::isFilenameThisTypeImpl(name);
           }
+
+        if (valid && !isGroupFiles())
+          {
+            try
+              {
+                valid = isSingleFile(name);
+              }
+            catch (const std::exception&)
+              {
+                valid = false;
+              }
+          }
+
+        return valid;
       }
 
       const ome::compat::shared_ptr<const tiff::IFD>
