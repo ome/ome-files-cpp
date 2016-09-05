@@ -904,6 +904,37 @@ namespace ome
     }
 
     void
+    removeTiffData(::ome::xml::meta::OMEXMLMetadata& omexml)
+    {
+      omexml.resolveReferences();
+      ome::compat::shared_ptr<ome::xml::meta::OMEXMLMetadataRoot> root(ome::compat::dynamic_pointer_cast<ome::xml::meta::OMEXMLMetadataRoot>(omexml.getRoot()));
+      if (root)
+        {
+          std::vector<ome::compat::shared_ptr<ome::xml::model::Image> >& images(root->getImageList());
+          for(std::vector<ome::compat::shared_ptr<ome::xml::model::Image> >::const_iterator image = images.begin();
+              image != images.end();
+              ++image)
+            {
+              ome::compat::shared_ptr<ome::xml::model::Pixels> pixels((*image)->getPixels());
+              if (pixels)
+                {
+                  // Note a copy not a reference to avoid iterator
+                  // invalidation during removal.
+                  std::vector<ome::compat::shared_ptr<ome::xml::model::TiffData> > tiffData(pixels->getTiffDataList());
+                  for (std::vector<ome::compat::shared_ptr<ome::xml::model::TiffData> >::iterator tiff = tiffData.begin();
+                   tiff != tiffData.end();
+                       ++tiff)
+                    {
+                      pixels->removeTiffData(*tiff);
+                    }
+                  ome::compat::shared_ptr<ome::xml::model::MetadataOnly> metadataOnly;
+                  pixels->setMetadataOnly(metadataOnly);
+                }
+            }
+        }
+    }
+
+    void
     removeChannels(::ome::xml::meta::OMEXMLMetadata& omexml,
                    dimension_size_type               image,
                    dimension_size_type               sizeC)

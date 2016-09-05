@@ -552,8 +552,9 @@ namespace ome
                     currentTIFF = tiffs.end();
                   }
 
-                // Remove any BinData elements.
+                // Remove any BinData and old TiffData elements.
                 removeBinData(*omeMeta);
+                removeTiffData(*omeMeta);
                 // Create UUID and TiffData elements for each series.
                 fillMetadata();
 
