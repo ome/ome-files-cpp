@@ -1390,10 +1390,10 @@ namespace ome
               }
           }
 
-        BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
-          << "Failed to open TIFF " << i->first.string();
         if (!i->second.first)
           {
+            BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
+              << "Failed to open TIFF " << i->first.string();
             boost::format fmt("Failed to open ‘%1%’");
             fmt % i->first.string();
             throw FormatException(fmt.str());
