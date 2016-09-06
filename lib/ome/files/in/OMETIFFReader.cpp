@@ -1406,7 +1406,7 @@ namespace ome
       OMETIFFReader::validTIFF(const boost::filesystem::path& tiff) const
       {
         const ome::compat::shared_ptr<const ome::files::tiff::TIFF> valid(getTIFF(tiff));
-        return valid;
+        return static_cast<bool>(valid);
       }
 
       void
