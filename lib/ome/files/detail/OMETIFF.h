@@ -40,7 +40,7 @@
 
 #include <ome/files/Types.h>
 
-#include <ome/common/filesystem.h>
+#include <boost/filesystem/path.hpp>
 
 namespace ome
 {

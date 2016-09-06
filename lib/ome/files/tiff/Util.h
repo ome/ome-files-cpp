@@ -41,7 +41,7 @@
 #include <string>
 #include <vector>
 
-#include <ome/common/filesystem.h>
+#include <boost/filesystem/path.hpp>
 
 #include <ome/compat/memory.h>
 

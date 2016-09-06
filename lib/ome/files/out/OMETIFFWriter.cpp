@@ -37,6 +37,8 @@
 
 #include <cassert>
 
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
 #include <boost/format.hpp>
 #include <boost/range/size.hpp>
 #include <boost/iostreams/device/file_descriptor.hpp>
@@ -449,7 +451,7 @@ namespace ome
         path canonicalpath = id;
         try
           {
-            canonicalpath = ome::common::canonical(id);
+            canonicalpath = boost::filesystem::canonical(id);
           }
         catch (const std::exception&)
           {

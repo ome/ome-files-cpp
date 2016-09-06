@@ -40,11 +40,10 @@
 
 #include <string>
 
+#include <boost/filesystem/path.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 
 #include <ome/files/tiff/Types.h>
-
-#include <ome/common/filesystem.h>
 
 #include <ome/compat/cstdint.h>
 #include <ome/compat/memory.h>

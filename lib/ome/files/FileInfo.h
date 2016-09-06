@@ -41,7 +41,7 @@
 #include <string>
 #include <ostream>
 
-#include <ome/common/filesystem.h>
+#include <boost/filesystem/path.hpp>
 
 namespace ome
 {

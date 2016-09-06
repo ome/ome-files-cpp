@@ -41,7 +41,6 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 
-#include <ome/common/filesystem.h>
 #include <ome/common/mstream.h>
 #include <ome/common/string.h>
 
@@ -173,7 +172,7 @@ namespace ome
 
         try
           {
-            path thisfile = ome::common::canonical(path(file));
+            path thisfile = boost::filesystem::canonical(path(file));
 
             /// @todo: Use a set rather than a list?
             const std::vector<path>& s = getUsedFiles();
@@ -183,7 +182,7 @@ namespace ome
               {
                 try
                   {
-                    path usedfile = ome::common::canonical(path(*i));
+                    path usedfile = boost::filesystem::canonical(path(*i));
                     if (thisfile == usedfile)
                       {
                         used = true;
@@ -424,7 +423,7 @@ namespace ome
         if (!suffixSufficient && !open)
           return false;
 
-        path cname(ome::common::canonical(name));
+        path cname(boost::filesystem::canonical(name));
 
         if (!boost::filesystem::exists(cname))
           return false;
@@ -921,8 +920,8 @@ namespace ome
             const boost::optional<path> currentid = getCurrentFile();
             if (currentid)
               {
-                path current = ome::common::canonical(currentid.get());
-                path thisfile = ome::common::canonical(*file);
+                path current = boost::filesystem::canonical(currentid.get());
+                path thisfile = boost::filesystem::canonical(*file);
 
                 info.usedToInitialize = (thisfile == current);
               }
@@ -950,8 +949,8 @@ namespace ome
             const boost::optional<path> currentid = getCurrentFile();
             if (currentid)
               {
-                path current = ome::common::canonical(currentid.get());
-                path thisfile = ome::common::canonical(*file);
+                path current = boost::filesystem::canonical(currentid.get());
+                path thisfile = boost::filesystem::canonical(*file);
 
                 info.usedToInitialize = (thisfile == current);
               }
@@ -1367,7 +1366,7 @@ namespace ome
         path canonicalpath = id;
         try
           {
-            canonicalpath = ome::common::canonical(id);
+            canonicalpath = boost::filesystem::canonical(id);
           }
         catch (const std::exception&)
           {
