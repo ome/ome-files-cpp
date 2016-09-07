@@ -775,11 +775,7 @@ TEST_F(TIFFTest, FieldName)
   std::string name;
   name = ifd->getField(ome::files::tiff::IMAGEDESCRIPTION).name();
 
-#if defined(TIFF_HAVE_FIELD) || defined(TIFF_HAVE_FIELDINFO)
   ASSERT_EQ(std::string("ImageDescription"), name);
-#else
-  ASSERT_EQ(std::string("Unknown"), name);
-#endif
 }
 
 TEST_F(TIFFTest, FieldCount)

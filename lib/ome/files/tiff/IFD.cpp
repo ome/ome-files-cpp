@@ -46,7 +46,6 @@
 #include <ome/files/PlaneRegion.h>
 #include <ome/files/TileBuffer.h>
 #include <ome/files/TileCache.h>
-#include <ome/files/tiff/config.h>
 #include <ome/files/tiff/IFD.h>
 #include <ome/files/tiff/Tags.h>
 #include <ome/files/tiff/Field.h>
@@ -708,13 +707,8 @@ namespace ome
 
         if (static_cast<offset_type>(TIFFCurrentDirOffset(tiffraw)) != impl->offset)
           {
-#if TIFF_HAVE_BIGTIFF
             if (!TIFFSetSubDirectory(tiffraw, impl->offset))
               sentry.error();
-#else // !TIFF_HAVE_BIGTIFF
-            if (!TIFFSetSubDirectory(tiffraw, static_cast<uint32_t>(impl->offset)))
-              sentry.error();
-#endif // TIFF_HAVE_BIGTIFF
           }
       }
 

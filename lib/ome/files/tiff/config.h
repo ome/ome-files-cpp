@@ -39,19 +39,6 @@
 #ifndef OME_FILES_TIFF_CONFIG_H
 #define OME_FILES_TIFF_CONFIG_H
 
-#cmakedefine TIFF_HAVE_BIGTIFF 1
-#cmakedefine TIFF_HAVE_FIELD 1
-#cmakedefine TIFF_HAVE_FIELDINFO 1
-#cmakedefine TIFF_HAVE_MERGEFIELDINFO 1
-#cmakedefine TIFF_HAVE_MERGEFIELDINFO_RETURN 1
-#cmakedefine TIFF_HAVE_TMSIZE_T 1
-#cmakedefine TIFF_HAVE_TSIZE_T 1
-
-#ifndef TIFF_HAVE_TMSIZE_T
-typedef signed long tmsize_t;
-#endif // ! TIFF_HAVE_TMSIZE_T
-#ifndef TIFF_HAVE_TSIZE_T
-typedef unsigned long tsize_t;
-#endif // !TIFF_HAVE_TSIZE_T
+// This header is deprecated and will be removed for 0.3.0.
 
 #endif // OME_FILES_TIFF_CONFIG_H
