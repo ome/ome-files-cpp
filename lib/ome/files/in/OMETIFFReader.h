@@ -39,7 +39,7 @@
 #define OME_FILES_IN_OMETIFFREADER_H
 
 #include <ome/files/in/MinimalTIFFReader.h>
-#include <ome/files/tiff/ImageJMetadata.h>
+#include <ome/files/tiff/TIFF.h>
 
 #include <ome/common/log.h>
 
@@ -72,7 +72,7 @@ namespace ome
 
       protected:
         /// Message logger.
-        ome::common::Logger logger;
+        mutable ome::common::Logger logger;
 
         /// Map UUID to filename.
         typedef std::map<std::string, boost::filesystem::path> uuid_file_map;
@@ -81,7 +81,7 @@ namespace ome
         typedef std::map<boost::filesystem::path, boost::filesystem::path> invalid_file_map;
 
         /// Map filename to open TIFF handle.
-        typedef std::map<boost::filesystem::path, ome::compat::shared_ptr<ome::files::tiff::TIFF> > tiff_map;
+        typedef std::map<boost::filesystem::path, std::pair<ome::compat::shared_ptr<ome::files::tiff::TIFF>, bool> > tiff_map;
 
         /// UUID to filename mapping.
         uuid_file_map files;
@@ -101,6 +101,15 @@ namespace ome
 
         /// Has screen-plate-well metadata.
         bool hasSPW;
+
+        /// Cached metadata (for re-using parsed metadata).
+        mutable ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> cachedMetadata;
+
+        /**
+         * Cached metadata file location (for re-using parsed
+         * metadata).
+         */
+        mutable boost::filesystem::path cachedMetadataFile;
 
       public:
         /// Constructor.
@@ -171,6 +180,15 @@ namespace ome
         getTIFF(const boost::filesystem::path& tiff) const;
 
         /**
+         * Check if a cached TIFF is valid (can be opened).
+         *
+         * @param tiff the TIFF file to get.
+         * @returns @c true if valid, @c false if invalid.
+         */
+        bool
+        validTIFF(const boost::filesystem::path& tiff) const;
+
+        /**
          * Close an open TIFF file from the internal TIFF map.
          *
          * If the file is currently open, it will be closed.
@@ -180,7 +198,41 @@ namespace ome
         void
         closeTIFF(const boost::filesystem::path& tiff);
 
-      public:
+        /**
+         * Read metadata into metadata store from an open TIFF.
+         *
+         * @param tiff the TIFF from which to read the metadata.
+         * @returns the parsed metadata as a metadata store.
+         */
+        ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
+        readMetadata(const ome::files::tiff::TIFF& tiff) const;
+
+        /**
+         * Read metadata into metadata store from a TIFF or companion
+         * XML file.
+         *
+         * @param id the file from which to read the metadata.
+         * @returns the parsed metadata as a metadata store.
+         */
+        ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
+        readMetadata(const boost::filesystem::path& id) const;
+
+        /**
+         * Read and cache metadata.
+         *
+         * Optimisation to allow sharing of previously parsed
+         * metadata.  The metadata will be cached in the @c meta
+         * member, but will not be cached if the reader has been fully
+         * initialised.  If the metadata was previously read and
+         * cached, the cached copy will be returned.
+         *
+         * @param id the file from which to read the metadata.
+         * @returns the parsed metadata as a metadata store.
+         */
+        ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
+        cacheMetadata(const boost::filesystem::path& id) const;
+
+        public:
         // Documented in superclass.
         void
         close(bool fileOnly = false);

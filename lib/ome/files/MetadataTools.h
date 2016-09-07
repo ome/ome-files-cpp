@@ -376,6 +376,14 @@ namespace ome
     removeBinData(::ome::xml::meta::OMEXMLMetadata& omexml);
 
     /**
+     * Remove all TiffData elements from OME-XML metadata.
+     *
+     * @param omexml the OME-XML metadata store.
+     */
+    void
+    removeTiffData(::ome::xml::meta::OMEXMLMetadata& omexml);
+
+    /**
      * Remove all but the specified number of valid Channel elements
      * from OME-XML metadata.
      *

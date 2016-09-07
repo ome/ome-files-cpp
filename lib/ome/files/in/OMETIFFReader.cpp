@@ -92,7 +92,11 @@ namespace ome
       namespace
       {
 
-        const char *suffixes[] = {"ome.tif", "ome.tiff", };
+        const char *suffixes[] = {"ome.tif",
+                                  "ome.tiff",
+                                  "ome.tf2",
+                                  "ome.tf8",
+                                  "ome.btf"};
         const char *companion_suffixes_array[] = {"companion.ome"};
 
         ReaderProperties
@@ -115,15 +119,18 @@ namespace ome
         std::vector<path> companion_suffixes(companion_suffixes_array,
                                              companion_suffixes_array + boost::size(companion_suffixes_array));
 
-        void
-        getComment(const TIFF&  tiff,
-                   std::string& omexml)
+        std::string
+        getImageDescription(const TIFF& tiff)
         {
           try
             {
               ome::compat::shared_ptr<tiff::IFD> ifd (tiff.getDirectoryByIndex(0));
               if (ifd)
-                ifd->getField(ome::files::tiff::IMAGEDESCRIPTION).get(omexml);
+                {
+                  std::string omexml;
+                  ifd->getField(ome::files::tiff::IMAGEDESCRIPTION).get(omexml);
+                  return omexml;
+                }
               else
                 throw tiff::Exception("No TIFF IFDs found");
             }
@@ -172,7 +179,9 @@ namespace ome
         tiffs(),
         metadataFile(),
         usedFiles(),
-        hasSPW(false)
+        hasSPW(false),
+        cachedMetadata(),
+        cachedMetadataFile()
       {
         this->suffixNecessary = false;
         this->suffixSufficient = false;
@@ -195,12 +204,12 @@ namespace ome
       void
       OMETIFFReader::close(bool fileOnly)
       {
-        /// @todo
-
         if (!fileOnly)
           {
             files.clear();
             invalidFiles.clear();
+            cachedMetadataFile.clear();
+            cachedMetadata.reset();
             hasSPW = false;
             usedFiles.clear();
             metadataFile.clear();
@@ -216,37 +225,41 @@ namespace ome
         if (checkSuffix(id, companion_suffixes))
           return false;
 
-        ome::compat::shared_ptr<tiff::TIFF> tiff = TIFF::open(id, "r");
-
-        if (!tiff)
+        try
           {
-            boost::format fmt("Failed to open ‘%1%’");
-            fmt % id.string();
-            throw FormatException(fmt.str());
+            ome::compat::shared_ptr< ::ome::xml::meta::Metadata> test_meta(cacheMetadata(id));
+
+            dimension_size_type nImages = 0U;
+            for (dimension_size_type i = 0U;
+                 i < test_meta->getImageCount();
+                 ++i)
+              {
+                dimension_size_type nChannels = test_meta->getChannelCount(i);
+                if (!nChannels)
+                  nChannels = 1;
+                ome::xml::model::primitives::PositiveInteger z(test_meta->getPixelsSizeZ(i));
+                ome::xml::model::primitives::PositiveInteger t(test_meta->getPixelsSizeT(i));
+
+                nImages += static_cast<dimension_size_type>(z) * static_cast<dimension_size_type>(t) * nChannels;
+              }
+
+            ome::compat::shared_ptr<tiff::TIFF> tiff = TIFF::open(id, "r");
+
+            if (!tiff)
+              {
+                boost::format fmt("Failed to open ‘%1%’");
+                fmt % id.string();
+                throw FormatException(fmt.str());
+              }
+
+            dimension_size_type nIFD = tiff->directoryCount();
+
+            return nImages > 0 && nImages <= nIFD;
           }
-
-        std::string omexml;
-        getComment(*tiff, omexml);
-
-        ome::compat::shared_ptr< ::ome::xml::meta::Metadata> meta(createOMEXMLMetadata(omexml));
-
-        dimension_size_type nImages = 0U;
-        for (dimension_size_type i = 0U;
-             i < meta->getImageCount();
-             ++i)
+        catch (const std::exception&)
           {
-            dimension_size_type nChannels = meta->getChannelCount(i);
-            if (!nChannels)
-              nChannels = 1;
-            ome::xml::model::primitives::PositiveInteger z(meta->getPixelsSizeZ(i));
-            ome::xml::model::primitives::PositiveInteger t(meta->getPixelsSizeT(i));
-
-            nImages += static_cast<dimension_size_type>(z) * static_cast<dimension_size_type>(t) * nChannels;
+            return FormatReader::isSingleFile(id);
           }
-
-        dimension_size_type nIFD = tiff->directoryCount();
-
-        return nImages > 0 && nImages <= nIFD;
       }
 
       bool
@@ -262,42 +275,54 @@ namespace ome
       bool
       OMETIFFReader::isFilenameThisTypeImpl(const boost::filesystem::path& name) const
       {
-        ome::compat::shared_ptr<tiff::TIFF> tiff = TIFF::open(name, "r");
-
-        if (!tiff)
-          {
-            boost::format fmt("Failed to open ‘%1%’");
-            fmt % name.string();
-            throw FormatException(fmt.str());
-          }
-
-        std::string omexml;
-        getComment(*tiff, omexml);
-
-        // Basic sanity check before parsing.
-        if (omexml.size() == 0 || omexml[0] != '<' || omexml[omexml.size()-1] != '>')
-          return false;
-
+        bool valid = true;
         try
           {
-            ome::compat::shared_ptr< ::ome::xml::meta::Metadata> meta(createOMEXMLMetadata(omexml));
-
-            std::string metadataFile = meta->getBinaryOnlyMetadataFile();
+            ome::compat::shared_ptr< ::ome::xml::meta::Metadata> test_meta(cacheMetadata(name));
+            std::string metadataFile = test_meta->getBinaryOnlyMetadataFile();
             if (!metadataFile.empty())
-              return true;
-
-            for (::ome::xml::meta::Metadata::index_type i = 0;
-                 i < meta->getImageCount();
-                 ++i)
               {
-                verifyMinimum(*meta, i);
+                // check the suffix to make sure that the MetadataFile is
+                // not referencing the current OME-TIFF
+                if (checkSuffix(metadataFile, getSuffixes()))
+                  {
+                    valid = false;
+                  }
+                else
+                  {
+                    test_meta = cacheMetadata(metadataFile);
+                  }
               }
-            return meta->getImageCount() > 0;
+            if (valid)
+              {
+                for (::ome::xml::meta::Metadata::index_type i = 0;
+                     i < test_meta->getImageCount();
+                     ++i)
+                  {
+                    verifyMinimum(*test_meta, i);
+                  }
+                if (test_meta->getImageCount() == 0)
+                  valid = false;
+              }
           }
         catch (const std::exception&)
           {
-            return false;
+            valid = FormatReader::isFilenameThisTypeImpl(name);
           }
+
+        if (valid && !isGroupFiles())
+          {
+            try
+              {
+                valid = isSingleFile(name);
+              }
+            catch (const std::exception&)
+              {
+                valid = false;
+              }
+          }
+
+        return valid;
       }
 
       const ome::compat::shared_ptr<const tiff::IFD>
@@ -419,16 +444,14 @@ namespace ome
 
         // Get the OME-XML from the first TIFF, and create OME-XML
         // metadata from it.
-        std::string omexml;
-        getComment(*tiff, omexml);
-        ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta(createOMEXMLMetadata(omexml));
+        ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta = cacheMetadata(*currentId);
 
         // Is there an associated binary-only metadata file?
         try
           {
             metadataFile = canonical(path(meta->getBinaryOnlyMetadataFile()), dir);
             if (!metadataFile.empty() && boost::filesystem::exists(metadataFile))
-              meta = createOMEXMLMetadata(metadataFile);
+              meta = readMetadata(metadataFile);
           }
         catch (const std::exception&)
           {
@@ -658,6 +681,8 @@ namespace ome
                         exists = usedFiles.size() == 1;
                       }
                   }
+                if (exists) // check it's really a valid TIFF
+                  exists = validTIFF(*filename);
 
                 // Fill plane index → IFD mapping
                 for (dimension_size_type q = 0;
@@ -936,7 +961,7 @@ namespace ome
             ms0->sizeT = 1U;
           }
 
-        fillMetadata(*metadataStore, *this, false, false);
+        fillMetadata(*metadataStore, *this, true, false);
 
         for (std::vector<boost::optional<Timestamp> >::const_iterator ts = acquiredDates.begin();
              ts != acquiredDates.end();
@@ -1332,35 +1357,127 @@ namespace ome
       void
       OMETIFFReader::addTIFF(const boost::filesystem::path& tiff)
       {
-        tiffs.insert(std::make_pair(tiff, ome::compat::shared_ptr<tiff::TIFF>()));
+        tiffs.insert(std::make_pair(tiff, std::pair<ome::compat::shared_ptr<tiff::TIFF>, bool>(ome::compat::shared_ptr<tiff::TIFF>(), false)));
       }
 
       const ome::compat::shared_ptr<const ome::files::tiff::TIFF>
       OMETIFFReader::getTIFF(const boost::filesystem::path& tiff) const
       {
         tiff_map::iterator i = tiffs.find(tiff);
-        if (!i->second)
-          i->second = tiff::TIFF::open(i->first, "r");
 
-        if (!i->second)
+        if (i == tiffs.end())
           {
+            BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
+              << "Failed to find cached TIFF " << i->first.string();
+            boost::format fmt("Failed to find cached TIFF ‘%1%’");
+            fmt % i->first.string();
+            throw FormatException(fmt.str());
+          }
+
+        // second.second is the validity if the TIFF is null.  false
+        // is uninitialised; true is invalid.  Used to prevent
+        // repeated initialisation when the file is broken or
+        // nonexistent.
+        if (!i->second.first || !i->second.second)
+          {
+            try
+              {
+                i->second.first = tiff::TIFF::open(i->first, "r");
+              }
+            catch (const ome::files::tiff::Exception&)
+              {
+                i->second.second = true;
+              }
+          }
+
+        if (!i->second.first)
+          {
+            BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
+              << "Failed to open TIFF " << i->first.string();
             boost::format fmt("Failed to open ‘%1%’");
             fmt % i->first.string();
             throw FormatException(fmt.str());
           }
 
-        return i->second;
+        return i->second.first;
+      }
+
+      bool
+      OMETIFFReader::validTIFF(const boost::filesystem::path& tiff) const
+      {
+        const ome::compat::shared_ptr<const ome::files::tiff::TIFF> valid(getTIFF(tiff));
+        return static_cast<bool>(valid);
       }
 
       void
       OMETIFFReader::closeTIFF(const boost::filesystem::path& tiff)
       {
         tiff_map::iterator i = tiffs.find(tiff);
-        if (i->second)
+        if (i->second.first)
           {
-            i->second->close();
-            i->second = ome::compat::shared_ptr<ome::files::tiff::TIFF>();
+            i->second.first->close();
+            i->second.first = ome::compat::shared_ptr<ome::files::tiff::TIFF>();
           }
+      }
+
+      ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
+      OMETIFFReader::readMetadata(const ome::files::tiff::TIFF& tiff) const
+      {
+        return createOMEXMLMetadata(getImageDescription(tiff));
+      }
+
+      ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
+      OMETIFFReader::readMetadata(const boost::filesystem::path& id) const
+      {
+        if (checkSuffix(id, companion_suffixes))
+          {
+            const ome::compat::shared_ptr<const TIFF> tiff(getTIFF(id));
+            return createOMEXMLMetadata(getImageDescription(*tiff));
+          }
+        else
+          {
+            return createOMEXMLMetadata(id);
+          }
+      }
+
+      ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
+      OMETIFFReader::cacheMetadata(const boost::filesystem::path& id) const
+      {
+        ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta;
+        path dir(id.parent_path());
+        if(canonical(id, dir) == cachedMetadataFile && cachedMetadata)
+          {
+            meta = cachedMetadata; // reuse cached metadata
+          }
+        else
+          {
+            ome::compat::shared_ptr<tiff::TIFF> tiff = TIFF::open(id, "r");
+
+            if (!tiff)
+              {
+                boost::format fmt("Failed to open ‘%1%’");
+                fmt % id.string();
+                throw FormatException(fmt.str());
+              }
+
+            std::string omexml(getImageDescription(*tiff));
+
+            // Basic sanity check before parsing.
+            if (omexml.size() == 0 || omexml[0] != '<' || omexml[omexml.size()-1] != '>')
+              {
+                boost::format fmt("Badly formed or invalid XML document in ‘%1%’");
+                fmt % id.string();
+                throw FormatException(fmt.str());
+              }
+
+            meta = createOMEXMLMetadata(omexml);
+
+            // Don't overwrite state for open readers
+            cachedMetadata = meta;
+            cachedMetadataFile = canonical(id, dir);
+          }
+
+        return meta;
       }
 
       ome::compat::shared_ptr<ome::xml::meta::MetadataStore>

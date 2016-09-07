@@ -50,6 +50,7 @@
 
 #include <ome/test/config.h>
 
+#include <boost/filesystem/fstream.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/range/size.hpp>
 
@@ -140,7 +141,7 @@ protected:
 
     // std::cout << "IN: " << in << std::endl;
 
-    return in == "Valid file content";
+    return in == "Valid file content\n";
   }
 
   ome::compat::shared_ptr<CoreMetadata>
@@ -306,38 +307,42 @@ TEST_P(FormatReaderTest, ReaderProperties)
 
 TEST_P(FormatReaderTest, IsThisType)
 {
-  std::string icontent("Invalid file content");
-  std::string vcontent("Valid file content");
+  std::string icontent("Invalid file content\n");
+  std::string vcontent("Valid file content\n");
   std::istringstream isicontent(icontent);
   std::istringstream isvcontent(vcontent);
 
-  EXPECT_FALSE(r.isThisType("invalid.file"));
-  EXPECT_FALSE(r.isThisType("invalid.file", true));
-  EXPECT_FALSE(r.isThisType("invalid.file", false));
+  EXPECT_FALSE(r.isThisType(PROJECT_SOURCE_DIR "/test/ome-files/data/invalid.file"));
+  EXPECT_FALSE(r.isThisType(PROJECT_SOURCE_DIR "/test/ome-files/data/invalid.file", true));
+  EXPECT_FALSE(r.isThisType(PROJECT_SOURCE_DIR "/test/ome-files/data/invalid.file", false));
 
-  EXPECT_FALSE(r.isThisType("invalid.file.gz"));
-  EXPECT_FALSE(r.isThisType("invalid.file.gz", true));
-  EXPECT_FALSE(r.isThisType("invalid.file.gz", false));
+  EXPECT_FALSE(r.isThisType(PROJECT_SOURCE_DIR "/test/ome-files/data/invalid.file.gz"));
+  EXPECT_FALSE(r.isThisType(PROJECT_SOURCE_DIR "/test/ome-files/data/invalid.file.gz", true));
+  EXPECT_FALSE(r.isThisType(PROJECT_SOURCE_DIR "/test/ome-files/data/invalid.file.gz", false));
 
-  EXPECT_TRUE(r.isThisType("valid.test"));
-  EXPECT_TRUE(r.isThisType("valid.test", true));
-  EXPECT_TRUE(r.isThisType("valid.test", false));
+  EXPECT_TRUE(r.isThisType(PROJECT_SOURCE_DIR "/test/ome-files/data/valid.test"));
+  EXPECT_TRUE(r.isThisType(PROJECT_SOURCE_DIR "/test/ome-files/data/valid.test", true));
+  EXPECT_TRUE(r.isThisType(PROJECT_SOURCE_DIR "/test/ome-files/data/valid.test", false));
 
-  EXPECT_TRUE(r.isThisType("valid.test.gz"));
-  EXPECT_TRUE(r.isThisType("valid.test.gz", true));
-  EXPECT_TRUE(r.isThisType("valid.test.gz", false));
+  EXPECT_TRUE(r.isThisType(PROJECT_SOURCE_DIR "/test/ome-files/data/valid.test.gz"));
+  EXPECT_TRUE(r.isThisType(PROJECT_SOURCE_DIR "/test/ome-files/data/valid.test.gz", true));
+  EXPECT_TRUE(r.isThisType(PROJECT_SOURCE_DIR "/test/ome-files/data/valid.test.gz", false));
 
   EXPECT_FALSE(r.isThisType(reinterpret_cast<uint8_t *>(&icontent[0]),
                             reinterpret_cast<uint8_t *>(&icontent[0] + icontent.size())));
   EXPECT_FALSE(r.isThisType(reinterpret_cast<uint8_t *>(&*icontent.begin()),
                             icontent.size()));
   EXPECT_FALSE(r.isThisType(isicontent));
+  boost::filesystem::ifstream istr(PROJECT_SOURCE_DIR "/test/ome-files/data/invalid.file");
+  EXPECT_FALSE(r.isThisType(istr));
 
   EXPECT_TRUE(r.isThisType(reinterpret_cast<uint8_t *>(&vcontent[0]),
                            reinterpret_cast<uint8_t *>(&vcontent[0] + vcontent.size())));
   EXPECT_TRUE(r.isThisType(reinterpret_cast<uint8_t *>(&*vcontent.begin()),
                            vcontent.size()));
   EXPECT_TRUE(r.isThisType(isvcontent));
+  boost::filesystem::ifstream vstr(PROJECT_SOURCE_DIR "/test/ome-files/data/valid.test");
+  EXPECT_TRUE(r.isThisType(vstr));
 }
 
 TEST_P(FormatReaderTest, DefaultClose)
