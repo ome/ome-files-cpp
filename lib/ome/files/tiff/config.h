@@ -39,6 +39,10 @@
 #ifndef OME_FILES_TIFF_CONFIG_H
 #define OME_FILES_TIFF_CONFIG_H
 
-// This header is deprecated and will be removed for 0.3.0.
+#if defined(__GNUC__)
+#pragma message "This header is deprecated and will be removed for 0.3.0."
+#elif defined(_MSC_VER)
+#pragma message("This header is deprecated and will be removed for 0.3.0.")
+#endif
 
 #endif // OME_FILES_TIFF_CONFIG_H
