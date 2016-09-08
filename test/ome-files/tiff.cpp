@@ -44,7 +44,6 @@
 #include <boost/type_traits.hpp>
 
 #include <ome/files/PixelProperties.h>
-#include <ome/files/tiff/config.h>
 #include <ome/files/tiff/Codec.h>
 #include <ome/files/tiff/TileInfo.h>
 #include <ome/files/tiff/TIFF.h>

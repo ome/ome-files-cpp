@@ -43,7 +43,6 @@
 # include "stdarg.h"
 #endif
 
-#include <ome/files/tiff/config.h>
 #include <ome/files/tiff/Sentry.h>
 #include <ome/files/tiff/Exception.h>
 

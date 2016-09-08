@@ -42,7 +42,6 @@
 #include <boost/filesystem.hpp>
 
 #include <ome/files/Types.h>
-#include <ome/files/tiff/config.h>
 
 #include <ome/compat/regex.h>
 
