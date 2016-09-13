@@ -434,6 +434,7 @@ namespace ome
             // recurse with this file as the id.
             ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta(createOMEXMLMetadata(*currentId));
             path firstTIFF(path(meta->getUUIDFileName(0, 0)));
+            close(false); // To force clearing of currentId.
             initFile(canonical(firstTIFF, dir));
             return;
           }
