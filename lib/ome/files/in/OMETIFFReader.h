@@ -205,7 +205,7 @@ namespace ome
          * @returns the parsed metadata as a metadata store.
          */
         ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
-        readMetadata(const ome::files::tiff::TIFF& tiff) const;
+        readMetadata(const ome::files::tiff::TIFF& tiff);
 
         /**
          * Read metadata into metadata store from a TIFF or companion
@@ -215,7 +215,7 @@ namespace ome
          * @returns the parsed metadata as a metadata store.
          */
         ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
-        readMetadata(const boost::filesystem::path& id) const;
+        readMetadata(const boost::filesystem::path& id);
 
         /**
          * Read and cache metadata.

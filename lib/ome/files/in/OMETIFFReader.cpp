@@ -1422,16 +1422,17 @@ namespace ome
       }
 
       ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
-      OMETIFFReader::readMetadata(const ome::files::tiff::TIFF& tiff) const
+      OMETIFFReader::readMetadata(const ome::files::tiff::TIFF& tiff)
       {
         return createOMEXMLMetadata(getImageDescription(tiff));
       }
 
       ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
-      OMETIFFReader::readMetadata(const boost::filesystem::path& id) const
+      OMETIFFReader::readMetadata(const boost::filesystem::path& id)
       {
-        if (checkSuffix(id, companion_suffixes))
+        if (!checkSuffix(id, companion_suffixes))
           {
+            addTIFF(id);
             const ome::compat::shared_ptr<const TIFF> tiff(getTIFF(id));
             return createOMEXMLMetadata(getImageDescription(*tiff));
           }
