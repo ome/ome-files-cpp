@@ -1040,13 +1040,14 @@ namespace ome
                     try
                       {
                         uuidFilename = meta.getUUIDFileName(series, td);
+                        uuidFilename = canonical(uuidFilename, currentDir);
                       }
                     catch (const std::exception&)
                       {
                       }
                     if (fs::exists(uuidFilename))
                       {
-                        filename = canonical(uuidFilename, currentDir);
+                        filename = uuidFilename;
                       }
                     else
                       {
