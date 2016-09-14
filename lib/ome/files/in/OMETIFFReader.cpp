@@ -1466,7 +1466,11 @@ namespace ome
             std::string omexml(getImageDescription(*tiff));
 
             // Basic sanity check before parsing.
-            if (omexml.size() == 0 || omexml[0] != '<' || omexml[omexml.size()-1] != '>')
+            std::string::size_type lpos = omexml.find_last_not_of(" \r\n\t\f\v");
+            if (omexml.size() == 0 ||
+                omexml[0] != '<' ||
+                lpos == std::string::npos ||
+                omexml[lpos] != '>')
               {
                 boost::format fmt("Badly formed or invalid XML document in ‘%1%’");
                 fmt % id.string();
