@@ -434,6 +434,7 @@ namespace ome
             // recurse with this file as the id.
             ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta(createOMEXMLMetadata(*currentId));
             path firstTIFF(path(meta->getUUIDFileName(0, 0)));
+            close(false); // To force clearing of currentId.
             initFile(canonical(firstTIFF, dir));
             return;
           }
@@ -1040,13 +1041,14 @@ namespace ome
                     try
                       {
                         uuidFilename = meta.getUUIDFileName(series, td);
+                        uuidFilename = canonical(uuidFilename, currentDir);
                       }
                     catch (const std::exception&)
                       {
                       }
                     if (fs::exists(uuidFilename))
                       {
-                        filename = canonical(uuidFilename, currentDir);
+                        filename = uuidFilename;
                       }
                     else
                       {
@@ -1421,16 +1423,17 @@ namespace ome
       }
 
       ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
-      OMETIFFReader::readMetadata(const ome::files::tiff::TIFF& tiff) const
+      OMETIFFReader::readMetadata(const ome::files::tiff::TIFF& tiff)
       {
         return createOMEXMLMetadata(getImageDescription(tiff));
       }
 
       ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
-      OMETIFFReader::readMetadata(const boost::filesystem::path& id) const
+      OMETIFFReader::readMetadata(const boost::filesystem::path& id)
       {
-        if (checkSuffix(id, companion_suffixes))
+        if (!checkSuffix(id, companion_suffixes))
           {
+            addTIFF(id);
             const ome::compat::shared_ptr<const TIFF> tiff(getTIFF(id));
             return createOMEXMLMetadata(getImageDescription(*tiff));
           }
@@ -1463,7 +1466,11 @@ namespace ome
             std::string omexml(getImageDescription(*tiff));
 
             // Basic sanity check before parsing.
-            if (omexml.size() == 0 || omexml[0] != '<' || omexml[omexml.size()-1] != '>')
+            std::string::size_type lpos = omexml.find_last_not_of(" \r\n\t\f\v");
+            if (omexml.size() == 0 ||
+                omexml[0] != '<' ||
+                lpos == std::string::npos ||
+                omexml[lpos] != '>')
               {
                 boost::format fmt("Badly formed or invalid XML document in ‘%1%’");
                 fmt % id.string();
