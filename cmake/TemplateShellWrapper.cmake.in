@@ -73,11 +73,9 @@ RELEASE_DATE="@OME_VCS_DATE_S@"
 
 # Program invoked as and command requested (if any)
 
-if [ "${0%"${0#?}"}" = "/" ]; then
-  prog="$0"
-else
-  prog="$(/bin/pwd)/$0"
-fi
+prog=$(readlink -f "$0" 2>/dev/null \
+  || perl -MCwd -le 'print Cwd::abs_path(shift)' "$0" 2>/dev/null \
+  || echo "$0")
 
 if [ "$#" -gt 0 ]; then
   cmd=$1
