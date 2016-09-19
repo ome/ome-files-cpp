@@ -43,7 +43,6 @@
 #include <boost/thread.hpp>
 
 #include <ome/files/Version.h>
-#include <ome/files/tiff/config.h>
 #include <ome/files/tiff/Field.h>
 #include <ome/files/tiff/Tags.h>
 #include <ome/files/tiff/TIFF.h>
@@ -265,13 +264,8 @@ namespace ome
       {
         Sentry sentry;
 
-#if TIFF_HAVE_BIGTIFF
         if (!TIFFSetSubDirectory(impl->tiff, offset))
           sentry.error();
-#else // !TIFF_HAVE_BIGTIFF
-        if (!TIFFSetSubDirectory(impl->tiff, static_cast<uint32_t>(offset)))
-          sentry.error();
-#endif // TIFF_HAVE_BIGTIFF
 
         ome::compat::shared_ptr<TIFF> t(ome::compat::const_pointer_cast<TIFF>(shared_from_this()));
         return IFD::openOffset(t, offset);
@@ -330,7 +324,7 @@ namespace ome
         // completely since some warnings will be issued reading the
         // first directory, before we can register them.  This is
         // deprecated in libtiff4, so guard against future removal.
-#ifdef TIFF_HAVE_MERGEFIELDINFO
+        //
         // These static strings are to provide a writable string to
         // comply with the TIFFFieldInfo interface which can't be
         // assigned const string literals.  They must outlive the
@@ -355,14 +349,9 @@ namespace ome
 
         Sentry sentry;
 
-# if TIFF_HAVE_MERGEFIELDINFO_RETURN
         int e = TIFFMergeFieldInfo(tiffraw, ImageJFieldInfo, boost::size(ImageJFieldInfo));
         if (e)
           sentry.error();
-# else // !TIFF_HAVE_MERGEFIELDINFO_RETURN
-        TIFFMergeFieldInfo(tiffraw, ImageJFieldInfo, boost::size(ImageJFieldInfo));
-#endif // TIFF_HAVE_MERGEFIELDINFO_RETURN
-#endif // TIFF_HAVE_MERGEFIELDINFO
       }
 
     }

@@ -35,7 +35,6 @@
  * #L%
  */
 
-#include <ome/files/tiff/config.h>
 #include <ome/files/tiff/Field.h>
 #include <ome/files/tiff/IFD.h>
 #include <ome/files/tiff/Tags.h>

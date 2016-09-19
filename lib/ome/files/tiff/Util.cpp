@@ -35,7 +35,6 @@
  * #L%
  */
 
-#include <ome/files/tiff/config.h>
 #include <ome/files/CoreMetadata.h>
 #include <ome/files/FormatException.h>
 #include <ome/files/tiff/Field.h>
@@ -409,7 +408,6 @@ namespace ome
         // overhead.
         bool needBig = (pixelSize + pixelSize/20) > storage_size_type(std::numeric_limits<uint32_t>::max());
 
-#if TIFF_HAVE_BIGTIFF
         if ((wantBig && *wantBig)     // BigTIFF explicitly requested.
             || extBig                 // BigTIFF file extension used
             || (!wantBig && needBig)) // BigTIFF unspecified but needed.
@@ -437,26 +435,6 @@ namespace ome
 
             BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
           }
-#else // ! TIFF_HAVE_BIGTIFF
-        if (needBig) // BigTIFF needed (but unsupported)
-          {
-            boost::format fmt
-              ("Unable to enable BigTIFF support since libtiff support "
-               " for BigTIFF is unavailable.  "
-               "Pixel data size is %1%, but TIFF without BigTIFF "
-               "support enabled has a maximum size of %2%; "
-               "TIFF writing may fail if the limit is exceeded; ");
-            fmt % pixelSize % std::numeric_limits<uint32_t>::max();
-
-            BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
-          }
-        else if ((wantBig && *wantBig) || extBig) // BigTIFF explicitly requested (but unsupported)
-          {
-            BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
-              << "Unable to enable BigTIFF support since libtiff support "
-              " for BigTIFF is unavailable";
-          }
-#endif // TIFF_HAVE_BIGTIFF
 
         return enable;
       }

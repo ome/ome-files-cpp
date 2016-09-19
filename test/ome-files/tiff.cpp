@@ -44,7 +44,6 @@
 #include <boost/type_traits.hpp>
 
 #include <ome/files/PixelProperties.h>
-#include <ome/files/tiff/config.h>
 #include <ome/files/tiff/Codec.h>
 #include <ome/files/tiff/TileInfo.h>
 #include <ome/files/tiff/TIFF.h>
@@ -775,11 +774,7 @@ TEST_F(TIFFTest, FieldName)
   std::string name;
   name = ifd->getField(ome::files::tiff::IMAGEDESCRIPTION).name();
 
-#if defined(TIFF_HAVE_FIELD) || defined(TIFF_HAVE_FIELDINFO)
   ASSERT_EQ(std::string("ImageDescription"), name);
-#else
-  ASSERT_EQ(std::string("Unknown"), name);
-#endif
 }
 
 TEST_F(TIFFTest, FieldCount)

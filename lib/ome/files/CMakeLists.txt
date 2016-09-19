@@ -38,8 +38,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Version.h.in
                ${CMAKE_CURRENT_BINARY_DIR}/Version.h @ONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config-internal.h.in
                ${CMAKE_CURRENT_BINARY_DIR}/config-internal.h @ONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/tiff/config.h.in
-               ${CMAKE_CURRENT_BINARY_DIR}/tiff/config.h @ONLY)
 
 set(OME_FILES_SOURCES
     CoreMetadata.cpp
@@ -133,6 +131,7 @@ set(OME_FILES_TIFF_SOURCES
     tiff/Util.cpp)
 
 set(OME_FILES_TIFF_HEADERS
+    tiff/config.h
     tiff/Codec.h
     tiff/Exception.h
     tiff/Field.h
@@ -144,9 +143,6 @@ set(OME_FILES_TIFF_HEADERS
     tiff/TileInfo.h
     tiff/Types.h
     tiff/Util.h)
-
-set(OME_FILES_TIFF_GENERATED_HEADERS
-    ${CMAKE_CURRENT_BINARY_DIR}/tiff/config.h)
 
 set(OME_FILES_SOURCES
     ${OME_FILES_SOURCES}
@@ -163,8 +159,7 @@ set(OME_FILES_ALL_STATIC_HEADERS
     ${OME_FILES_TIFF_HEADERS})
 
 set(OME_FILES_ALL_GENERATED_HEADERS
-    ${OME_FILES_GENERATED_HEADERS}
-    ${OME_FILES_TIFF_GENERATED_HEADERS})
+    ${OME_FILES_GENERATED_HEADERS})
 
 add_library(ome-files
             ${OME_FILES_SOURCES}
@@ -236,7 +231,7 @@ install(FILES ${OME_FILES_IN_HEADERS}
 install(FILES ${OME_FILES_OUT_HEADERS}
         DESTINATION ${ome_files_includedir}/out
         COMPONENT "development")
-install(FILES ${OME_FILES_TIFF_HEADERS} ${OME_FILES_TIFF_GENERATED_HEADERS}
+install(FILES ${OME_FILES_TIFF_HEADERS}
         DESTINATION ${ome_files_includedir}/tiff
         COMPONENT "development")
 
