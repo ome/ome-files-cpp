@@ -754,6 +754,35 @@ namespace ome
       }
 
       void
+      IFD::getRawFieldDefaulted(tag_type tag,
+                                ...) const
+      {
+        ome::compat::shared_ptr<TIFF>& tiff = getTIFF();
+        ::TIFF *tiffraw = reinterpret_cast< ::TIFF *>(tiff->getWrapped());
+
+        Sentry sentry;
+
+        makeCurrent();
+
+        va_list ap;
+        va_start(ap, tag);
+
+        if (!tag)
+          {
+            boost::format fmt("Error getting field: Tag %1% is not valid");
+            fmt % tag;
+            throw Exception(fmt.str());
+          }
+
+        if (!TIFFVGetFieldDefaulted(tiffraw, tag, ap))
+          {
+            boost::format fmt("Error getting field: Tag %1% was not found");
+            fmt % tag;
+            sentry.error();
+          }
+      }
+
+      void
       IFD::setRawField(tag_type tag,
                        ...)
       {
