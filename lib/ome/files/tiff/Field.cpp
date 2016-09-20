@@ -232,7 +232,7 @@ namespace ome
 
         const ::TIFFField *field = impl->getFieldInfo();
         if (field)
-          ret = (TIFFFieldPassCount(field));
+          ret = TIFFFieldPassCount(field) > 0;
 
         return ret;
       }
