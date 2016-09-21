@@ -232,7 +232,7 @@ namespace ome
 
         const ::TIFFField *field = impl->getFieldInfo();
         if (field)
-          ret = (TIFFFieldPassCount(field));
+          ret = TIFFFieldPassCount(field) > 0;
 
         return ret;
       }
@@ -526,24 +526,39 @@ namespace ome
                            int                          readcount,
                            T&                           value)
         {
-          bool limit = false; // Special case for TIFFTAG_TRANSFERFUNCTION which can used 1 or 3 vectors.
           typename T::value_type::value_type *valueptr0, *valueptr1, *valueptr2;
           uint32_t count;
+          bool limit = false; // special case for TRANSFERFUNCTION
 
-          // Special case:
-          if (tag == TIFFTAG_COLORMAP ||
-              tag == TIFFTAG_TRANSFERFUNCTION)
+          // Special case COLORMAP
+          if (tag == TIFFTAG_COLORMAP)
+            {
+              uint16_t bps;
+              ifd->getRawField(TIFFTAG_BITSPERSAMPLE, &bps);
+              ifd->getRawField(tag, &valueptr0, &valueptr1, &valueptr2);
+              count = 1U << bps;
+            }
+          // Special case TRANSFERFUNCTION
+          else if (tag == TIFFTAG_TRANSFERFUNCTION)
             {
               uint16_t spp;
               ifd->getRawField(TIFFTAG_SAMPLESPERPIXEL, &spp);
               uint16_t bps;
               ifd->getRawField(TIFFTAG_BITSPERSAMPLE, &bps);
-              count = 1U << bps;
-              if (spp == 1)
-                limit = true;
-            }
+              uint16_t extrasamples, *ep = 0;
+              ifd->getRawFieldDefaulted(TIFFTAG_EXTRASAMPLES, &extrasamples, &ep);
 
-          if (readcount == TIFF_SPP)
+              if ((spp - extrasamples) == 1)
+                limit = true;
+
+              if(!limit)
+                ifd->getRawField(tag, &valueptr0, &valueptr1, &valueptr2);
+              else
+                ifd->getRawField(tag, &valueptr0);
+
+              count = 1U << bps;
+            }
+          else if (readcount == TIFF_SPP)
             {
               uint16_t spp;
               ifd->getRawField(TIFFTAG_SAMPLESPERPIXEL, &spp);
@@ -562,10 +577,7 @@ namespace ome
             }
           else
             {
-              if (!limit)
-                ifd->getRawField(tag, &valueptr0, &valueptr1, &valueptr2);
-              else
-                ifd->getRawField(tag, &valueptr0);
+              ifd->getRawField(tag, &valueptr0, &valueptr1, &valueptr2);
               count = static_cast<uint32_t>(readcount);
             }
 
@@ -593,19 +605,25 @@ namespace ome
               value[0].size() != value[2].size())
             throw Exception("Field array sizes are not equal");
 
-          bool limit = false; // Special case for TIFFTAG_TRANSFERFUNCTION which can used 1 or 3 vectors.
-
-          // Special case:
-          if (tag == TIFFTAG_COLORMAP ||
-              tag == TIFFTAG_TRANSFERFUNCTION)
+          // Special case COLORMAP
+          if (tag == TIFFTAG_COLORMAP)
+            {
+              ifd->setRawField(tag, value[0].data(), value[1].data(), value[2].data());
+            }
+          // Special case TRANSFERFUNCTION
+          else if (tag == TIFFTAG_TRANSFERFUNCTION)
             {
               uint16_t spp;
               ifd->getRawField(TIFFTAG_SAMPLESPERPIXEL, &spp);
-              if (spp == 1)
-                limit = true;
-            }
+              uint16_t extrasamples, *ep = 0;
+              ifd->getRawFieldDefaulted(TIFFTAG_EXTRASAMPLES, &extrasamples, &ep);
 
-          if (writecount == TIFF_SPP)
+              if ((spp - extrasamples) > 1)
+                ifd->setRawField(tag, value[0].data(), value[1].data(), value[2].data());
+              else
+                ifd->setRawField(tag, value[0].data());
+            }
+          else if (writecount == TIFF_SPP)
             {
               uint16_t spp;
               ifd->getRawField(TIFFTAG_SAMPLESPERPIXEL, &spp);
@@ -628,10 +646,7 @@ namespace ome
             }
           else
             {
-              if (!limit)
-                ifd->setRawField(tag, value[0].data(), value[1].data(), value[2].data());
-              else
-                ifd->setRawField(tag, value[0].data());
+              ifd->setRawField(tag, value[0].data(), value[1].data(), value[2].data());
             }
         }
 

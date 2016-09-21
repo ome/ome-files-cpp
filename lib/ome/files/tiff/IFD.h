@@ -167,6 +167,21 @@ namespace ome
                     ...) const;
 
         /**
+         * Get a field by its tag number, falling back to default if
+         * unset.
+         *
+         * @note This should not be used except internally.  Use
+         * getField(TagCategory) instead which offers a type-safe
+         * interface on top of this lower-level TIFFGetField wrapper.
+         *
+         * @param tag the tag number.
+         * @param ... pointers to variables to store the value(s) in.
+         */
+        void
+        getRawFieldDefaulted(tag_type tag,
+                             ...) const;
+
+        /**
          * Set a field by its tag number.
          *
          * @note This should not be used except internally.  Use
