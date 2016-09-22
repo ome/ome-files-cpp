@@ -37,9 +37,10 @@
 
 #include <iostream>
 
+#include <boost/filesystem/path.hpp>
+
 #include <ome/compat/memory.h>
 
-#include <ome/common/filesystem.h>
 #include <ome/common/xml/Platform.h>
 #include <ome/common/xml/dom/Document.h>
 

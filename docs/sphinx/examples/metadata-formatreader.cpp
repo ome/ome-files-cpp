@@ -37,12 +37,12 @@
 
 #include <iostream>
 
+#include <boost/filesystem/path.hpp>
+
 #include <ome/files/VariantPixelBuffer.h>
 #include <ome/files/in/TIFFReader.h>
 
 #include <ome/compat/memory.h>
-
-#include <ome/common/filesystem.h>
 
 using boost::filesystem::path;
 using ome::compat::make_shared;

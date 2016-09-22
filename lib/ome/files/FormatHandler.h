@@ -44,11 +44,10 @@
 #include <string>
 #include <vector>
 
+#include <boost/filesystem/path.hpp>
 #include <boost/format.hpp>
 #include <boost/optional.hpp>
 #include <boost/version.hpp>
-
-#include <ome/common/filesystem.h>
 
 namespace ome
 {

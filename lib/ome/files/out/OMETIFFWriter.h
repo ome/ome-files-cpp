@@ -38,10 +38,11 @@
 #ifndef OME_FILES_OUT_OMETIFFWRITER_H
 #define OME_FILES_OUT_OMETIFFWRITER_H
 
+#include <boost/filesystem/path.hpp>
+
 #include <ome/files/detail/FormatWriter.h>
 #include <ome/files/detail/OMETIFF.h>
 
-#include <ome/common/filesystem.h>
 #include <ome/common/log.h>
 
 #include <ome/xml/meta/OMEXMLMetadata.h>

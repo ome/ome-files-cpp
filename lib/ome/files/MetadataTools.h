@@ -37,11 +37,11 @@
 
 #include <string>
 
+#include <boost/filesystem/path.hpp>
+
 #include <ome/files/FormatReader.h>
 #include <ome/files/MetadataMap.h>
 #include <ome/files/Types.h>
-
-#include <ome/common/filesystem.h>
 
 #include <ome/xml/meta/Metadata.h>
 #include <ome/xml/meta/MetadataRoot.h>

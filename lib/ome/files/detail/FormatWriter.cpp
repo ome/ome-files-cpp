@@ -41,7 +41,6 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 
-#include <ome/common/filesystem.h>
 #include <ome/common/mstream.h>
 #include <ome/common/string.h>
 
@@ -110,7 +109,7 @@ namespace ome
         path canonicalpath = id;
         try
           {
-            canonicalpath = ome::common::canonical(id);
+            canonicalpath = boost::filesystem::canonical(id);
           }
         catch (const std::exception&)
           {
