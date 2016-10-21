@@ -47,7 +47,7 @@ namespace ome
     {
     }
 
-    UnsupportedCompressionException::~UnsupportedCompressionException () throw()
+    UnsupportedCompressionException::~UnsupportedCompressionException ()
     {
     }
 

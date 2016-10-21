@@ -47,7 +47,7 @@ namespace ome
     {
     }
 
-    UnknownFormatException::~UnknownFormatException () throw()
+    UnknownFormatException::~UnknownFormatException ()
     {
     }
 

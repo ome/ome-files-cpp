@@ -49,7 +49,7 @@ namespace ome
       {
       }
 
-      Exception::~Exception () throw()
+      Exception::~Exception ()
       {
       }
 

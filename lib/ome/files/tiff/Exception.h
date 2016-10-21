@@ -63,7 +63,7 @@ namespace ome
 
         /// Destructor.
         virtual
-        ~Exception () throw();
+        ~Exception ();
       };
 
     }
