@@ -35,7 +35,6 @@
 # #L%
 
 set(BUILD_SPHINX ${sphinx})
-set(BUILD_SPHINX_PDF ${sphinx-pdf})
 
 set(_ome_sphinx_list_dir "${CMAKE_CURRENT_LIST_DIR}")
 

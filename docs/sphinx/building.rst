@@ -52,9 +52,6 @@ sphinx-linkcheck=(ON|OFF)
   Disabled by default.  If set to ON, the build will fail if any links
   are invalid; if set to OFF, the linkchecking targets will not be run
   automatically, but may still be run by hand.
-sphinx-pdf=(ON|OFF)
-  Build PDF documentation with Sphinx.  Enabled by default if Sphinx
-  and XeLaTeX are autodetected.
 test=(ON|OFF)
   Enable unit tests.  Tests are enabled by default.
 
