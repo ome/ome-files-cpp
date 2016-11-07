@@ -1,7 +1,7 @@
 .. _ome-files-info:
 
 ome-files info
-============
+==============
 
 Synopsis
 --------

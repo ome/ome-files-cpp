@@ -141,40 +141,6 @@ if (BUILD_SPHINX AND SPHINX_BUILD)
                      COMMENT "Checking local links in sphinx documentation"
                      WORKING_DIRECTORY "${sphinx_srcdir}"
                      DEPENDS doc-linkcheck)
-
-  # Generate and install PDF manual
-  # Depends on man to allow sharing of cache with parallel build.
-
-  if (BUILD_SPHINX_PDF AND XELATEX AND MAKEINDEX)
-    add_custom_command(OUTPUT "${sphinx_builddir}/latex/OME-Files.tex" "${sphinx_builddir}/latex/preamble.tex"
-                       COMMAND ${CMAKE_COMMAND} -E make_directory "${sphinx_builddir}/cache"
-                       COMMAND ${CMAKE_COMMAND} -E make_directory "${sphinx_builddir}/latex"
-                       COMMAND ${SPHINX_BUILD}
-                               -D "release=${OME_VERSION_SHORT}"
-                               -D "version=${OME_VERSION_MAJOR}.${OME_VERSION_MINOR}"
-                               -c "${sphinx_builddir}"
-                               -d "${sphinx_builddir}/cache"
-                               -b latex
-                               "${sphinx_srcdir}" "${sphinx_builddir}/latex"
-                       COMMAND ${CMAKE_COMMAND} -E copy "preamble.tex" "${sphinx_builddir}/latex"
-                       WORKING_DIRECTORY "${sphinx_srcdir}"
-                       DEPENDS man ${SPHINX_DEPENDENCIES})
-    add_custom_command(OUTPUT "${sphinx_builddir}/latex/OME-Files.pdf"
-                       COMMAND ${XELATEX} "OME-Files.tex"
-                       COMMAND ${XELATEX} "OME-Files.tex"
-                       COMMAND ${MAKEINDEX} -s python.ist "OME-Files.idx"
-                       COMMAND ${XELATEX} "OME-Files.tex"
-                       COMMAND ${XELATEX} "OME-Files.tex"
-                       COMMAND ${XELATEX} "OME-Files.tex"
-                       WORKING_DIRECTORY "${sphinx_builddir}/latex"
-                       DEPENDS "${sphinx_builddir}/latex/OME-Files.tex" "${sphinx_builddir}/latex/preamble.tex")
-
-    add_custom_target(doc-pdf ALL DEPENDS "${sphinx_builddir}/latex/OME-Files.pdf")
-
-    install(FILES "${sphinx_builddir}/latex/OME-Files.pdf"
-            DESTINATION "${CMAKE_INSTALL_DOCDIR}/manual"
-            COMPONENT "runtime")
-  endif (BUILD_SPHINX_PDF AND XELATEX AND MAKEINDEX)
 else()
   message(WARNING "Manual pages and HTML manual will not be generated or installed")
 endif()

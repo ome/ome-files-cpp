@@ -1,7 +1,7 @@
 .. _ome-files-view:
 
 ome-files view
-============
+==============
 
 Synopsis
 --------
