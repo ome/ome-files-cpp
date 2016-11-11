@@ -37,6 +37,9 @@
 
 #include <iostream>
 
+// Include before boost headers to ensure the MPL limits get defined.
+#include <ome/common/config.h>
+
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/format.hpp>

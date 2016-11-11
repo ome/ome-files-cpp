@@ -39,6 +39,9 @@
 #include <cmath>
 #include <cstdarg>
 
+// Include before boost headers to ensure the MPL limits get defined.
+#include <ome/common/config.h>
+
 #include <boost/range/size.hpp>
 #include <boost/thread.hpp>
 
