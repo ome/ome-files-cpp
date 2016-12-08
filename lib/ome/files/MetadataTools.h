@@ -44,6 +44,7 @@
 #include <ome/files/Types.h>
 
 #include <ome/xml/meta/Metadata.h>
+#include <ome/xml/meta/MetadataModel.h>
 #include <ome/xml/meta/MetadataRoot.h>
 #include <ome/xml/meta/OMEXMLMetadata.h>
 
@@ -159,6 +160,9 @@ namespace ome
      * @param doPlane create Plane elements if @c true.
      * @param doImageName set image name if @c true.
      * @returns the OME-XML metadata.
+     *
+     * @deprecated Use createOMEXMLRoot(const std::string&)
+     * instead.
      */
     ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
     createOMEXMLMetadata(const FormatReader& reader,
@@ -174,6 +178,15 @@ namespace ome
      */
     ome::compat::shared_ptr< ::ome::xml::meta::MetadataRoot>
     createOMEXMLRoot(const std::string& document);
+
+    /**
+     * Create OME-XML metadata model from XML document.
+     *
+     * @param document the XML document source.
+     * @returns the OME-XML metadata root.
+     */
+    ome::compat::shared_ptr< ::ome::xml::meta::MetadataModel>
+    createOMEXMLModel(const std::string& document);
 
     /**
      * Get OME-XML metadata from metadata.

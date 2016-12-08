@@ -477,7 +477,7 @@ namespace ome
         // Retrieve original metadata.
         metadata = getOriginalMetadata(*meta);
 
-        if (!meta->getRoot())
+        if (!meta->getModel())
           throw FormatException("Could not parse OME-XML from TIFF ImageDescription");
 
         // Save image timestamps for later use.
