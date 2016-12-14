@@ -7,6 +7,9 @@
 #include <ome/files/in/OMETIFFReader.h>
 
 
+static PyObject *Error;
+
+
 static PyObject *
 get_image_count(PyObject *self, PyObject *args) {
     const char *filename;
@@ -15,10 +18,15 @@ get_image_count(PyObject *self, PyObject *args) {
     if (!PyArg_ParseTuple(args, "s", &filename)) {
         return NULL;
     }
-    reader = ome::compat::make_shared<ome::files::in::OMETIFFReader>();
-    reader->setId(std::string(filename));
-    image_count = PyInt_FromSize_t(reader->getImageCount());
-    reader->close();
+    try {
+      reader = ome::compat::make_shared<ome::files::in::OMETIFFReader>();
+      reader->setId(std::string(filename));
+      image_count = PyInt_FromSize_t(reader->getImageCount());
+      reader->close();
+    } catch (const std::exception& e) {
+      PyErr_SetString(Error, e.what());
+      return NULL;
+    }
     return image_count;
 }
 
@@ -32,5 +40,12 @@ static PyMethodDef OMEFilesMethods[] = {
 
 PyMODINIT_FUNC
 initome_files(void) {
-  Py_InitModule3("ome_files", OMEFilesMethods, "OME Files wrapper");
+  PyObject *m;
+  m = Py_InitModule3("ome_files", OMEFilesMethods, "OME Files wrapper");
+  if (!m) {
+    return;
+  }
+  Error = PyErr_NewException(const_cast<char*>("ome_files.Error"), NULL, NULL);
+  Py_INCREF(Error);
+  PyModule_AddObject(m, "Error", Error);
 }
