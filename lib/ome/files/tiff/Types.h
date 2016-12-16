@@ -108,16 +108,16 @@ namespace ome
           COMPRESSION_CCITTRLEW = 32771,   ///< 1 w/ word alignment.
           COMPRESSION_PACKBITS = 32773,    ///< Macintosh RLE.
           COMPRESSION_THUNDERSCAN = 32809, ///< ThunderScan RLE.
-          /// codes 32895-32898 are reserved for ANSI IT8 TIFF/IT <dkelly@apago.com).
+          // codes 32895-32898 are reserved for ANSI IT8 TIFF/IT <dkelly@apago.com).
           COMPRESSION_IT8CTPAD = 32895,    ///< IT8 CT w/padding.
           COMPRESSION_IT8LW = 32896,       ///< IT8 Linework RLE.
           COMPRESSION_IT8MP = 32897,       ///< IT8 Monochrome picture.
           COMPRESSION_IT8BL = 32898,       ///< IT8 Binary line art.
-          /// compression codes 32908-32911 are reserved for Pixar.
+          // compression codes 32908-32911 are reserved for Pixar.
           COMPRESSION_PIXARFILM = 32908,   ///< Pixar companded 10bit LZW.
           COMPRESSION_PIXARLOG = 32909,    ///< Pixar companded 11bit ZIP.
           COMPRESSION_DEFLATE = 32946,     ///< Deflate compression.
-          /// compression code 32947 is reserved for Oceana Matrix <dev@oceana.com>.
+          // compression code 32947 is reserved for Oceana Matrix <dev@oceana.com>.
           COMPRESSION_DCS = 32947,         ///< Kodak DCS encoding.
           COMPRESSION_JBIG = 34661,        ///< ISO JBIG.
           COMPRESSION_SGILOG = 34676,      ///< SGI Log Luminance RLE.

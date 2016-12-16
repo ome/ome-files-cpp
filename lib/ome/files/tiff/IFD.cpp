@@ -605,6 +605,8 @@ namespace ome
         boost::optional<PlanarConfiguration> planarconfig;
         /// Photometric interpretation.
         boost::optional<PhotometricInterpretation> photometric;
+        /// Compression scheme.
+        boost::optional<Compression> compression;
         /// Current tile (for writing).
         tstrile_t ctile;
 
@@ -1198,6 +1200,25 @@ namespace ome
       {
         getField(PHOTOMETRIC).set(photometric);
         impl->photometric = photometric;
+      }
+
+      Compression
+      IFD::getCompression() const
+      {
+        if (!impl->compression)
+          {
+            Compression compression;
+            getField(COMPRESSION).get(compression);
+            impl->compression = compression;
+          }
+        return impl->compression.get();
+      }
+
+      void
+      IFD::setCompression(Compression compression)
+      {
+        getField(COMPRESSION).set(compression);
+        impl->compression = compression;
       }
 
       void

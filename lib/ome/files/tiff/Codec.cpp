@@ -35,11 +35,15 @@
  * #L%
  */
 
+#include <map>
+
 #include <ome/files/tiff/Codec.h>
 
 #include <ome/compat/memory.h>
 
 #include <tiffio.h>
+
+using ome::xml::model::enums::PixelType;
 
 namespace ome
 {
@@ -48,25 +52,157 @@ namespace ome
     namespace tiff
     {
 
-      std::vector<Codec>
-      getConfiguredCodecs()
+      const std::vector<Codec>&
+      getCodecs()
       {
-        std::vector<Codec> ret;
+        static std::vector<Codec> ret;
 
-        ome::compat::shared_ptr<TIFFCodec> codecs(TIFFGetConfiguredCODECs(), _TIFFfree);
-        if (codecs)
+        if(ret.empty())
           {
-            for (const TIFFCodec *c = &*codecs; c->name != 0; ++c)
+            ome::compat::shared_ptr<TIFFCodec> codecs(TIFFGetConfiguredCODECs(), _TIFFfree);
+            if (codecs)
               {
-                Codec nc;
-                nc.name = c->name;
-                nc.scheme = c->scheme;
-                ret.push_back(nc);
+                for (const TIFFCodec *c = &*codecs; c->name != 0; ++c)
+                  {
+                    Codec nc;
+                    nc.name = c->name;
+                    nc.scheme = static_cast<Compression>(c->scheme);
+                    ret.push_back(nc);
+                  }
               }
           }
+
         return ret;
       }
 
+      const std::vector<std::string>&
+      getCodecNames()
+      {
+        static std::vector<std::string> ret;
+
+        if(ret.empty())
+          {
+            const std::vector<Codec>& codecs = getCodecs();
+            for (std::vector<Codec>::const_iterator i = codecs.begin();
+                 i != codecs.end();
+                 ++i)
+              ret.push_back(i->name);
+          }
+
+        return ret;
+      }
+
+      const std::vector<std::string>&
+      getCodecNames(PixelType pixeltype)
+      {
+        static std::map<PixelType, std::vector<std::string> > pixeltypes;
+
+        std::map<PixelType, std::vector<std::string> >::const_iterator found = pixeltypes.find(pixeltype);
+        if(found == pixeltypes.end())
+          {
+            std::vector<std::string> ptcodecs;
+            const std::vector<Codec>& codecs = getCodecs();
+            for (std::vector<Codec>::const_iterator i = codecs.begin();
+                 i != codecs.end();
+                 ++i)
+              {
+                switch(i->scheme)
+                  {
+                    // Don't expose directly since it's not a real
+                    // codec and the API uses an optional here to
+                    // signify no compression.
+                  case COMPRESSION_NONE:
+                    break;
+
+                    // Bilevel codecs
+                  case COMPRESSION_CCITTRLE:
+                  case COMPRESSION_CCITT_T4:
+                  case COMPRESSION_CCITT_T6:
+                  case COMPRESSION_CCITTRLEW:
+                  case COMPRESSION_PACKBITS:
+                  case COMPRESSION_T85:
+                  case COMPRESSION_T43:
+                  case COMPRESSION_JBIG: // also for other pixel types
+                                         // but there are better
+                                         // choices for other types
+                    if (pixeltype == PixelType::BIT)
+                      ptcodecs.push_back(i->name);
+                    break;
+
+                    // Codecs which work with all pixel types.
+                  case COMPRESSION_LZW:
+                  case COMPRESSION_ADOBE_DEFLATE:
+                  case COMPRESSION_DEFLATE:
+                  case COMPRESSION_LZMA:
+                  case COMPRESSION_JP2000:
+                    ptcodecs.push_back(i->name);
+                    break;
+
+                    // JPEG compression of 8-bit data (12-bit not
+                    // supported by default, and this interface does
+                    // not cater for samples per pixel or bits per
+                    // sample when querying)
+                  case COMPRESSION_JPEG:
+                    if (pixeltype == PixelType::UINT8)
+                      ptcodecs.push_back(i->name);
+                    break;
+
+                    // Compatibility codecs for decompression only.
+                  case COMPRESSION_OJPEG:
+                    break;
+
+                    // Codecs incompatible with all pixel types (ignore).
+                  case COMPRESSION_NEXT: // 2-bit
+                  case COMPRESSION_THUNDERSCAN: // 4-bit
+                  case COMPRESSION_PIXARFILM: // Pixar-specific
+                  case COMPRESSION_PIXARLOG: // Pixar-specific
+                  case COMPRESSION_SGILOG: // SGI-specific
+                  case COMPRESSION_SGILOG24: // SGI-specific
+                  case COMPRESSION_DCS: // Kodac-specific 10/12-bit
+                  case COMPRESSION_IT8CTPAD: // Prepress image data
+                  case COMPRESSION_IT8LW: // Prepress image data
+                  case COMPRESSION_IT8MP: // Prepress image data
+                  case COMPRESSION_IT8BL: // Prepress image data
+                    break;
+
+                    // Allow by default so we support codecs we don't
+                    // know about (but use with incompatible pixel
+                    // types at own risk).
+                  default:
+                    ptcodecs.push_back(i->name);
+                    break;
+                  }
+              }
+
+            std::pair<std::map<PixelType, std::vector<std::string> >::iterator, bool> inserted = pixeltypes.insert(std::make_pair(pixeltype, ptcodecs));
+            found = inserted.first;
+          }
+
+        return found->second;
+      }
+
+      Compression
+      getCodecScheme(const std::string& name)
+      {
+        static std::map<std::string, Codec> cmap;
+
+        if(cmap.empty())
+          {
+            const std::vector<Codec>& codecs = getCodecs();
+            for (std::vector<Codec>::const_iterator i = codecs.begin();
+                 i != codecs.end();
+                 ++i)
+              cmap.insert(std::make_pair(i->name, *i));
+          }
+
+        Compression ret = static_cast<Compression>(COMPRESSION_NONE);
+        std::map<std::string, Codec>::const_iterator found = cmap.find(name);
+
+        if (found != cmap.end())
+          ret = found->second.scheme;
+
+        return ret;
+      }
     }
   }
 }

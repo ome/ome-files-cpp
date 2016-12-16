@@ -249,21 +249,26 @@ namespace ome
         return framesPerSecond;
       }
 
-      const std::set<ome::xml::model::enums::PixelType>&
+      const std::set<ome::xml::model::enums::PixelType>
       FormatWriter::getPixelTypes() const
       {
         return getPixelTypes("default");
       }
 
-      const std::set<ome::xml::model::enums::PixelType>&
+      const std::set<ome::xml::model::enums::PixelType>
       FormatWriter::getPixelTypes(const std::string& codec) const
       {
-        static std::set<ome::xml::model::enums::PixelType> empty;
-        WriterProperties::codec_pixel_type_map::const_iterator ci =
-          writerProperties.codec_pixel_types.find(codec);
-        if (ci != writerProperties.codec_pixel_types.end())
-          return ci->second;
-        return empty;
+        std::set<ome::xml::model::enums::PixelType> ret;
+
+        for(WriterProperties::pixel_compression_type_map::const_iterator ci = writerProperties.pixel_compression_types.begin();
+            ci != writerProperties.pixel_compression_types.end();
+            ++ci)
+          {
+            if (ci->second.find(codec) != ci->second.end())
+              ret.insert(ci->first);
+          }
+
+        return ret;
       }
 
       bool
@@ -276,9 +281,9 @@ namespace ome
       FormatWriter::isSupportedType(ome::xml::model::enums::PixelType type,
                                     const std::string&                codec) const
       {
-        std::set<ome::xml::model::enums::PixelType> pixel_types = getPixelTypes(codec);
-        std::set<ome::xml::model::enums::PixelType>::const_iterator i = pixel_types.find(type);
-        return i != pixel_types.end();
+        WriterProperties::pixel_compression_type_map::const_iterator ci = writerProperties.pixel_compression_types.find(type);
+        return ci != writerProperties.pixel_compression_types.end() &&
+          ci->second.find(codec) != ci->second.end();
       }
 
       void
@@ -519,6 +524,18 @@ namespace ome
       FormatWriter::getCompressionTypes() const
       {
         return writerProperties.compression_types;
+      }
+
+      const std::set<std::string>&
+      FormatWriter::getCompressionTypes(ome::xml::model::enums::PixelType type) const
+      {
+        static std::set<std::string> empty;
+
+        WriterProperties::pixel_compression_type_map::const_iterator ci = writerProperties.pixel_compression_types.find(type);
+        if (ci != writerProperties.pixel_compression_types.end())
+          return ci->second;
+        else
+          return empty;
       }
 
       bool

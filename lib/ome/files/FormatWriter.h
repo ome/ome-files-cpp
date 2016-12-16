@@ -271,7 +271,7 @@ namespace ome
        * @returns the supported pixel types.
        */
       virtual
-      const std::set<ome::xml::model::enums::PixelType>&
+      const std::set<ome::xml::model::enums::PixelType>
       getPixelTypes() const = 0;
 
       /**
@@ -281,7 +281,7 @@ namespace ome
        * @returns the supported pixel types.
        */
       virtual
-      const std::set<ome::xml::model::enums::PixelType>&
+      const std::set<ome::xml::model::enums::PixelType>
       getPixelTypes(const std::string& codec) const = 0;
 
       /**
@@ -314,6 +314,16 @@ namespace ome
       virtual
       const std::set<std::string>&
       getCompressionTypes() const  = 0;
+
+      /**
+       * Get supported compression types for a given pixel type.
+       *
+       * @param type the pixel type to use.
+       * @returns the supported compression types.
+       */
+      virtual
+      const std::set<std::string>&
+      getCompressionTypes(ome::xml::model::enums::PixelType type) const  = 0;
 
       /**
        * Set the compression type to use when writing.

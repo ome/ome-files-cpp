@@ -36,14 +36,16 @@
  * #L%
  */
 
+#include <ome/files/tiff/Types.h>
+
 #include "tiffsamples.h"
 
 using namespace boost::filesystem;
 
-std::vector<TileTestParameters>
-find_tile_tests()
+std::vector<TIFFTestParameters>
+find_tiff_tests()
 {
-  std::vector<TileTestParameters> params;
+  std::vector<TIFFTestParameters> params;
 
   path dir(PROJECT_BINARY_DIR "/test/ome-files/data");
   if (exists(dir) && is_directory(dir))
@@ -60,10 +62,11 @@ find_tile_tests()
           std::string wfile(wpath.string());
           if (ome::compat::regex_match(file, found, tile_match))
             {
-              TileTestParameters p;
+              TIFFTestParameters p;
               p.tile = true;
               p.file = file;
               p.wfile = wfile;
+              p.compression = ome::files::tiff::COMPRESSION_NONE;
 
               std::istringstream iwid(found[1]);
               if (!(iwid >> p.imagewidth))
@@ -89,10 +92,11 @@ find_tile_tests()
             }
           else if (ome::compat::regex_match(file, found, strip_match))
             {
-              TileTestParameters p;
+              TIFFTestParameters p;
               p.tile = false;
               p.file = file;
               p.wfile = wfile;
+              p.compression = ome::files::tiff::COMPRESSION_NONE;
 
               std::istringstream iwid(found[1]);
               if (!(iwid >> p.imagewidth))

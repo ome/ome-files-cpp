@@ -56,8 +56,8 @@ namespace ome
       struct WriterProperties
       {
         /// Map of codec to pixel types.
-        typedef std::map<std::string,
-                         std::set<ome::xml::model::enums::PixelType> > codec_pixel_type_map;
+        typedef std::map<ome::xml::model::enums::PixelType,
+                         std::set<std::string> > pixel_compression_type_map;
 
         /// Format name.
         std::string name;
@@ -69,8 +69,8 @@ namespace ome
         std::vector<boost::filesystem::path> compression_suffixes;
         /// Supported compression types.
         std::set<std::string> compression_types;
-        /// Supported pixel types.
-        codec_pixel_type_map codec_pixel_types;
+        /// Supported compression codecs types for each pixel type.
+        pixel_compression_type_map pixel_compression_types;
         /// Stacks are supported.
         bool stacks;
 
@@ -87,7 +87,7 @@ namespace ome
           suffixes(),
           compression_suffixes(),
           compression_types(),
-          codec_pixel_types(),
+          pixel_compression_types(),
           stacks()
         {
           compression_suffixes.push_back(boost::filesystem::path(""));
@@ -372,11 +372,11 @@ namespace ome
         getFramesPerSecond() const;
 
         // Documented in superclass.
-        const std::set<ome::xml::model::enums::PixelType>&
+        const std::set<ome::xml::model::enums::PixelType>
         getPixelTypes() const;
 
         // Documented in superclass.
-        const std::set<ome::xml::model::enums::PixelType>&
+        const std::set<ome::xml::model::enums::PixelType>
         getPixelTypes(const std::string& codec) const;
 
         // Documented in superclass.
@@ -390,7 +390,10 @@ namespace ome
 
         // Documented in superclass.
         const std::set<std::string>&
-        getCompressionTypes() const ;
+        getCompressionTypes() const;
+
+        const std::set<std::string>&
+        getCompressionTypes(ome::xml::model::enums::PixelType type) const;
 
         // Documented in superclass.
         void
