@@ -40,6 +40,29 @@ PyOMETIFFReader_setId(PyOMETIFFReader *self, PyObject *args) {
 
 
 static PyObject *
+PyOMETIFFReader_close(PyOMETIFFReader *self, PyObject *args, PyObject *kwds) {
+  PyObject *file_only = Py_False;
+  static const char *kwlist[] = {"file_only", NULL};
+  int fileOnly;
+  if (!PyArg_ParseTupleAndKeywords(
+        args, kwds, "|O", const_cast<char**>(kwlist), &file_only)) {
+    return NULL;
+  }
+  fileOnly = PyObject_IsTrue(file_only);
+  if (fileOnly < 0) {
+    return PyErr_Format(PyExc_TypeError, "could not convert argument to bool");
+  }
+  try {
+    self->reader->close(fileOnly);
+  } catch (const std::exception& e) {
+    PyErr_SetString(Error, e.what());
+    return NULL;
+  }
+  Py_RETURN_NONE;
+}
+
+
+static PyObject *
 PyOMETIFFReader_getImageCount(PyOMETIFFReader *self, PyObject *args) {
   try {
     return PyInt_FromSize_t(self->reader->getImageCount());
@@ -53,6 +76,9 @@ PyOMETIFFReader_getImageCount(PyOMETIFFReader *self, PyObject *args) {
 static PyMethodDef PyOMETIFFReader_methods[] = {
   {"set_id", (PyCFunction)PyOMETIFFReader_setId, METH_VARARGS,
    "set the current file name"},
+  {"close", (PyCFunction)PyOMETIFFReader_close, METH_VARARGS | METH_KEYWORDS,
+   "close(file_only=False): close the currently open file. "
+   "If file_only is False, also reset all internal state"},
   {"get_image_count", (PyCFunction)PyOMETIFFReader_getImageCount, METH_VARARGS,
    "get the number of image planes in the current series"},
   {NULL}                                       /* Sentinel */
