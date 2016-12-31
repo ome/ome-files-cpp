@@ -166,7 +166,7 @@ namespace
         if (i->first == PixelType::BIT)
           codecset.insert("rle");
         if (i->first == PixelType::INT8 || i->first == PixelType::UINT8)
-          codecset.insert("jpeg");
+          codecset.insert("test-8bit-only");
 
         p.compression_types.insert(codecset.begin(), codecset.end());
         p.pixel_compression_types.insert(WriterProperties::pixel_compression_type_map::value_type(i->first, codecset));
@@ -630,11 +630,11 @@ TEST_P(FormatWriterTest, PixelTypesByCodec)
   const std::set<ome::xml::model::enums::PixelType> rle = w.getPixelTypes("rle");
   EXPECT_EQ(rle_pixel_types, rle);
 
-  std::set<ome::xml::model::enums::PixelType> jpeg_pixel_types;
-  jpeg_pixel_types.insert(PixelType::INT8);
-  jpeg_pixel_types.insert(PixelType::UINT8);
-  const std::set<ome::xml::model::enums::PixelType> jpeg = w.getPixelTypes("jpeg");
-  EXPECT_EQ(jpeg_pixel_types, jpeg);
+  std::set<ome::xml::model::enums::PixelType> test_8bit_pixel_types;
+  test_8bit_pixel_types.insert(PixelType::INT8);
+  test_8bit_pixel_types.insert(PixelType::UINT8);
+  const std::set<ome::xml::model::enums::PixelType> test_8bit = w.getPixelTypes("test-8bit-only");
+  EXPECT_EQ(test_8bit_pixel_types, test_8bit);
 
   const std::set<ome::xml::model::enums::PixelType> ipt = w.getPixelTypes("invalid");
   EXPECT_TRUE(ipt.empty());
@@ -669,13 +669,13 @@ TEST_P(FormatWriterTest, SupportedPixelTypeByCodec)
   EXPECT_TRUE(w.isSupportedType(ome::xml::model::enums::PixelType::BIT, "rle"));
   EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::INT16, "rle"));
 
-  EXPECT_TRUE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT8, "jpeg"));
-  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT16, "jpeg"));
-  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT32, "jpeg"));
-  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::DOUBLE, "jpeg"));
-  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::COMPLEXDOUBLE, "jpeg"));
-  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::BIT, "jpeg"));
-  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::INT16, "jpeg"));
+  EXPECT_TRUE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT8, "test-8bit-only"));
+  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT16, "test-8bit-only"));
+  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT32, "test-8bit-only"));
+  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::DOUBLE, "test-8bit-only"));
+  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::COMPLEXDOUBLE, "test-8bit-only"));
+  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::BIT, "test-8bit-only"));
+  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::INT16, "test-8bit-only"));
 
   EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT8, "invalid"));
   EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT16, "invalid"));
