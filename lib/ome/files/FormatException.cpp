@@ -47,7 +47,7 @@ namespace ome
     {
     }
 
-    FormatException::~FormatException () throw()
+    FormatException::~FormatException ()
     {
     }
 

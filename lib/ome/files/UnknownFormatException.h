@@ -61,7 +61,7 @@ namespace ome
 
       /// Destructor.
       virtual
-      ~UnknownFormatException () throw();
+      ~UnknownFormatException ();
     };
 
   }
