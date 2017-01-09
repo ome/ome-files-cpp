@@ -194,12 +194,12 @@ namespace
 
     // Special case for BIT
     void
-    transfer(std::shared_ptr<PixelBuffer<PixelProperties<PixelType::BIT>::std_type> >& buffer,
-             PixelBuffer<PixelProperties<PixelType::BIT>::std_type>::indices_type&     destidx,
-             const TileBuffer&                                                         tilebuf,
-             PlaneRegion&                                                              rfull,
-             PlaneRegion&                                                              rclip,
-             uint16_t                                                                  copysamples)
+    transfer(std::shared_ptr<PixelBuffer<PixelProperties<PixelType::BIT>::std_type>>& buffer,
+             PixelBuffer<PixelProperties<PixelType::BIT>::std_type>::indices_type&    destidx,
+             const TileBuffer&                                                        tilebuf,
+             PlaneRegion&                                                             rfull,
+             PlaneRegion&                                                             rclip,
+             uint16_t                                                                 copysamples)
     {
       // Unpack bits from buffer.
 
@@ -245,9 +245,9 @@ namespace
 
     // Special case for BIT
     dimension_size_type
-    expected_read(const std::shared_ptr<PixelBuffer<PixelProperties<PixelType::BIT>::std_type> >& /* buffer */,
-                  const PlaneRegion&                                                              rclip,
-                  uint16_t                                                                        copysamples) const
+    expected_read(const std::shared_ptr<PixelBuffer<PixelProperties<PixelType::BIT>::std_type>>& /* buffer */,
+                  const PlaneRegion&                                                             rclip,
+                  uint16_t                                                                       copysamples) const
     {
       dimension_size_type expectedread = rclip.w;
 
@@ -444,12 +444,12 @@ namespace
 
     // Special case for BIT
     void
-    transfer(const std::shared_ptr<PixelBuffer<PixelProperties<PixelType::BIT>::std_type> >& buffer,
-             PixelBuffer<PixelProperties<PixelType::BIT>::std_type>::indices_type&           srcidx,
-             TileBuffer&                                                                     tilebuf,
-             PlaneRegion&                                                                    rfull,
-             PlaneRegion&                                                                    rclip,
-             uint16_t                                                                        copysamples)
+    transfer(const std::shared_ptr<PixelBuffer<PixelProperties<PixelType::BIT>::std_type>>& buffer,
+             PixelBuffer<PixelProperties<PixelType::BIT>::std_type>::indices_type&          srcidx,
+             TileBuffer&                                                                    tilebuf,
+             PlaneRegion&                                                                   rfull,
+             PlaneRegion&                                                                   rclip,
+             uint16_t                                                                       copysamples)
     {
       // Pack bits into buffer.
 
@@ -1305,8 +1305,8 @@ namespace ome
 
         buf.setBuffer(shape, PixelType::UINT16, order_planar);
 
-        std::shared_ptr<PixelBuffer<PixelProperties<PixelType::UINT16>::std_type> > uint16_buffer
-          (boost::get<std::shared_ptr<PixelBuffer<PixelProperties<PixelType::UINT16>::std_type> > >(buf.vbuffer()));
+        std::shared_ptr<PixelBuffer<PixelProperties<PixelType::UINT16>::std_type>> uint16_buffer
+          (boost::get<std::shared_ptr<PixelBuffer<PixelProperties<PixelType::UINT16>::std_type>>>(buf.vbuffer()));
         assert(uint16_buffer);
 
         for (VariantPixelBuffer::size_type s = 0U; s < shape[DIM_SUBCHANNEL]; ++s)

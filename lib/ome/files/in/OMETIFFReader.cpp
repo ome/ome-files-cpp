@@ -481,7 +481,7 @@ namespace ome
           throw FormatException("Could not parse OME-XML from TIFF ImageDescription");
 
         // Save image timestamps for later use.
-        std::vector<boost::optional<Timestamp> > acquiredDates(meta->getImageCount());
+        std::vector<boost::optional<Timestamp>> acquiredDates(meta->getImageCount());
         getAcquisitionDates(*meta, acquiredDates);
 
         // Get UUID for the first file.
@@ -1014,11 +1014,11 @@ namespace ome
               }
           }
 
-        for (std::vector<boost::optional<Timestamp> >::const_iterator ts = acquiredDates.begin();
+        for (std::vector<boost::optional<Timestamp>>::const_iterator ts = acquiredDates.begin();
              ts != acquiredDates.end();
              ++ts)
           {
-            index_type series = std::distance<std::vector<boost::optional<Timestamp> >::const_iterator>(acquiredDates.begin(), ts);
+            index_type series = std::distance<std::vector<boost::optional<Timestamp>>::const_iterator>(acquiredDates.begin(), ts);
             if (*ts)
               {
                 try
@@ -1149,8 +1149,8 @@ namespace ome
       }
 
       void
-      OMETIFFReader::getAcquisitionDates(const ome::xml::meta::OMEXMLMetadata&                                  meta,
-                                         std::vector<boost::optional<ome::xml::model::primitives::Timestamp> >& timestamps)
+      OMETIFFReader::getAcquisitionDates(const ome::xml::meta::OMEXMLMetadata&                                 meta,
+                                         std::vector<boost::optional<ome::xml::model::primitives::Timestamp>>& timestamps)
       {
         for (index_type i = 0; i < meta.getImageCount(); ++i)
           {

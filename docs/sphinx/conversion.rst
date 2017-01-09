@@ -505,7 +505,7 @@ Types with a common base
 
 .. code-block:: cpp
 
-    std::vector<std::shared_ptr<Base> > v;
+    std::vector<std::shared_ptr<Base>> v;
     v.push_back(std::make_shared<Derived>());
 
 This can store any type derived from :cpp:class:`Base`.  An
@@ -770,7 +770,7 @@ integer, floating point, complex floating point and bitmask cases.
       typename boost::enable_if_c<
         boost::is_integral<T>::value, void
         >::type
-      operator() (std::shared_ptr< ::ome::files::PixelBuffer<T> >& buf)
+      operator() (std::shared_ptr< ::ome::files::PixelBuffer<T>>& buf)
       {
         // Integer algorithm.
       }
@@ -780,7 +780,7 @@ integer, floating point, complex floating point and bitmask cases.
       typename boost::enable_if_c<
         boost::is_floating_point<T>::value, void
         >::type
-      operator() (std::shared_ptr< ::ome::files::PixelBuffer<T> >& buf)
+      operator() (std::shared_ptr< ::ome::files::PixelBuffer<T>>& buf)
       {
         // Floating point algorithm.
       }
@@ -790,7 +790,7 @@ integer, floating point, complex floating point and bitmask cases.
       typename boost::enable_if_c<
         boost::is_complex<T>::value, void
         >::type
-      operator() (std::shared_ptr< ::ome::files::PixelBuffer<T> >& buf)
+      operator() (std::shared_ptr< ::ome::files::PixelBuffer<T>>& buf)
       {
         // Complex floating point algorithm.
       }
@@ -798,7 +798,7 @@ integer, floating point, complex floating point and bitmask cases.
       // BIT/bool pixel type.  Note this is a simple overload since it is
       // a simple type, not a category of different types.
       void
-      operator() (std::shared_ptr< ::ome::files::PixelBuffer<bit_type> >& buf)
+      operator() (std::shared_ptr< ::ome::files::PixelBuffer<bit_type>>& buf)
       {
         // Boolean algorithm.
       }

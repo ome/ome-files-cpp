@@ -287,8 +287,8 @@ namespace ome
          * @param timestamps the acquisition dates, indexed by image.
          */
         void
-        getAcquisitionDates(const ome::xml::meta::OMEXMLMetadata&                                  meta,
-                            std::vector<boost::optional<ome::xml::model::primitives::Timestamp> >& timestamps);
+        getAcquisitionDates(const ome::xml::meta::OMEXMLMetadata&                                 meta,
+                            std::vector<boost::optional<ome::xml::model::primitives::Timestamp>>& timestamps);
 
         /**
          * Clean up OME-XML metadata.

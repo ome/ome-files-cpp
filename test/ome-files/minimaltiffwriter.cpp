@@ -147,7 +147,7 @@ TEST(TIFFWriter, SupportedCompressionTypes)
 
 TEST_P(TIFFWriterTest, setId)
 {
-  std::vector<std::shared_ptr<CoreMetadata> > seriesList;
+  std::vector<std::shared_ptr<CoreMetadata>> seriesList;
   for (TIFF::const_iterator i = tiff->begin();
        i != tiff->end();
        ++i)

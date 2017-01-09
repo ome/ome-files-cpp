@@ -95,8 +95,8 @@ typedef ::testing::Types<PixelTypeParam<PT::INT8,         int8_t>,
                          PixelTypeParam<PT::BIT,          bool>,
                          PixelTypeParam<PT::FLOAT,        float>,
                          PixelTypeParam<PT::DOUBLE,       double>,
-                         PixelTypeParam<PT::COMPLEXFLOAT, std::complex<float> >,
-                         PixelTypeParam<PT::COMPLEXDOUBLE,std::complex<double> > > TestTypes;
+                         PixelTypeParam<PT::COMPLEXFLOAT, std::complex<float>>,
+                         PixelTypeParam<PT::COMPLEXDOUBLE,std::complex<double>>> TestTypes;
 INSTANTIATE_TYPED_TEST_CASE_P(PixelPropertiesTypeTest, PixelPropertiesType, TestTypes);
 
 class PixelPropertiesTestParameters

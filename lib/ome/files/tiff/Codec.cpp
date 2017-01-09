@@ -94,9 +94,9 @@ namespace ome
       const std::vector<std::string>&
       getCodecNames(PixelType pixeltype)
       {
-        static std::map<PixelType, std::vector<std::string> > pixeltypes;
+        static std::map<PixelType, std::vector<std::string>> pixeltypes;
 
-        std::map<PixelType, std::vector<std::string> >::const_iterator found = pixeltypes.find(pixeltype);
+        std::map<PixelType, std::vector<std::string>>::const_iterator found = pixeltypes.find(pixeltype);
         if(found == pixeltypes.end())
           {
             std::vector<std::string> ptcodecs;
@@ -173,7 +173,7 @@ namespace ome
                   }
               }
 
-            std::pair<std::map<PixelType, std::vector<std::string> >::iterator, bool> inserted = pixeltypes.insert(std::make_pair(pixeltype, ptcodecs));
+            std::pair<std::map<PixelType, std::vector<std::string>>::iterator, bool> inserted = pixeltypes.insert(std::make_pair(pixeltype, ptcodecs));
             found = inserted.first;
           }
 

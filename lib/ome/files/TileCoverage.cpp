@@ -89,7 +89,7 @@ namespace ome
     {
     public:
       /// Region coverage stored as box ranges.
-      geomi::rtree<box, geomi::quadratic<16> > rtree;
+      geomi::rtree<box, geomi::quadratic<16>> rtree;
 
       /**
        * Constructor.
