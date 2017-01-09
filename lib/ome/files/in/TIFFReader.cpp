@@ -59,15 +59,11 @@ namespace ome
       namespace
       {
 
-        const char *suffixes[] = {"tif", "tiff", "tf2", "tf8", "btf"};
-        const char *companion_suffixes_array[] = {"txt", "xml"};
-
         ReaderProperties
         tiff_properties()
         {
           ReaderProperties p("TIFF", "Tagged Image File Format");
-          p.suffixes = std::vector<boost::filesystem::path>(suffixes,
-                                                            suffixes + boost::size(suffixes));
+          p.suffixes = {"tif", "tiff", "tf2", "tf8", "btf"};
           p.metadata_levels.insert(MetadataOptions::METADATA_MINIMUM);
           p.metadata_levels.insert(MetadataOptions::METADATA_NO_OVERLAYS);
           p.metadata_levels.insert(MetadataOptions::METADATA_ALL);
@@ -77,8 +73,7 @@ namespace ome
 
         const ReaderProperties props(tiff_properties());
 
-        std::vector<boost::filesystem::path> companion_suffixes(companion_suffixes_array,
-                                                                companion_suffixes_array + boost::size(companion_suffixes_array));
+        const std::vector<boost::filesystem::path> companion_suffixes = {"txt", "xml"};
 
       }
 

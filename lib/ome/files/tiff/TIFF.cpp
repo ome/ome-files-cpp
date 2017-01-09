@@ -345,25 +345,25 @@ namespace ome
         // registered field info.
         static std::string ijbc("ImageJMetadataByteCounts");
         static std::string ij("ImageJMetadata");
-        static const TIFFFieldInfo ImageJFieldInfo[] =
-          {
-            {
-              TIFFTAG_IMAGEJ_META_DATA_BYTE_COUNTS,
-              TIFF_VARIABLE2, TIFF_VARIABLE2, TIFF_LONG, FIELD_CUSTOM,
-              true, true, const_cast<char *>(ijbc.c_str())
-            },
-            {
-              TIFFTAG_IMAGEJ_META_DATA,
-              TIFF_VARIABLE2, TIFF_VARIABLE2, TIFF_BYTE, FIELD_CUSTOM,
-              true, true, const_cast<char *>(ij.c_str())
-            }
-          };
+        static const std::array<TIFFFieldInfo, 2> ImageJFieldInfo
+          {{
+              {
+                TIFFTAG_IMAGEJ_META_DATA_BYTE_COUNTS,
+                TIFF_VARIABLE2, TIFF_VARIABLE2, TIFF_LONG, FIELD_CUSTOM,
+                true, true, const_cast<char *>(ijbc.c_str())
+              },
+              {
+                TIFFTAG_IMAGEJ_META_DATA,
+                TIFF_VARIABLE2, TIFF_VARIABLE2, TIFF_BYTE, FIELD_CUSTOM,
+                true, true, const_cast<char *>(ij.c_str())
+              }
+          }};
 
         ::TIFF *tiffraw = reinterpret_cast<::TIFF *>(getWrapped());
 
         Sentry sentry;
 
-        int e = TIFFMergeFieldInfo(tiffraw, ImageJFieldInfo, boost::size(ImageJFieldInfo));
+        int e = TIFFMergeFieldInfo(tiffraw, ImageJFieldInfo.data(), ImageJFieldInfo.size());
         if (e)
           sentry.error();
       }

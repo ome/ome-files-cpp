@@ -102,11 +102,11 @@ TEST_P(XMLToolsFileTest, ValidateXML)
     }
 }
 
-XMLToolsFileTestParameters params[] =
+const std::vector<XMLToolsFileTestParameters> params
   {
-    XMLToolsFileTestParameters(PROJECT_SOURCE_DIR "/test/ome-files/data/18x24y5z5t2c8b-text.ome",          true),
-    XMLToolsFileTestParameters(PROJECT_SOURCE_DIR "/test/ome-files/data/18x24y5z5t2c8b-text-invalid.ome",  false),
-    XMLToolsFileTestParameters(PROJECT_SOURCE_DIR "/test/ome-files/data/18x24y5z5t2c8b-text-invalid2.ome", false)
+    {PROJECT_SOURCE_DIR "/test/ome-files/data/18x24y5z5t2c8b-text.ome",          true},
+    {PROJECT_SOURCE_DIR "/test/ome-files/data/18x24y5z5t2c8b-text-invalid.ome",  false},
+    {PROJECT_SOURCE_DIR "/test/ome-files/data/18x24y5z5t2c8b-text-invalid2.ome", false}
   };
 
 // Disable missing-prototypes warning for INSTANTIATE_TEST_CASE_P;

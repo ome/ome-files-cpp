@@ -94,21 +94,17 @@ namespace ome
       namespace
       {
 
-        const char *suffixes[] = {"ome.tif",
-                                  "ome.tiff",
-                                  "ome.tf2",
-                                  "ome.tf8",
-                                  "ome.btf"};
-        const char *companion_suffixes_array[] = {"companion.ome"};
-
         ReaderProperties
         tiff_properties()
         {
           ReaderProperties p("OME-TIFF",
                              "Open Microscopy Environment TIFF");
 
-          p.suffixes = std::vector<boost::filesystem::path>(suffixes,
-                                                            suffixes + boost::size(suffixes));
+          p.suffixes = {"ome.tif",
+                        "ome.tiff",
+                        "ome.tf2",
+                        "ome.tf8",
+                        "ome.btf"};
           p.metadata_levels.insert(MetadataOptions::METADATA_MINIMUM);
           p.metadata_levels.insert(MetadataOptions::METADATA_NO_OVERLAYS);
           p.metadata_levels.insert(MetadataOptions::METADATA_ALL);
@@ -118,8 +114,7 @@ namespace ome
 
         const ReaderProperties props(tiff_properties());
 
-        std::vector<path> companion_suffixes(companion_suffixes_array,
-                                             companion_suffixes_array + boost::size(companion_suffixes_array));
+        const std::vector<path> companion_suffixes{"companion.ome"};
 
         std::string
         getImageDescription(const TIFF& tiff)

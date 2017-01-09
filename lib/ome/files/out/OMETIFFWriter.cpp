@@ -91,20 +91,16 @@ namespace ome
       namespace
       {
 
-        // Note that tf2, tf8 and btf are all extensions for "bigTIFF"
-        // (2nd generation TIFF, TIFF with 8-byte offsets and big TIFF
-        // respectively).
-        const char *suffixes[] = {"ome.tif", "ome.tiff", "ome.tf2", "ome.tf8", "ome.btf"};
-        const char *companion_suffixes_array[] = {"companion.ome"};
-
         WriterProperties
         tiff_properties()
         {
           WriterProperties p("OME-TIFF",
                              "Open Microscopy Environment TIFF");
 
-          p.suffixes = std::vector<boost::filesystem::path>(suffixes,
-                                                            suffixes + boost::size(suffixes));
+          // Note that tf2, tf8 and btf are all extensions for
+          // "bigTIFF" (2nd generation TIFF, TIFF with 8-byte offsets
+          // and big TIFF respectively).
+          p.suffixes = {"ome.tif", "ome.tiff", "ome.tf2", "ome.tf8", "ome.btf"};
 
           const PixelType::value_map_type& pv = PixelType::values();
           for (PixelType::value_map_type::const_iterator i = pv.begin();
@@ -124,8 +120,7 @@ namespace ome
 
         const WriterProperties props(tiff_properties());
 
-        std::vector<path> companion_suffixes(companion_suffixes_array,
-                                             companion_suffixes_array + boost::size(companion_suffixes_array));
+        const std::vector<path> companion_suffixes{"companion.ome"};
 
         const std::string default_description("OME-TIFF");
 

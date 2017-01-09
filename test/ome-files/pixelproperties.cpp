@@ -190,22 +190,6 @@ TEST_P(PixelPropertiesTest, Complex)
     ASSERT_FALSE(ome::files::isComplex(params.type));
 }
 
-
-PixelPropertiesTestParameters property_params[] =
-  { //                            PixelType          byte size                     bit size                        signed integer complex
-    PixelPropertiesTestParameters(PT::INT8,          sizeof(int8_t),               sizeof(int8_t)*8,               true,  true,   false),
-    PixelPropertiesTestParameters(PT::INT16,         sizeof(int16_t),              sizeof(int16_t)*8,              true,  true,   false),
-    PixelPropertiesTestParameters(PT::INT32,         sizeof(int32_t),              sizeof(int32_t)*8,              true,  true,   false),
-    PixelPropertiesTestParameters(PT::UINT8,         sizeof(uint8_t),              sizeof(uint8_t)*8,              false, true,   false),
-    PixelPropertiesTestParameters(PT::UINT16,        sizeof(uint16_t),             sizeof(uint16_t)*8,             false, true,   false),
-    PixelPropertiesTestParameters(PT::UINT32,        sizeof(uint32_t),             sizeof(uint32_t)*8,             false, true,   false),
-    PixelPropertiesTestParameters(PT::BIT,           sizeof(bool),                 sizeof(bool)*8,                 false, true,   false),
-    PixelPropertiesTestParameters(PT::FLOAT,         sizeof(float),                sizeof(float)*8,                true,  false,  false),
-    PixelPropertiesTestParameters(PT::DOUBLE,        sizeof(double),               sizeof(double)*8,               true,  false,  false),
-    PixelPropertiesTestParameters(PT::COMPLEXFLOAT,  sizeof(std::complex<float>),  sizeof(std::complex<float>)*8,  true,  false,  true),
-    PixelPropertiesTestParameters(PT::COMPLEXDOUBLE, sizeof(std::complex<double>), sizeof(std::complex<double>)*8, true,  false,  true)
-  };
-
 class FindPixelTypeTestParameters
 {
 public:
@@ -274,23 +258,38 @@ TEST_P(FindPixelTypeTest, FindFromBits)
     }
 }
 
-FindPixelTypeTestParameters find_params[] =
-  { //                          PixelType          byte size                     bit size                        signed integer complex throws
-    FindPixelTypeTestParameters(PT::INT8,          sizeof(int8_t),               sizeof(int8_t)*8,               true,  true,   false,  false),
-    FindPixelTypeTestParameters(PT::INT16,         sizeof(int16_t),              sizeof(int16_t)*8,              true,  true,   false,  false),
-    FindPixelTypeTestParameters(PT::INT32,         sizeof(int32_t),              sizeof(int32_t)*8,              true,  true,   false,  false),
-    FindPixelTypeTestParameters(PT::UINT8,         sizeof(uint8_t),              sizeof(uint8_t)*8,              false, true,   false,  false),
-    FindPixelTypeTestParameters(PT::UINT16,        sizeof(uint16_t),             sizeof(uint16_t)*8,             false, true,   false,  false),
-    FindPixelTypeTestParameters(PT::UINT32,        sizeof(uint32_t),             sizeof(uint32_t)*8,             false, true,   false,  false),
-    FindPixelTypeTestParameters(PT::FLOAT,         sizeof(float),                sizeof(float)*8,                true,  false,  false,  false),
-    FindPixelTypeTestParameters(PT::DOUBLE,        sizeof(double),               sizeof(double)*8,               true,  false,  false,  false),
-    FindPixelTypeTestParameters(PT::COMPLEXFLOAT,  sizeof(std::complex<float>),  sizeof(std::complex<float>)*8,  true,  false,  true,   false),
-    FindPixelTypeTestParameters(PT::COMPLEXDOUBLE, sizeof(std::complex<double>), sizeof(std::complex<double>)*8, true,  false,  true,   false),
-    FindPixelTypeTestParameters(PT::INT8,          0,                            0,                              true,  true,   false,  true),
-    FindPixelTypeTestParameters(PT::INT8,          0,                            3,                              true,  true,   false,  true),
-    FindPixelTypeTestParameters(PT::INT8,          0,                            3,                              true,  true,   true,   true),
-    FindPixelTypeTestParameters(PT::INT8,          0,                            3,                              false, true,   true,   true),
-    FindPixelTypeTestParameters(PT::INT8,          0,                            3,                              false, false,  false,  true)
+const std::vector<PixelPropertiesTestParameters> property_params
+  { // PixelType        byte size                     bit size                        signed integer complex
+    {PT::INT8,          sizeof(int8_t),               sizeof(int8_t)*8,               true,  true,   false},
+    {PT::INT16,         sizeof(int16_t),              sizeof(int16_t)*8,              true,  true,   false},
+    {PT::INT32,         sizeof(int32_t),              sizeof(int32_t)*8,              true,  true,   false},
+    {PT::UINT8,         sizeof(uint8_t),              sizeof(uint8_t)*8,              false, true,   false},
+    {PT::UINT16,        sizeof(uint16_t),             sizeof(uint16_t)*8,             false, true,   false},
+    {PT::UINT32,        sizeof(uint32_t),             sizeof(uint32_t)*8,             false, true,   false},
+    {PT::BIT,           sizeof(bool),                 sizeof(bool)*8,                 false, true,   false},
+    {PT::FLOAT,         sizeof(float),                sizeof(float)*8,                true,  false,  false},
+    {PT::DOUBLE,        sizeof(double),               sizeof(double)*8,               true,  false,  false},
+    {PT::COMPLEXFLOAT,  sizeof(std::complex<float>),  sizeof(std::complex<float>)*8,  true,  false,  true},
+    {PT::COMPLEXDOUBLE, sizeof(std::complex<double>), sizeof(std::complex<double>)*8, true,  false,  true}
+  };
+
+const std::vector<FindPixelTypeTestParameters> find_params
+  { // PixelType        byte size                     bit size                        signed integer complex throws
+    {PT::INT8,          sizeof(int8_t),               sizeof(int8_t)*8,               true,  true,   false,  false},
+    {PT::INT16,         sizeof(int16_t),              sizeof(int16_t)*8,              true,  true,   false,  false},
+    {PT::INT32,         sizeof(int32_t),              sizeof(int32_t)*8,              true,  true,   false,  false},
+    {PT::UINT8,         sizeof(uint8_t),              sizeof(uint8_t)*8,              false, true,   false,  false},
+    {PT::UINT16,        sizeof(uint16_t),             sizeof(uint16_t)*8,             false, true,   false,  false},
+    {PT::UINT32,        sizeof(uint32_t),             sizeof(uint32_t)*8,             false, true,   false,  false},
+    {PT::FLOAT,         sizeof(float),                sizeof(float)*8,                true,  false,  false,  false},
+    {PT::DOUBLE,        sizeof(double),               sizeof(double)*8,               true,  false,  false,  false},
+    {PT::COMPLEXFLOAT,  sizeof(std::complex<float>),  sizeof(std::complex<float>)*8,  true,  false,  true,   false},
+    {PT::COMPLEXDOUBLE, sizeof(std::complex<double>), sizeof(std::complex<double>)*8, true,  false,  true,   false},
+    {PT::INT8,          0,                            0,                              true,  true,   false,  true},
+    {PT::INT8,          0,                            3,                              true,  true,   false,  true},
+    {PT::INT8,          0,                            3,                              true,  true,   true,   true},
+    {PT::INT8,          0,                            3,                              false, true,   true,   true},
+    {PT::INT8,          0,                            3,                              false, false,  false,  true}
   };
 
 // Disable missing-prototypes warning for INSTANTIATE_TEST_CASE_P;

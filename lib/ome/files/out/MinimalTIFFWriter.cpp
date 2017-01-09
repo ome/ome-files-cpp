@@ -66,19 +66,16 @@ namespace ome
       namespace
       {
 
-        // Note that tf2, tf8 and btf are all extensions for "bigTIFF"
-        // (2nd generation TIFF, TIFF with 8-byte offsets and big TIFF
-        // respectively).
-        const char *suffixes[] = {"tif", "tiff", "tf2", "tf8", "btf"};
-
         WriterProperties
         tiff_properties()
         {
           WriterProperties p("MinimalTIFF",
                              "Baseline Tagged Image File Format");
 
-          p.suffixes = std::vector<boost::filesystem::path>(suffixes,
-                                                            suffixes + boost::size(suffixes));
+          // Note that tf2, tf8 and btf are all extensions for
+          // "bigTIFF" (2nd generation TIFF, TIFF with 8-byte offsets
+          // and big TIFF respectively).
+          p.suffixes = {"tif", "tiff", "tf2", "tf8", "btf"};
 
           const PixelType::value_map_type& pv = PixelType::values();
           for (PixelType::value_map_type::const_iterator i = pv.begin();

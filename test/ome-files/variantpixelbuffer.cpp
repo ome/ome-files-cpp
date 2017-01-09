@@ -1020,19 +1020,19 @@ TEST_P(VariantPixelBufferTest, StreamOutput)
   boost::apply_visitor(v, buf.vbuffer());
 }
 
-VariantPixelBufferTestParameters variant_params[] =
-  { //                               PixelType
-    VariantPixelBufferTestParameters(PT::INT8),
-    VariantPixelBufferTestParameters(PT::INT16),
-    VariantPixelBufferTestParameters(PT::INT32),
-    VariantPixelBufferTestParameters(PT::UINT8),
-    VariantPixelBufferTestParameters(PT::UINT16),
-    VariantPixelBufferTestParameters(PT::UINT32),
-    VariantPixelBufferTestParameters(PT::FLOAT),
-    VariantPixelBufferTestParameters(PT::DOUBLE),
-    VariantPixelBufferTestParameters(PT::BIT),
-    VariantPixelBufferTestParameters(PT::COMPLEXFLOAT),
-    VariantPixelBufferTestParameters(PT::COMPLEXDOUBLE)
+const std::vector<VariantPixelBufferTestParameters> variant_params
+  { // PixelType
+    {PT::INT8},
+    {PT::INT16},
+    {PT::INT32},
+    {PT::UINT8},
+    {PT::UINT16},
+    {PT::UINT32},
+    {PT::FLOAT},
+    {PT::DOUBLE},
+    {PT::BIT},
+    {PT::COMPLEXFLOAT},
+    {PT::COMPLEXDOUBLE}
   };
 
 // Disable missing-prototypes warning for INSTANTIATE_TEST_CASE_P;

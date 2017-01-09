@@ -63,20 +63,16 @@ namespace ome
       namespace
       {
 
-        // Note that tf2, tf8 and btf are all extensions for "bigTIFF"
-        // (2nd generation TIFF, TIFF with 8-byte offsets and big TIFF
-        // respectively).
-        const char *suffixes[] = {"tif", "tiff", "tf2", "tf8", "btf"};
-        const char *companion_suffixes_array[] = {"txt", "xml"};
-
         ReaderProperties
         tiff_properties()
         {
           ReaderProperties p("MinimalTIFF",
                              "Baseline Tagged Image File Format");
 
-          p.suffixes = std::vector<boost::filesystem::path>(suffixes,
-                                                            suffixes + boost::size(suffixes));
+          // Note that tf2, tf8 and btf are all extensions for
+          // "bigTIFF" (2nd generation TIFF, TIFF with 8-byte offsets
+          // and big TIFF respectively).
+          p.suffixes = {"tif", "tiff", "tf2", "tf8", "btf"};
           p.metadata_levels.insert(MetadataOptions::METADATA_MINIMUM);
           p.metadata_levels.insert(MetadataOptions::METADATA_NO_OVERLAYS);
           p.metadata_levels.insert(MetadataOptions::METADATA_ALL);
@@ -86,8 +82,7 @@ namespace ome
 
         const ReaderProperties props(tiff_properties());
 
-        std::vector<std::string> companion_suffixes(companion_suffixes_array,
-                                                    companion_suffixes_array + boost::size(companion_suffixes_array));
+        const std::vector<std::string> companion_suffixes{"txt", "xml"};
 
       }
 

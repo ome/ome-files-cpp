@@ -36,6 +36,7 @@
  * #L%
  */
 
+#include <array>
 #include <cstdio>
 #include <stdexcept>
 #include <tuple>
@@ -153,7 +154,7 @@ namespace
         idx[ome::files::DIM_CHANNEL] = idx[ome::files::DIM_MODULO_Z] =
         idx[ome::files::DIM_MODULO_T] = idx[ome::files::DIM_MODULO_C] = 0;
 
-      const char * const shades[] = {" ", "░", "▒", "▓", "█"};
+      const std::array<const char *,5> shades{{" ", "░", "▒", "▓", "█"}};
 
       for (VariantPixelBuffer::size_type y = 0; y < h; ++y)
         {

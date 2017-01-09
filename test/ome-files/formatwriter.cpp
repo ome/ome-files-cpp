@@ -715,40 +715,40 @@ TEST_P(FormatWriterTest, OutputMetadataRetrieve)
   EXPECT_NO_THROW(cw.getMetadataRetrieve());
 }
 
-FormatWriterTestParameters variant_params[] =
-  { //                         PixelType          EndianType
-    FormatWriterTestParameters(PT::INT8,          ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::INT8,          ome::files::ENDIAN_LITTLE),
+std::vector<FormatWriterTestParameters> variant_params
+  { // PixelType        EndianType
+    {PT::INT8,          ome::files::ENDIAN_BIG},
+    {PT::INT8,          ome::files::ENDIAN_LITTLE},
 
-    FormatWriterTestParameters(PT::INT16,         ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::INT16,         ome::files::ENDIAN_LITTLE),
+    {PT::INT16,         ome::files::ENDIAN_BIG},
+    {PT::INT16,         ome::files::ENDIAN_LITTLE},
 
-    FormatWriterTestParameters(PT::INT32,         ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::INT32,         ome::files::ENDIAN_LITTLE),
+    {PT::INT32,         ome::files::ENDIAN_BIG},
+    {PT::INT32,         ome::files::ENDIAN_LITTLE},
 
-    FormatWriterTestParameters(PT::UINT8,         ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::UINT8,         ome::files::ENDIAN_LITTLE),
+    {PT::UINT8,         ome::files::ENDIAN_BIG},
+    {PT::UINT8,         ome::files::ENDIAN_LITTLE},
 
-    FormatWriterTestParameters(PT::UINT16,        ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::UINT16,        ome::files::ENDIAN_LITTLE),
+    {PT::UINT16,        ome::files::ENDIAN_BIG},
+    {PT::UINT16,        ome::files::ENDIAN_LITTLE},
 
-    FormatWriterTestParameters(PT::UINT32,        ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::UINT32,        ome::files::ENDIAN_LITTLE),
+    {PT::UINT32,        ome::files::ENDIAN_BIG},
+    {PT::UINT32,        ome::files::ENDIAN_LITTLE},
 
-    FormatWriterTestParameters(PT::FLOAT,         ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::FLOAT,         ome::files::ENDIAN_LITTLE),
+    {PT::FLOAT,         ome::files::ENDIAN_BIG},
+    {PT::FLOAT,         ome::files::ENDIAN_LITTLE},
 
-    FormatWriterTestParameters(PT::DOUBLE,        ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::DOUBLE,        ome::files::ENDIAN_LITTLE),
+    {PT::DOUBLE,        ome::files::ENDIAN_BIG},
+    {PT::DOUBLE,        ome::files::ENDIAN_LITTLE},
 
-    FormatWriterTestParameters(PT::BIT,           ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::BIT,           ome::files::ENDIAN_LITTLE),
+    {PT::BIT,           ome::files::ENDIAN_BIG},
+    {PT::BIT,           ome::files::ENDIAN_LITTLE},
 
-    FormatWriterTestParameters(PT::COMPLEXFLOAT,  ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::COMPLEXFLOAT,  ome::files::ENDIAN_LITTLE),
+    {PT::COMPLEXFLOAT,  ome::files::ENDIAN_BIG},
+    {PT::COMPLEXFLOAT,  ome::files::ENDIAN_LITTLE},
 
-    FormatWriterTestParameters(PT::COMPLEXDOUBLE, ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::COMPLEXDOUBLE, ome::files::ENDIAN_LITTLE),
+    {PT::COMPLEXDOUBLE, ome::files::ENDIAN_BIG},
+    {PT::COMPLEXDOUBLE, ome::files::ENDIAN_LITTLE}
   };
 
 // Disable missing-prototypes warning for INSTANTIATE_TEST_CASE_P;

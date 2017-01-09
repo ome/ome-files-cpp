@@ -178,7 +178,7 @@ struct Corrections
 typedef ModelState MS;
 typedef Corrections Corr;
 
-const Corrections corrections[] =
+const std::vector<Corrections> corrections
   {
     {
       path(PROJECT_SOURCE_DIR "/test/ome-files/data/validchannels.ome"),
