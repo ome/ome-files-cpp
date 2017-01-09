@@ -38,12 +38,11 @@
 #ifndef OME_FILES_TIFF_TAGS_H
 #define OME_FILES_TIFF_TAGS_H
 
+#include <memory>
 #include <string>
 #include <vector>
 
 #include <ome/files/tiff/Types.h>
-
-#include <ome/compat/memory.h>
 
 #include <ome/compat/array.h>
 #include <ome/compat/cstdint.h>

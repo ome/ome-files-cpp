@@ -38,12 +38,11 @@
 #ifndef OME_FILES_TIFF_UTIL_H
 #define OME_FILES_TIFF_UTIL_H
 
+#include <memory>
 #include <string>
 #include <vector>
 
 #include <boost/filesystem/path.hpp>
-
-#include <ome/compat/memory.h>
 
 #include <ome/files/CoreMetadata.h>
 #include <ome/files/TileCoverage.h>
@@ -71,7 +70,7 @@ namespace ome
        * @param ifd the IFD to use.
        * @returns the CoreMetadata.
        */
-      ome::compat::shared_ptr<CoreMetadata>
+      std::shared_ptr<CoreMetadata>
       makeCoreMetadata(const IFD& ifd);
 
       /**

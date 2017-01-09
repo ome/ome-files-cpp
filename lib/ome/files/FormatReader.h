@@ -38,6 +38,7 @@
 #ifndef OME_FILES_FORMATREADER_H
 #define OME_FILES_FORMATREADER_H
 
+#include <memory>
 #include <string>
 #include <vector>
 #include <map>
@@ -54,7 +55,6 @@
 #include <ome/files/Types.h>
 
 #include <ome/compat/array.h>
-#include <ome/compat/memory.h>
 
 #include <ome/xml/meta/MetadataStore.h>
 
@@ -949,7 +949,7 @@ namespace ome
        * @returns a const reference to the core metadata.
        */
       virtual
-      const std::vector<ome::compat::shared_ptr<CoreMetadata> >&
+      const std::vector<std::shared_ptr<CoreMetadata> >&
       getCoreMetadataList() const = 0;
 
       /**
@@ -983,7 +983,7 @@ namespace ome
        */
       virtual
       void
-      setMetadataStore(ome::compat::shared_ptr< ::ome::xml::meta::MetadataStore>& store) = 0;
+      setMetadataStore(std::shared_ptr< ::ome::xml::meta::MetadataStore>& store) = 0;
 
       /**
        * Get the current metadata store for this reader.
@@ -991,7 +991,7 @@ namespace ome
        * @returns the metadata store, which will never be @c null.
        */
       virtual
-      const ome::compat::shared_ptr< ::ome::xml::meta::MetadataStore>&
+      const std::shared_ptr< ::ome::xml::meta::MetadataStore>&
       getMetadataStore() const = 0;
 
       /**
@@ -1000,7 +1000,7 @@ namespace ome
        * @returns the metadata store, which will never be @c null.
        */
       virtual
-      ome::compat::shared_ptr< ::ome::xml::meta::MetadataStore>&
+      std::shared_ptr< ::ome::xml::meta::MetadataStore>&
       getMetadataStore() = 0;
 
       /**
@@ -1012,7 +1012,7 @@ namespace ome
        * @returns a list of readers.
        */
       virtual
-      std::vector<ome::compat::shared_ptr<FormatReader> >
+      std::vector<std::shared_ptr<FormatReader> >
       getUnderlyingReaders() const = 0;
 
       /**

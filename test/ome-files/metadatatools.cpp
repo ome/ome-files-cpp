@@ -510,7 +510,7 @@ TEST_P(CorrectionTest, ValidateAndCorrectModel)
 
   ASSERT_EQ(std::string("2013-06"), ome::files::getModelVersion(doc));
 
-  ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta(createOMEXMLMetadata(doc));
+  std::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta(createOMEXMLMetadata(doc));
 
   {
     const ModelState& state(current.before);
@@ -644,7 +644,7 @@ TEST_P(ModelTest, CreateMetadataFromFile)
 {
   const ModelTestParameters& params = GetParam();
 
-  ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta;
+  std::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta;
   ASSERT_NO_THROW(meta = createOMEXMLMetadata(params.file));
 }
 
@@ -654,7 +654,7 @@ TEST_P(ModelTest, CreateMetadataFromStream)
 
   boost::filesystem::ifstream input(params.file);
 
-  ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta;
+  std::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta;
   ASSERT_NO_THROW(meta = createOMEXMLMetadata(input));
 }
 
@@ -665,7 +665,7 @@ TEST_P(ModelTest, CreateMetadataFromString)
   std::string input;
   readFile(params.file, input);
 
-  ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta;
+  std::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta;
   ASSERT_NO_THROW(meta = createOMEXMLMetadata(input));
 }
 

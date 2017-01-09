@@ -36,17 +36,16 @@
  */
 
 #include <iostream>
+#include <memory>
 
 #include <boost/filesystem/path.hpp>
 
 #include <ome/files/VariantPixelBuffer.h>
 #include <ome/files/in/TIFFReader.h>
 
-#include <ome/compat/memory.h>
-
 using boost::filesystem::path;
-using ome::compat::make_shared;
-using ome::compat::shared_ptr;
+using std::make_shared;
+using std::shared_ptr;
 using ome::files::dimension_size_type;
 using ome::files::FormatReader;
 using ome::files::MetadataMap;

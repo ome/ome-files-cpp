@@ -41,9 +41,8 @@
 #include <ome/files/Types.h>
 #include <ome/files/TileBuffer.h>
 
-#include <ome/compat/memory.h>
-
 #include <map>
+#include <memory>
 
 namespace ome
 {
@@ -62,7 +61,7 @@ namespace ome
       /// Tile index type.
       typedef dimension_size_type key_type;
       /// Tile buffer type.
-      typedef ome::compat::shared_ptr<TileBuffer> value_type;
+      typedef std::shared_ptr<TileBuffer> value_type;
 
       /// Constructor.
       TileCache();

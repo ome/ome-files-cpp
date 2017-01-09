@@ -411,7 +411,7 @@ namespace ome
 
       }
 
-      OMETIFFWriter::TIFFState::TIFFState(ome::compat::shared_ptr<ome::files::tiff::TIFF>& tiff):
+      OMETIFFWriter::TIFFState::TIFFState(std::shared_ptr<ome::files::tiff::TIFF>& tiff):
         uuid(boost::uuids::to_string(boost::uuids::random_generator()())),
         tiff(tiff),
         ifdCount(0U)
@@ -469,7 +469,7 @@ namespace ome
 
             // Create OME-XML metadata.
             originalMetadataRetrieve = metadataRetrieve;
-            omeMeta = ome::compat::make_shared<OMEXMLMetadata>();
+            omeMeta = std::make_shared<OMEXMLMetadata>();
             convert(*metadataRetrieve, *omeMeta);
             omeMeta->resolveReferences();
             metadataRetrieve = omeMeta;
@@ -517,7 +517,7 @@ namespace ome
             flags += 'w';
 
             // Get expected size of pixel data.
-            ome::compat::shared_ptr<const ::ome::xml::meta::MetadataRetrieve> mr(getMetadataRetrieve());
+            std::shared_ptr<const ::ome::xml::meta::MetadataRetrieve> mr(getMetadataRetrieve());
             storage_size_type pixelSize = significantPixelSize(*mr);
 
             if (enableBigTIFF(bigTIFF, pixelSize, canonicalpath, logger))
@@ -528,7 +528,7 @@ namespace ome
         if (i == tiffs.end())
           {
             detail::FormatWriter::setId(canonicalpath);
-            ome::compat::shared_ptr<ome::files::tiff::TIFF> tiff(ome::files::tiff::TIFF::open(canonicalpath, flags));
+            std::shared_ptr<ome::files::tiff::TIFF> tiff(ome::files::tiff::TIFF::open(canonicalpath, flags));
             std::pair<tiff_map::iterator,bool> result =
               tiffs.insert(tiff_map::value_type(*currentId, TIFFState(tiff)));
             if (result.second) // should always be true
@@ -639,7 +639,7 @@ namespace ome
       OMETIFFWriter::setupIFD() const
       {
         // Get current IFD.
-        ome::compat::shared_ptr<tiff::IFD> ifd (currentTIFF->second.tiff->getCurrentDirectory());
+        std::shared_ptr<tiff::IFD> ifd (currentTIFF->second.tiff->getCurrentDirectory());
 
         // Default to single strips for now.
         ifd->setImageWidth(getSizeX());
@@ -688,7 +688,7 @@ namespace ome
         setPlane(plane);
 
         // Get current IFD.
-        ome::compat::shared_ptr<tiff::IFD> ifd (currentTIFF->second.tiff->getCurrentDirectory());
+        std::shared_ptr<tiff::IFD> ifd (currentTIFF->second.tiff->getCurrentDirectory());
 
         // Get plane metadata.
         detail::OMETIFFPlane& planeMeta(seriesState.at(getSeries()).planes.at(plane));

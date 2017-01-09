@@ -38,6 +38,7 @@
 #ifndef OME_FILES_TIFF_TIFF_H
 #define OME_FILES_TIFF_TIFF_H
 
+#include <memory>
 #include <string>
 
 #include <boost/filesystem/path.hpp>
@@ -46,7 +47,6 @@
 #include <ome/files/tiff/Types.h>
 
 #include <ome/compat/cstdint.h>
-#include <ome/compat/memory.h>
 
 namespace ome
 {
@@ -65,7 +65,7 @@ namespace ome
        */
       template<typename Value>
       class IFDIterator : public boost::iterator_facade<IFDIterator<Value>,
-                                                        ome::compat::shared_ptr<Value>,
+                                                        std::shared_ptr<Value>,
                                                         boost::forward_traversal_tag>
       {
       public:
@@ -85,7 +85,7 @@ namespace ome
          *
          * @param ifd the descriptor to point to.
          */
-        IFDIterator(ome::compat::shared_ptr<IFD>& ifd):
+        IFDIterator(std::shared_ptr<IFD>& ifd):
           pos(ifd)
         {}
 
@@ -105,7 +105,7 @@ namespace ome
          * It's mutable to allow const and non-const access to the
          * underlying descriptor via const and non-const iterators.
          */
-        mutable ome::compat::shared_ptr<Value> pos;
+        mutable std::shared_ptr<Value> pos;
 
         friend class boost::iterator_core_access;
         template <class> friend class IFDIterator;
@@ -137,7 +137,7 @@ namespace ome
          *
          * @returns a reference to currently referenced descriptor.
          */
-        ome::compat::shared_ptr<Value>&
+        std::shared_ptr<Value>&
         dereference() const
         {
           return pos;
@@ -152,13 +152,13 @@ namespace ome
        * instance.  This instance may be used to get IFD instances and
        * then access to image metadata and pixel data.
        */
-      class TIFF : public ome::compat::enable_shared_from_this<TIFF>
+      class TIFF : public std::enable_shared_from_this<TIFF>
       {
       private:
         class Impl;
         class wrapped_type;
         /// Private implementation details.
-        ome::compat::shared_ptr<Impl> impl;
+        std::shared_ptr<Impl> impl;
 
       protected:
         /// Constructor (non-public).
@@ -189,7 +189,7 @@ namespace ome
          * @returns the the open TIFF.
          * @throws an Exception on failure.
          */
-        static ome::compat::shared_ptr<TIFF>
+        static std::shared_ptr<TIFF>
         open(const boost::filesystem::path& filename,
              const std::string&             mode);
 
@@ -227,7 +227,7 @@ namespace ome
          * @throws an Exception if the index is invalid or could not
          * be accessed.
          */
-        ome::compat::shared_ptr<IFD>
+        std::shared_ptr<IFD>
         getDirectoryByIndex(directory_index_type index) const;
 
         /**
@@ -238,7 +238,7 @@ namespace ome
          * @throws an Exception if the offset is invalid or could not
          * be accessed.
          */
-        ome::compat::shared_ptr<IFD>
+        std::shared_ptr<IFD>
         getDirectoryByOffset(offset_type offset) const;
 
         /**
@@ -247,7 +247,7 @@ namespace ome
          * @returns the IFD.
          * @throws an Exception if the IFD could not be accessed.
          */
-        ome::compat::shared_ptr<IFD>
+        std::shared_ptr<IFD>
         getCurrentDirectory() const;
 
         /**

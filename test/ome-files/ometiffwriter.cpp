@@ -67,7 +67,7 @@ using namespace boost::filesystem;
 class TIFFWriterTest : public ::testing::TestWithParam<TIFFTestParameters>
 {
 public:
-  ome::compat::shared_ptr<TIFF> tiff;
+  std::shared_ptr<TIFF> tiff;
   uint32_t iwidth;
   uint32_t iheight;
   ome::files::tiff::PlanarConfiguration planarconfig;
@@ -87,7 +87,7 @@ public:
 
     ASSERT_NO_THROW(tiff = TIFF::open(params.file, "r"));
     ASSERT_TRUE(static_cast<bool>(tiff));
-    ome::compat::shared_ptr<IFD> ifd;
+    std::shared_ptr<IFD> ifd;
     ASSERT_NO_THROW(ifd = tiff->getDirectoryByIndex(0));
     ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -108,18 +108,18 @@ public:
 
 TEST_P(TIFFWriterTest, setId)
 {
-  std::vector<ome::compat::shared_ptr<CoreMetadata> > seriesList;
+  std::vector<std::shared_ptr<CoreMetadata> > seriesList;
   for (TIFF::const_iterator i = tiff->begin();
        i != tiff->end();
        ++i)
     {
-      ome::compat::shared_ptr<CoreMetadata> c = ome::files::tiff::makeCoreMetadata(**i);
+      std::shared_ptr<CoreMetadata> c = ome::files::tiff::makeCoreMetadata(**i);
       seriesList.push_back(c);
     }
 
-  ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta(ome::compat::make_shared< ::ome::xml::meta::OMEXMLMetadata>());
+  std::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta(std::make_shared< ::ome::xml::meta::OMEXMLMetadata>());
   ome::files::fillMetadata(*meta, seriesList);
-  ome::compat::shared_ptr< ::ome::xml::meta::MetadataRetrieve> retrieve(ome::compat::static_pointer_cast< ::ome::xml::meta::MetadataRetrieve>(meta));
+  std::shared_ptr< ::ome::xml::meta::MetadataRetrieve> retrieve(std::static_pointer_cast< ::ome::xml::meta::MetadataRetrieve>(meta));
 
   tiffwriter.setMetadataRetrieve(retrieve);
 
@@ -133,7 +133,7 @@ TEST_P(TIFFWriterTest, setId)
   dimension_size_type currentSeries = 0U;
   for (dimension_size_type i = 0U; i < seriesList.size(); ++i)
     {
-      ome::compat::shared_ptr<IFD> ifd = tiff->getDirectoryByIndex(i);
+      std::shared_ptr<IFD> ifd = tiff->getDirectoryByIndex(i);
       ASSERT_TRUE(static_cast<bool>(ifd));
       ifd->readImage(buf);
 

@@ -36,10 +36,9 @@
  */
 
 #include <iostream>
+#include <memory>
 
 #include <boost/filesystem/path.hpp>
-
-#include <ome/compat/memory.h>
 
 #include <ome/common/xml/Platform.h>
 #include <ome/common/xml/dom/Document.h>
@@ -51,8 +50,8 @@
 #include <ome/xml/model/detail/OMEModel.h>
 
 using boost::filesystem::path;
-using ome::compat::shared_ptr;
-using ome::compat::make_shared;
+using std::shared_ptr;
+using std::make_shared;
 namespace xml = ome::common::xml;
 namespace model = ome::xml::model;
 
