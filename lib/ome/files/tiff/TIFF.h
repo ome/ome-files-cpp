@@ -38,6 +38,7 @@
 #ifndef OME_FILES_TIFF_TIFF_H
 #define OME_FILES_TIFF_TIFF_H
 
+#include <cstdint>
 #include <memory>
 #include <string>
 
@@ -45,8 +46,6 @@
 #include <boost/iterator/iterator_facade.hpp>
 
 #include <ome/files/tiff/Types.h>
-
-#include <ome/compat/cstdint.h>
 
 namespace ome
 {

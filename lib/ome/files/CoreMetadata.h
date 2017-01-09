@@ -38,12 +38,11 @@
 #ifndef OME_FILES_COREMETADATA_H
 #define OME_FILES_COREMETADATA_H
 
+#include <cstdint>
 #include <map>
 #include <numeric>
 #include <string>
 #include <vector>
-
-#include <ome/compat/cstdint.h>
 
 #include <ome/files/MetadataMap.h>
 #include <ome/files/Modulo.h>

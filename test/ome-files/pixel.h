@@ -39,11 +39,11 @@
 #ifndef TEST_PIXEL_H
 #define TEST_PIXEL_H
 
+#include <cstdint>
+
 #include <ome/files/PixelBuffer.h>
 #include <ome/files/PixelProperties.h>
 #include <ome/files/VariantPixelBuffer.h>
-
-#include <ome/compat/cstdint.h>
 
 /// Helpers to create pixel values of all supported types from integers.
 

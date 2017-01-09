@@ -38,12 +38,11 @@
 #ifndef OME_FILES_PIXELPROPERTIES_H
 #define OME_FILES_PIXELPROPERTIES_H
 
+#include <cstdint>
 #include <complex>
 
 #include <ome/common/boolean.h>
 #include <ome/common/endian.h>
-
-#include <ome/compat/cstdint.h>
 
 #include <ome/files/Types.h>
 

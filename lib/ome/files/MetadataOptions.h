@@ -38,11 +38,10 @@
 #ifndef OME_FILES_METADATAOPTIONS_H
 #define OME_FILES_METADATAOPTIONS_H
 
+#include <cstdint>
 #include <string>
 #include <vector>
 #include <sstream>
-
-#include <ome/compat/cstdint.h>
 
 namespace ome
 {
