@@ -560,7 +560,7 @@ namespace ome
             {
               for (dimension_size_type p = 0; p < reader.getImageCount(); ++p)
                 {
-                  ome::compat::array<dimension_size_type, 3> coords = reader.getZCTCoords(p);
+                  std::array<dimension_size_type, 3> coords = reader.getZCTCoords(p);
                   // The cast to int here is nasty, but the data model
                   // isn't using unsigned types…
                   store.setPlaneTheZ(static_cast<int>(coords[0]), s, p);
@@ -610,7 +610,7 @@ namespace ome
                   if (sizeZT)
                     effSizeC = (*i)->imageCount / sizeZT;
 
-                  ome::compat::array<dimension_size_type, 3> coords =
+                  std::array<dimension_size_type, 3> coords =
                     getZCTCoords((*i)->dimensionOrder,
                                  (*i)->sizeZ,
                                  effSizeC,

@@ -138,7 +138,7 @@ namespace ome
       typedef boost::multi_array_types::size_type size_type;
 
       /// Type used to index all dimensions in public interfaces.
-      typedef ome::compat::array<boost::multi_array_types::index, PixelBufferBase::dimensions> indices_type;
+      typedef std::array<boost::multi_array_types::index, PixelBufferBase::dimensions> indices_type;
 
       /// Storage ordering type for controlling pixel memory layout.
       typedef PixelBufferBase::storage_order_type storage_order_type;
@@ -851,7 +851,7 @@ namespace ome
         operator()(const T& v)
         {
           // Shape is the same as the source buffer, but with one subchannel.
-          ome::compat::array<VariantPixelBuffer::size_type, 9> dest_shape;
+          std::array<VariantPixelBuffer::size_type, 9> dest_shape;
           const VariantPixelBuffer::size_type *shape_ptr(v->shape());
           std::copy(shape_ptr, shape_ptr + PixelBufferBase::dimensions,
                     dest_shape.begin());

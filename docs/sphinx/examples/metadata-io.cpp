@@ -51,7 +51,7 @@
 #include <ome/files/MetadataTools.h>
 
 using boost::filesystem::path;
-using ome::compat::array;
+using std::array;
 using std::make_shared;
 using std::shared_ptr;
 using ome::files::dimension_size_type;

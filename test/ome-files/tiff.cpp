@@ -548,7 +548,7 @@ TEST_F(TIFFTest, FieldWrapUInt16Pair)
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
-  ome::compat::array<uint16_t, 2> value;
+  std::array<uint16_t, 2> value;
 
   ASSERT_THROW(ifd->getField(ome::files::tiff::DOTRANGE).get(value), ome::files::tiff::Exception);
   ASSERT_THROW(ifd->getField(ome::files::tiff::HALFTONEHINTS).get(value), ome::files::tiff::Exception);
@@ -586,7 +586,7 @@ TEST_F(TIFFTest, FieldWrapFloat2)
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
-  ome::compat::array<float, 2> value;
+  std::array<float, 2> value;
 
   ASSERT_THROW(ifd->getField(ome::files::tiff::WHITEPOINT).get(value), ome::files::tiff::Exception);
 }
@@ -601,7 +601,7 @@ TEST_F(TIFFTest, FieldWrapFloat3)
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
-  ome::compat::array<float, 3> value;
+  std::array<float, 3> value;
 
   ASSERT_THROW(ifd->getField(ome::files::tiff::YCBCRCOEFFICIENTS).get(value), ome::files::tiff::Exception);
 }
@@ -617,7 +617,7 @@ TEST_F(TIFFTest, FieldWrapFloat6)
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
-  ome::compat::array<float, 6> value;
+  std::array<float, 6> value;
 
   ASSERT_THROW(ifd->getField(ome::files::tiff::PRIMARYCHROMATICITIES).get(value), ome::files::tiff::Exception);
   ASSERT_THROW(ifd->getField(ome::files::tiff::REFERENCEBLACKWHITE).get(value), ome::files::tiff::Exception);
@@ -647,7 +647,7 @@ TEST_F(TIFFTest, FieldWrapUInt16Array3)
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
-  ome::compat::array<std::vector<uint16_t>, 3> value;
+  std::array<std::vector<uint16_t>, 3> value;
   ASSERT_THROW(ifd->getField(ome::files::tiff::COLORMAP).get(value), ome::files::tiff::Exception);
   ASSERT_THROW(ifd->getField(ome::files::tiff::TRANSFERFUNCTION).get(value), ome::files::tiff::Exception);
 }
@@ -912,7 +912,7 @@ public:
     png_set_interlace_handling(pngptr);
     png_read_update_info(pngptr, infoptr);
 
-    ome::compat::array<VariantPixelBuffer::size_type, 9> shape;
+    std::array<VariantPixelBuffer::size_type, 9> shape;
     shape[::ome::files::DIM_SPATIAL_X] = pwidth;
     shape[::ome::files::DIM_SPATIAL_Y] = pheight;
     shape[::ome::files::DIM_SUBCHANNEL] = 3U;
@@ -1566,7 +1566,7 @@ TEST_P(PixelTest, WriteTIFF)
       {
         const PlaneRegion& r = *i;
 
-        ome::compat::array<VariantPixelBuffer::size_type, 9> shape;
+        std::array<VariantPixelBuffer::size_type, 9> shape;
         shape[::ome::files::DIM_SPATIAL_X] = r.w;
         shape[::ome::files::DIM_SPATIAL_Y] = r.h;
         shape[::ome::files::DIM_SUBCHANNEL] = 3U;

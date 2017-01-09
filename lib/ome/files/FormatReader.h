@@ -38,6 +38,7 @@
 #ifndef OME_FILES_FORMATREADER_H
 #define OME_FILES_FORMATREADER_H
 
+#include <array>
 #include <memory>
 #include <string>
 #include <vector>
@@ -53,8 +54,6 @@
 #include <ome/files/MetadataConfigurable.h>
 #include <ome/files/MetadataMap.h>
 #include <ome/files/Types.h>
-
-#include <ome/compat/array.h>
 
 #include <ome/xml/meta/MetadataStore.h>
 
@@ -863,7 +862,7 @@ namespace ome
        * @todo unify with the pixel buffer dimension indexes.
        */
       virtual
-      ome::compat::array<dimension_size_type, 3>
+      std::array<dimension_size_type, 3>
       getZCTCoords(dimension_size_type index) const = 0;
 
       /**
@@ -883,7 +882,7 @@ namespace ome
        * @todo unify with the pixel buffer dimension indexes.
        */
       virtual
-      ome::compat::array<dimension_size_type, 6>
+      std::array<dimension_size_type, 6>
       getZCTModuloCoords(dimension_size_type index) const = 0;
 
       /**

@@ -474,26 +474,22 @@ is not known unless passed separately.
   };
 
 C++ arrays “decay” to “bare” pointers, and pointers have no associated
-size information.
-
-:cpp:class:`ome::compat::array` is a safe alternative.  This is either
-a C++11 :cpp:class:`std::array` or :cpp:class:`boost::array` with
-older compilers.
+size information.  :cpp:class:`std::array` is a safe alternative.
 
 .. code-block:: cpp
 
   class Image
   {
-    typedef ome::compat::array<uint8_t, 256> LUT;
+    typedef std::array<uint8_t, 256> LUT;
 
     // Safe; size defined
     const LUT& getLUT() const;
           void setLUT(const LUT&);
   };
 
-:cpp:class:`ome::compat::array` is a array-like object (a class which
-behaves like an array).  Its type and size are defined in the
-template, and it may be passed around like any other object.  Its
+:cpp:class:`std::array` is a array-like object (a class which behaves
+like an array).  Its type and size are defined in the template, and it
+may be passed around like any other object.  Its
 :cpp:func:`array::at()` method provides strict bounds checking, while
 its index :cpp:func:`array::operator[]` provides unchecked access.
 
