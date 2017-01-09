@@ -38,6 +38,7 @@
 
 #include <cstdio>
 #include <stdexcept>
+#include <tuple>
 #include <vector>
 
 #include <boost/filesystem.hpp>
@@ -53,7 +54,6 @@
 #include <ome/files/tiff/Exception.h>
 
 #include <ome/compat/regex.h>
-#include <ome/compat/tuple.h>
 
 #include <ome/test/config.h>
 #include <ome/test/test.h>
@@ -823,7 +823,7 @@ TEST(TIFFCodec, ListCodecs)
     }
 }
 
-typedef ome::compat::tuple<uint32_t,uint32_t,PT,ome::files::tiff::PlanarConfiguration> plane_configuration;
+typedef std::tuple<uint32_t,uint32_t,PT,ome::files::tiff::PlanarConfiguration> plane_configuration;
 
 struct compare_tuple
 {
@@ -831,18 +831,18 @@ struct compare_tuple
   operator() (const plane_configuration& lhs,
               const plane_configuration& rhs) const
   {
-    if (ome::compat::get<0>(lhs) < ome::compat::get<0>(rhs)) return true;
-    if (ome::compat::get<0>(lhs) > ome::compat::get<0>(rhs)) return false;
+    if (std::get<0>(lhs) < std::get<0>(rhs)) return true;
+    if (std::get<0>(lhs) > std::get<0>(rhs)) return false;
 
-    if (ome::compat::get<1>(lhs) < ome::compat::get<1>(rhs)) return true;
-    if (ome::compat::get<1>(lhs) > ome::compat::get<1>(rhs)) return false;
+    if (std::get<1>(lhs) < std::get<1>(rhs)) return true;
+    if (std::get<1>(lhs) > std::get<1>(rhs)) return false;
 
-    if (static_cast<PT::enum_value>(ome::compat::get<2>(lhs)) <
-        static_cast<PT::enum_value>(ome::compat::get<2>(rhs))) return true;
-    if (static_cast<PT::enum_value>(ome::compat::get<2>(lhs)) >
-        static_cast<PT::enum_value>(ome::compat::get<2>(rhs))) return false;
+    if (static_cast<PT::enum_value>(std::get<2>(lhs)) <
+        static_cast<PT::enum_value>(std::get<2>(rhs))) return true;
+    if (static_cast<PT::enum_value>(std::get<2>(lhs)) >
+        static_cast<PT::enum_value>(std::get<2>(rhs))) return false;
 
-    return ome::compat::get<3>(lhs) < ome::compat::get<3>(rhs);
+    return std::get<3>(lhs) < std::get<3>(rhs);
   }
 };
 
