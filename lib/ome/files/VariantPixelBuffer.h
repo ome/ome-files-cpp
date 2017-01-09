@@ -92,19 +92,19 @@ namespace ome
        */
 
       /// Integer pixel types.
-      typedef boost::mpl::vector<PixelProperties< ::ome::xml::model::enums::PixelType::INT8>,
-                                 PixelProperties< ::ome::xml::model::enums::PixelType::INT16>,
-                                 PixelProperties< ::ome::xml::model::enums::PixelType::INT32>,
-                                 PixelProperties< ::ome::xml::model::enums::PixelType::UINT8>,
-                                 PixelProperties< ::ome::xml::model::enums::PixelType::UINT16>,
-                                 PixelProperties< ::ome::xml::model::enums::PixelType::UINT32>,
-                                 PixelProperties< ::ome::xml::model::enums::PixelType::BIT>> integer_pixel_types;
+      typedef boost::mpl::vector<PixelProperties<::ome::xml::model::enums::PixelType::INT8>,
+                                 PixelProperties<::ome::xml::model::enums::PixelType::INT16>,
+                                 PixelProperties<::ome::xml::model::enums::PixelType::INT32>,
+                                 PixelProperties<::ome::xml::model::enums::PixelType::UINT8>,
+                                 PixelProperties<::ome::xml::model::enums::PixelType::UINT16>,
+                                 PixelProperties<::ome::xml::model::enums::PixelType::UINT32>,
+                                 PixelProperties<::ome::xml::model::enums::PixelType::BIT>> integer_pixel_types;
 
       /// Floating-point pixel types.
-      typedef boost::mpl::vector< PixelProperties< ::ome::xml::model::enums::PixelType::FLOAT>,
-                                  PixelProperties< ::ome::xml::model::enums::PixelType::DOUBLE>,
-                                  PixelProperties< ::ome::xml::model::enums::PixelType::COMPLEXFLOAT>,
-                                  PixelProperties< ::ome::xml::model::enums::PixelType::COMPLEXDOUBLE>> float_pixel_types;
+      typedef boost::mpl::vector< PixelProperties<::ome::xml::model::enums::PixelType::FLOAT>,
+                                  PixelProperties<::ome::xml::model::enums::PixelType::DOUBLE>,
+                                  PixelProperties<::ome::xml::model::enums::PixelType::COMPLEXFLOAT>,
+                                  PixelProperties<::ome::xml::model::enums::PixelType::COMPLEXDOUBLE>> float_pixel_types;
 
       /// Aggregate view of all numeric types.
       typedef boost::mpl::joint_view<integer_pixel_types,
@@ -132,7 +132,7 @@ namespace ome
       typedef boost::make_variant_over<pixel_buffer_types>::type variant_buffer_type;
 
       /// Raw pixel type used in public interfaces.
-      typedef PixelProperties< ::ome::xml::model::enums::PixelType::UINT8>::std_type raw_type;
+      typedef PixelProperties<::ome::xml::model::enums::PixelType::UINT8>::std_type raw_type;
 
       /// Size type.
       typedef boost::multi_array_types::size_type size_type;
@@ -298,7 +298,7 @@ namespace ome
 
 #define OME_FILES_VARIANTPIXELBUFFER_CREATEEXTENTS_CASE(maR, maProperty, maType) \
           case ::ome::xml::model::enums::PixelType::maType:                      \
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::maType>::std_type>(extents, storage, pixeltype); \
+            buf = makeBuffer<PixelProperties<::ome::xml::model::enums::PixelType::maType>::std_type>(extents, storage, pixeltype); \
             break;
 
       /**
@@ -332,7 +332,7 @@ namespace ome
 
 #define OME_FILES_VARIANTPIXELBUFFER_CREATERANGE_CASE(maR, maProperty, maType) \
           case ::ome::xml::model::enums::PixelType::maType:                    \
-            buf = makeBuffer<PixelProperties< ::ome::xml::model::enums::PixelType::maType>::std_type>(range, storage, pixeltype); \
+            buf = makeBuffer<PixelProperties<::ome::xml::model::enums::PixelType::maType>::std_type>(range, storage, pixeltype); \
             break;
 
       /**

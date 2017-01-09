@@ -229,7 +229,7 @@ namespace ome
 
         try
           {
-            std::shared_ptr< ::ome::xml::meta::Metadata> test_meta(cacheMetadata(id));
+            std::shared_ptr<::ome::xml::meta::Metadata> test_meta(cacheMetadata(id));
 
             dimension_size_type nImages = 0U;
             for (dimension_size_type i = 0U;
@@ -280,7 +280,7 @@ namespace ome
         bool valid = true;
         try
           {
-            std::shared_ptr< ::ome::xml::meta::Metadata> test_meta(cacheMetadata(name));
+            std::shared_ptr<::ome::xml::meta::Metadata> test_meta(cacheMetadata(name));
             std::string metadataFile = test_meta->getBinaryOnlyMetadataFile();
             if (!metadataFile.empty())
               {
@@ -434,7 +434,7 @@ namespace ome
             // This is a companion file.  Read the metadata, get the
             // TIFF for the TiffData for the first image, and then
             // recurse with this file as the id.
-            std::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta(createOMEXMLMetadata(*currentId));
+            std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> meta(createOMEXMLMetadata(*currentId));
             path firstTIFF(path(meta->getUUIDFileName(0, 0)));
             close(false); // To force clearing of currentId.
             initFile(canonical(firstTIFF, dir));
@@ -447,7 +447,7 @@ namespace ome
 
         // Get the OME-XML from the first TIFF, and create OME-XML
         // metadata from it.
-        std::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta = cacheMetadata(*currentId);
+        std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> meta = cacheMetadata(*currentId);
 
         // Is there an associated binary-only metadata file?
         try
@@ -1471,13 +1471,13 @@ namespace ome
           }
       }
 
-      std::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
+      std::shared_ptr<::ome::xml::meta::OMEXMLMetadata>
       OMETIFFReader::readMetadata(const ome::files::tiff::TIFF& tiff)
       {
         return createOMEXMLMetadata(getImageDescription(tiff));
       }
 
-      std::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
+      std::shared_ptr<::ome::xml::meta::OMEXMLMetadata>
       OMETIFFReader::readMetadata(const boost::filesystem::path& id)
       {
         if (!checkSuffix(id, companion_suffixes))
@@ -1492,10 +1492,10 @@ namespace ome
           }
       }
 
-      std::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
+      std::shared_ptr<::ome::xml::meta::OMEXMLMetadata>
       OMETIFFReader::cacheMetadata(const boost::filesystem::path& id) const
       {
-        std::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta;
+        std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> meta;
         path dir(id.parent_path());
         if(canonical(id, dir) == cachedMetadataFile && cachedMetadata)
           {

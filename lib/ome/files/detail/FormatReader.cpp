@@ -388,12 +388,12 @@ namespace ome
         boost::apply_visitor(v, dest.vbuffer());
       }
 
-      std::shared_ptr< ::ome::xml::meta::MetadataStore>
+      std::shared_ptr<::ome::xml::meta::MetadataStore>
       FormatReader::makeFilterMetadata()
       {
         // While std::make_shared<> works, here, boost::make_shared<>
         // does not, so use new directly.
-        return std::shared_ptr< ::ome::xml::meta::MetadataStore>
+        return std::shared_ptr<::ome::xml::meta::MetadataStore>
           (new FilterMetadata(getMetadataStore(), isMetadataFiltered()));
       }
 
@@ -1055,7 +1055,7 @@ namespace ome
         return getCoreMetadata(getCoreIndex()).seriesMetadata;
       }
 
-      const std::vector<std::shared_ptr< ::ome::files::CoreMetadata>>&
+      const std::vector<std::shared_ptr<::ome::files::CoreMetadata>>&
       FormatReader::getCoreMetadataList() const
       {
         assertId(currentId, true);
@@ -1076,7 +1076,7 @@ namespace ome
       }
 
       void
-      FormatReader::setMetadataStore(std::shared_ptr< ::ome::xml::meta::MetadataStore>& store)
+      FormatReader::setMetadataStore(std::shared_ptr<::ome::xml::meta::MetadataStore>& store)
       {
         assertId(currentId, false);
 
@@ -1086,22 +1086,22 @@ namespace ome
         metadataStore = store;
       }
 
-      const std::shared_ptr< ::ome::xml::meta::MetadataStore>&
+      const std::shared_ptr<::ome::xml::meta::MetadataStore>&
       FormatReader::getMetadataStore() const
       {
         return metadataStore;
       }
 
-      std::shared_ptr< ::ome::xml::meta::MetadataStore>&
+      std::shared_ptr<::ome::xml::meta::MetadataStore>&
       FormatReader::getMetadataStore()
       {
         return metadataStore;
       }
 
-      std::vector<std::shared_ptr< ::ome::files::FormatReader>>
+      std::vector<std::shared_ptr<::ome::files::FormatReader>>
       FormatReader::getUnderlyingReaders() const
       {
-        return std::vector<std::shared_ptr< ::ome::files::FormatReader>>();
+        return std::vector<std::shared_ptr<::ome::files::FormatReader>>();
       }
 
       bool
@@ -1378,8 +1378,8 @@ namespace ome
           {
             initFile(canonicalpath);
 
-            const std::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>& store =
-              std::dynamic_pointer_cast< ::ome::xml::meta::OMEXMLMetadata>(getMetadataStore());
+            const std::shared_ptr<::ome::xml::meta::OMEXMLMetadata>& store =
+              std::dynamic_pointer_cast<::ome::xml::meta::OMEXMLMetadata>(getMetadataStore());
             if(store)
               {
                 if(saveOriginalMetadata)

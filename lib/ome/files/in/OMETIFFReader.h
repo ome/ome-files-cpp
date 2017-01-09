@@ -103,7 +103,7 @@ namespace ome
         bool hasSPW;
 
         /// Cached metadata (for re-using parsed metadata).
-        mutable std::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> cachedMetadata;
+        mutable std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> cachedMetadata;
 
         /**
          * Cached metadata file location (for re-using parsed
@@ -204,7 +204,7 @@ namespace ome
          * @param tiff the TIFF from which to read the metadata.
          * @returns the parsed metadata as a metadata store.
          */
-        std::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
+        std::shared_ptr<::ome::xml::meta::OMEXMLMetadata>
         readMetadata(const ome::files::tiff::TIFF& tiff);
 
         /**
@@ -214,7 +214,7 @@ namespace ome
          * @param id the file from which to read the metadata.
          * @returns the parsed metadata as a metadata store.
          */
-        std::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
+        std::shared_ptr<::ome::xml::meta::OMEXMLMetadata>
         readMetadata(const boost::filesystem::path& id);
 
         /**
@@ -229,7 +229,7 @@ namespace ome
          * @param id the file from which to read the metadata.
          * @returns the parsed metadata as a metadata store.
          */
-        std::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
+        std::shared_ptr<::ome::xml::meta::OMEXMLMetadata>
         cacheMetadata(const boost::filesystem::path& id) const;
 
         public:

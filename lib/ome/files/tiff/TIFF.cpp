@@ -359,7 +359,7 @@ namespace ome
             }
           };
 
-        ::TIFF *tiffraw = reinterpret_cast< ::TIFF *>(getWrapped());
+        ::TIFF *tiffraw = reinterpret_cast<::TIFF *>(getWrapped());
 
         Sentry sentry;
 
