@@ -368,12 +368,10 @@ namespace ome
 
             const OMETIFFMetadata& ometa(dynamic_cast<const OMETIFFMetadata&>(getCoreMetadata(getCoreIndex())));
 
-            for(std::vector<OMETIFFPlane>::const_iterator i = ometa.tiffPlanes.begin();
-                i != ometa.tiffPlanes.end();
-                ++i)
+            for(const auto& plane : ometa.tiffPlanes)
               {
-                if (!i->id.empty())
-                  fileSet.insert(i->id);
+                if (!plane.id.empty())
+                  fileSet.insert(plane.id);
               }
           }
 

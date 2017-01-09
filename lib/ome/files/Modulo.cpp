@@ -96,11 +96,9 @@ namespace ome
      if (labels.size() > 0)
        {
          os << ">";
-         for (std::vector<std::string>::const_iterator label = labels.begin();
-              label != labels.end();
-              ++label)
+         for (const auto& label : labels)
            {
-             os << "\n<Label>" << *label << "</Label>";
+             os << "\n<Label>" << label << "</Label>";
            }
          os << "\n</ModuloAlong" << parentDimension << ">";
        }

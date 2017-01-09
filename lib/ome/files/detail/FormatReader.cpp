@@ -142,13 +142,8 @@ namespace ome
       {
         if (currentId)
           {
-            const std::vector<path>& s = getUsedFiles();
-            for (std::vector<path>::const_iterator i = s.begin();
-                 i != s.end();
-                 ++i)
-              {
-                if (id == *i) return;
-              }
+            for (const auto& file : getUsedFiles())
+              if (id == file) return;
           }
 
         coreIndex = 0;
@@ -176,13 +171,11 @@ namespace ome
 
             /// @todo: Use a set rather than a list?
             const std::vector<path>& s = getUsedFiles();
-            for (std::vector<path>::const_iterator i = s.begin();
-                 i != s.end();
-                 ++i)
+            for (const auto& file : getUsedFiles())
               {
                 try
                   {
-                    path usedfile = boost::filesystem::canonical(path(*i));
+                    path usedfile = boost::filesystem::canonical(file);
                     if (thisfile == usedfile)
                       {
                         used = true;
@@ -883,13 +876,8 @@ namespace ome
         for (dimension_size_type i = 0; i < getSeriesCount(); ++i)
           {
             setSeries(i);
-            std::vector<path> s = getSeriesUsedFiles(noPixels);
-            for (std::vector<path>::const_iterator file = s.begin();
-                 file != s.end();
-                 ++file)
-              {
-                files.insert(*file);
-              }
+            for (const auto& file : getSeriesUsedFiles(noPixels))
+              files.insert(file);
           }
         return std::vector<path>(files.begin(), files.end());
       }
@@ -909,12 +897,10 @@ namespace ome
         std::vector<path> files = getUsedFiles(noPixels);
         std::vector<FileInfo> infos(files.size());
 
-        for (std::vector<path>::iterator file = files.begin();
-             file != files.end();
-             ++file)
+        for (const auto& file : files)
           {
             FileInfo info;
-            info.filename = *file;
+            info.filename = file;
             info.reader = getFormat();
             info.usedToInitialize = false;
 
@@ -922,7 +908,7 @@ namespace ome
             if (currentid)
               {
                 path current = boost::filesystem::canonical(currentid.get());
-                path thisfile = boost::filesystem::canonical(*file);
+                path thisfile = boost::filesystem::canonical(file);
 
                 info.usedToInitialize = (thisfile == current);
               }
@@ -938,12 +924,10 @@ namespace ome
         std::vector<path> files = getSeriesUsedFiles(noPixels);
         std::vector<FileInfo> infos(files.size());
 
-        for (std::vector<path>::iterator file = files.begin();
-             file != files.end();
-             ++file)
+        for (const auto& file : files)
           {
             FileInfo info;
-            info.filename = *file;
+            info.filename = file;
             info.reader = getFormat();
             info.usedToInitialize = false;
 
@@ -951,7 +935,7 @@ namespace ome
             if (currentid)
               {
                 path current = boost::filesystem::canonical(currentid.get());
-                path thisfile = boost::filesystem::canonical(*file);
+                path thisfile = boost::filesystem::canonical(file);
 
                 info.usedToInitialize = (thisfile == current);
               }

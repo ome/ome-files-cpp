@@ -660,10 +660,8 @@ namespace ome
           std::vector<uint16_t> v;
           generic_array_get1(ifd, tag, readcount, v);
           value.clear();
-          for (std::vector<uint16_t>::const_iterator i = v.begin();
-               i != v.end();
-               ++i)
-            value.push_back(static_cast<typename T::value_type>(*i));
+          for (auto i : v)
+            value.push_back(static_cast<typename T::value_type>(i));
         }
 
         template<typename T>

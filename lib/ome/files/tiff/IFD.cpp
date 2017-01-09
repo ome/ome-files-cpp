@@ -272,11 +272,9 @@ namespace
 
       Sentry sentry;
 
-      for(std::vector<dimension_size_type>::const_iterator i = tiles.begin();
-          i != tiles.end();
-          ++i)
+      for(const auto i : tiles)
         {
-          tstrile_t tile = static_cast<tstrile_t>(*i);
+          tstrile_t tile = static_cast<tstrile_t>(i);
           PlaneRegion rfull = tileinfo.tileRegion(tile);
           PlaneRegion rclip = tileinfo.tileRegion(tile, region);
           dimension_size_type sample = tileinfo.tileSample(tile);
@@ -496,11 +494,9 @@ namespace
       if (tilecoverage.size() != (planarconfig == CONTIG ? 1 : samples))
         tilecoverage.resize(planarconfig == CONTIG ? 1 : samples);
 
-      for(std::vector<dimension_size_type>::const_iterator i = tiles.begin();
-          i != tiles.end();
-          ++i)
+      for(const auto i : tiles)
         {
-          tstrile_t tile = static_cast<tstrile_t>(*i);
+          tstrile_t tile = static_cast<tstrile_t>(i);
           PlaneRegion rfull = tileinfo.tileRegion(tile);
           PlaneRegion rclip = tileinfo.tileRegion(tile, region);
           dimension_size_type sample = tileinfo.tileSample(tile);

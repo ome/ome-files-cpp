@@ -442,11 +442,9 @@ namespace ome
       merge(const MetadataMap& map,
             const std::string& prefix)
       {
-        for (const_iterator i = map.begin();
-             i != map.end();
-             ++i)
+        for (const auto& m : map)
           {
-            map_type::value_type v(prefix + i->first, i->second);
+            map_type::value_type v(prefix + m.first, m.second);
             insert(v);
           }
       }
@@ -933,11 +931,9 @@ namespace ome
     MetadataMap::flatten() const
     {
       MetadataMap newmap;
-      for (MetadataMap::const_iterator i = discriminating_map.begin();
-           i != discriminating_map.end();
-           ++i)
+      for (const auto& m : discriminating_map)
         {
-          boost::apply_visitor(detail::MetadataMapFlattenVisitor(newmap, i->first), i->second);
+          boost::apply_visitor(detail::MetadataMapFlattenVisitor(newmap, m.first), m.second);
         }
       return newmap;
     }
@@ -976,11 +972,9 @@ namespace std
     operator<< (basic_ostream<charT,traits>& os,
                 const ::ome::files::MetadataMap& map)
     {
-      for (::ome::files::MetadataMap::const_iterator i = map.begin();
-           i != map.end();
-           ++i)
+      for (const auto& m : map)
         {
-          boost::apply_visitor(::ome::files::detail::MetadataMapOStreamVisitor(os, i->first), i->second);
+          boost::apply_visitor(::ome::files::detail::MetadataMapOStreamVisitor(os, m.first), m.second);
         }
       return os;
     }

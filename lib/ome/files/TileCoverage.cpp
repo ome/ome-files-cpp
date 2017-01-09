@@ -162,17 +162,15 @@ namespace ome
                   merged = false;
                   std::vector<box> results = impl->intersecting(b);
 
-                  for(std::vector<box>::const_iterator i = results.begin();
-                      i != results.end();
-                      ++i)
+                  for(const auto& i : results)
                     {
-                      PlaneRegion test(region_from_box(*i));
+                      PlaneRegion test(region_from_box(i));
                       PlaneRegion m = merged_region | test;
 
                       if (m.valid())
                         {
                           merged_region = m;
-                          remove.push_back(*i);
+                          remove.push_back(i);
                           merged = true;
                         }
                     }
@@ -181,12 +179,8 @@ namespace ome
               // Remove merged regions
               if (!remove.empty())
                 {
-                  for (std::vector<box>::const_iterator r = remove.begin();
-                       r != remove.end();
-                       ++r)
-                    {
-                      impl->rtree.remove(*r);
-                    }
+                  for (const auto& r : remove)
+                    impl->rtree.remove(r);
                 }
 
               // Insert merged region
@@ -227,11 +221,9 @@ namespace ome
       std::vector<box> results = impl->intersecting(b);
 
       dimension_size_type area = 0;
-      for(std::vector<box>::const_iterator i = results.begin();
-          i != results.end();
-          ++i)
+      for(const auto& i : results)
         {
-          PlaneRegion test(region_from_box(*i));
+          PlaneRegion test(region_from_box(i));
           PlaneRegion intersection = region & test;
 
           if (intersection.valid())

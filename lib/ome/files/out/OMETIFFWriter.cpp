@@ -102,17 +102,14 @@ namespace ome
           // and big TIFF respectively).
           p.suffixes = {"ome.tif", "ome.tiff", "ome.tf2", "ome.tf8", "ome.btf"};
 
-          const PixelType::value_map_type& pv = PixelType::values();
-          for (PixelType::value_map_type::const_iterator i = pv.begin();
-               i != pv.end();
-               ++i)
+          for (const auto& pixeltype : PixelType::values())
             {
-              const std::vector<std::string>& ptcodecs = tiff::getCodecNames(i->first);
+              const std::vector<std::string>& ptcodecs = tiff::getCodecNames(pixeltype.first);
               std::set<std::string> codecset(ptcodecs.begin(), ptcodecs.end());
               // Supported by default with no compression
               codecset.insert("default");
               p.compression_types.insert(codecset.begin(), codecset.end());
-              p.pixel_compression_types.insert(WriterProperties::pixel_compression_type_map::value_type(i->first, codecset));
+              p.pixel_compression_types.insert(WriterProperties::pixel_compression_type_map::value_type(pixeltype.first, codecset));
             }
 
           return p;
@@ -558,25 +555,21 @@ namespace ome
                 // Create UUID and TiffData elements for each series.
                 fillMetadata();
 
-                for (tiff_map::const_iterator t = tiffs.begin();
-                     t != tiffs.end();
-                     ++t)
+                for (auto& tiff : tiffs)
                   {
                     // Get OME-XML for this TIFF file.
-                    std::string xml = getOMEXML(t->first);
+                    std::string xml = getOMEXML(tiff.first);
                     // Make sure file is closed before we modify it outside libtiff.
-                    t->second.tiff->close();
+                    tiff.second.tiff->close();
 
                     // Save OME-XML in the TIFF.
-                    saveComment(t->first, xml);
+                    saveComment(tiff.first, xml);
                   }
               }
 
             // Close any open TIFFs.
-            for (tiff_map::const_iterator t = tiffs.begin();
-                 t != tiffs.end();
-                 ++t)
-              t->second.tiff->close();
+            for (auto& tiff : tiffs)
+              tiff.second.tiff->close();
 
             files.clear();
             tiffs.clear();
@@ -704,18 +697,11 @@ namespace ome
           throw std::logic_error("OMEXMLMetadata null");
 
         dimension_size_type badPlanes = 0U;
-        for (series_list::const_iterator series = seriesState.begin();
-             series != seriesState.end();
-             ++series)
-          {
-            for (std::vector<detail::OMETIFFPlane>::const_iterator plane = series->planes.begin();
-                 plane != series->planes.end();
-                 ++plane)
-              {
-                if (plane->status != detail::OMETIFFPlane::PRESENT) // Plane not written.
-                  ++badPlanes;
-              }
-          }
+        for (const auto& series : seriesState)
+          for (const auto& plane : series.planes)
+            if (plane.status != detail::OMETIFFPlane::PRESENT) // Plane not written.
+              ++badPlanes;
+
         if (badPlanes)
           {
             boost::format fmt

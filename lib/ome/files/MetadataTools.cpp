@@ -503,10 +503,8 @@ namespace ome
                   throw FormatException(fmt.str());
                 }
 
-              for (std::vector<dimension_size_type>::const_iterator i = badChannels.begin();
-                   i != badChannels.end();
-                   ++i)
-                meta.setChannelSamplesPerPixel(splitSamples, series, *i);
+              for (const auto& c : badChannels)
+                meta.setChannelSamplesPerPixel(splitSamples, series, c);
             }
         }
 
@@ -805,10 +803,8 @@ namespace ome
                       ::ome::common::xml::dom::NodeList labels = modulo.getElementsByTagName("Label");
                       if (labels && !labels.empty())
                         {
-                          for (::ome::common::xml::dom::NodeList::iterator i = labels.begin();
-                               i != labels.end();
-                               ++i)
-                            m.labels.push_back(i->getTextContent());
+                          for (auto& node : labels)
+                            m.labels.push_back(node.getTextContent());
                         }
 
                     }
@@ -890,11 +886,9 @@ namespace ome
                   // Note a copy not a reference to avoid iterator
                   // invalidation during removal.
                   std::vector<std::shared_ptr<ome::xml::model::BinData>> binData(pixels->getBinDataList());
-                  for (std::vector<std::shared_ptr<ome::xml::model::BinData>>::iterator bin = binData.begin();
-                   bin != binData.end();
-                       ++bin)
+                  for (auto& bin : binData)
                     {
-                      pixels->removeBinData(*bin);
+                      pixels->removeBinData(bin);
                     }
                   std::shared_ptr<ome::xml::model::MetadataOnly> metadataOnly;
                   pixels->setMetadataOnly(metadataOnly);
@@ -1226,21 +1220,17 @@ namespace ome
 
       std::string validorder;
 
-      for (std::string::const_iterator i = order.begin();
-           i != order.end();
-           ++i)
+      for (const auto& o : order)
         {
-          if (validchars.find_first_of(*i) != std::string::npos &&
-              validorder.find_first_of(*i) == std::string::npos)
-              validorder += *i;
+          if (validchars.find_first_of(o) != std::string::npos &&
+              validorder.find_first_of(o) == std::string::npos)
+              validorder += o;
         }
 
-      for (std::string::const_iterator i = validchars.begin();
-           i != validchars.end();
-           ++i)
+      for (auto c : validchars)
         {
-          if (validorder.find_first_of(*i) == std::string::npos)
-            validorder += *i;
+          if (validorder.find_first_of(c) == std::string::npos)
+            validorder += c;
         }
 
       return ome::xml::model::enums::DimensionOrder(validorder);

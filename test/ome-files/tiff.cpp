@@ -816,11 +816,9 @@ TEST(TIFFCodec, ListCodecs)
   // present here.
 
   std::vector<Codec> codecs = ome::files::tiff::getCodecs();
-  for (std::vector<Codec>::const_iterator c = codecs.begin();
-       c != codecs.end();
-       ++c)
+  for (const auto& c: codecs)
     {
-      std::cout << c->name << " = " << c->scheme << '\n';
+      std::cout << c.name << " = " << c.scheme << '\n';
     }
 }
 
@@ -1089,11 +1087,9 @@ TEST_P(TIFFVariantTest, PlaneArea1)
 
   dimension_size_type area = 0;
   std::vector<PlaneRegion> regions;
-  for (std::vector<dimension_size_type>::const_iterator i = tiles.begin();
-       i != tiles.end();
-       ++i)
+  for (const auto& t : tiles)
     {
-      PlaneRegion r = info.tileRegion(*i, full);
+      PlaneRegion r = info.tileRegion(t, full);
       regions.push_back(r);
       area += (r.w * r.h);
     }
@@ -1134,11 +1130,9 @@ TEST_P(TIFFVariantTest, PlaneArea2)
 
   dimension_size_type area = 0;
   std::vector<PlaneRegion> regions;
-  for (std::vector<dimension_size_type>::const_iterator i = tiles.begin();
-       i != tiles.end();
-       ++i)
+  for (const auto& t : tiles)
     {
-      PlaneRegion r = info.tileRegion(*i, partial);
+      PlaneRegion r = info.tileRegion(t, partial);
       regions.push_back(r);
       area += (r.w * r.h);
     }
@@ -1178,11 +1172,9 @@ TEST_P(TIFFVariantTest, PlaneArea3)
 
   dimension_size_type area = 0;
   std::vector<PlaneRegion> regions;
-  for (std::vector<dimension_size_type>::const_iterator i = tiles.begin();
-       i != tiles.end();
-       ++i)
+  for (const auto& t : tiles)
     {
-      PlaneRegion r = info.tileRegion(*i, partial);
+      PlaneRegion r = info.tileRegion(t, partial);
       regions.push_back(r);
       area += (r.w * r.h);
     }
@@ -1261,11 +1253,9 @@ TEST_P(TIFFVariantTest, PlaneReadAlignedTileOrdered)
 
   VariantPixelBuffer vb;
 
-  for (std::vector<dimension_size_type>::const_iterator i = tiles.begin();
-       i != tiles.end();
-       ++i)
+  for (const auto& t : tiles)
     {
-      PlaneRegion r = info.tileRegion(*i, full);
+      PlaneRegion r = info.tileRegion(t, full);
 
       ifd->readImage(vb, r.x, r.y, r.w, r.h);
 
@@ -1284,11 +1274,9 @@ TEST_P(TIFFVariantTest, PlaneReadAlignedTileRandom)
   VariantPixelBuffer vb;
 
   std::random_shuffle(tiles.begin(), tiles.end());
-  for (std::vector<dimension_size_type>::const_iterator i = tiles.begin();
-       i != tiles.end();
-       ++i)
+  for (const auto& t : tiles)
     {
-      PlaneRegion r = info.tileRegion(*i, full);
+      PlaneRegion r = info.tileRegion(t, full);
 
       ifd->readImage(vb, r.x, r.y, r.w, r.h);
 
@@ -1313,13 +1301,9 @@ TEST_P(TIFFVariantTest, PlaneReadUnalignedTileOrdered)
 
   VariantPixelBuffer vb;
 
-  for (std::vector<PlaneRegion>::const_iterator i = tiles.begin();
-       i != tiles.end();
-       ++i)
+  for (const auto& t : tiles)
     {
-      const PlaneRegion& r = *i;
-
-      ifd->readImage(vb, r.x, r.y, r.w, r.h);
+      ifd->readImage(vb, t.x, t.y, t.w, t.h);
 
       /// @todo Verify buffer contents once pixelbuffer subsetting is
       /// available.
@@ -1343,13 +1327,9 @@ TEST_P(TIFFVariantTest, PlaneReadUnalignedTileRandom)
   VariantPixelBuffer vb;
 
   std::random_shuffle(tiles.begin(), tiles.end());
-  for (std::vector<PlaneRegion>::const_iterator i = tiles.begin();
-       i != tiles.end();
-       ++i)
+  for (const auto& t : tiles)
     {
-      const PlaneRegion& r = *i;
-
-      ifd->readImage(vb, r.x, r.y, r.w, r.h);
+      ifd->readImage(vb, t.x, t.y, t.w, t.h);
 
       /// @todo Verify buffer contents once pixelbuffer subsetting is
       /// available.
@@ -1561,15 +1541,11 @@ TEST_P(PixelTest, WriteTIFF)
     if (!params.ordered)
       std::random_shuffle(tiles.begin(), tiles.end());
 
-    for (std::vector<PlaneRegion>::const_iterator i = tiles.begin();
-         i != tiles.end();
-         ++i)
+    for (const auto& t : tiles)
       {
-        const PlaneRegion& r = *i;
-
         std::array<VariantPixelBuffer::size_type, 9> shape;
-        shape[::ome::files::DIM_SPATIAL_X] = r.w;
-        shape[::ome::files::DIM_SPATIAL_Y] = r.h;
+        shape[::ome::files::DIM_SPATIAL_X] = t.w;
+        shape[::ome::files::DIM_SPATIAL_Y] = t.h;
         shape[::ome::files::DIM_SUBCHANNEL] = 3U;
         shape[::ome::files::DIM_SPATIAL_Z] = shape[::ome::files::DIM_TEMPORAL_T] = shape[::ome::files::DIM_CHANNEL] =
           shape[::ome::files::DIM_MODULO_Z] = shape[::ome::files::DIM_MODULO_T] = shape[::ome::files::DIM_MODULO_C] = 1;
@@ -1582,10 +1558,10 @@ TEST_P(PixelTest, WriteTIFF)
         vb.setBuffer(shape, params.pixeltype, order);
 
         // Temporary subrange to write into tile
-        PixelSubrangeVisitor sv(r.x, r.y);
+        PixelSubrangeVisitor sv(t.x, t.y);
         boost::apply_visitor(sv, pixels.vbuffer(), vb.vbuffer());
 
-        wifd->writeImage(vb, r.x, r.y, r.w, r.h);
+        wifd->writeImage(vb, t.x, t.y, t.w, t.h);
       }
 
     wtiff->writeCurrentDirectory();
@@ -1703,40 +1679,40 @@ namespace
     std::vector<PT> pixeltypes;
     std::transform(pixeltypemap.begin(), pixeltypemap.end(), std::back_inserter(pixeltypes), ptkey);
 
-    for(std::vector<dimension_size_type>::const_iterator imwid = imagexsizes.begin(); imwid != imagexsizes.end(); ++imwid)
-      for(std::vector<dimension_size_type>::const_iterator imht = imageysizes.begin(); imht != imageysizes.end(); ++imht)
-        for (std::vector<PT>::const_iterator pt = pixeltypes.begin(); pt != pixeltypes.end(); ++pt)
-          for (std::vector<ome::files::tiff::PlanarConfiguration>::const_iterator pc = planarconfigs.begin(); pc != planarconfigs.end(); ++pc)
-            for (std::vector<ome::files::tiff::PhotometricInterpretation>::const_iterator pi = photometricinterps.begin(); pi != photometricinterps.end(); ++pi)
-              for (std::vector<boost::optional<std::string>>::const_iterator comp = compression_types.begin(); comp != compression_types.end(); ++comp)
+    for(auto imwid : imagexsizes)
+      for(auto imht : imageysizes)
+        for (auto pt : pixeltypes)
+          for (auto pc : planarconfigs)
+            for (auto pi : photometricinterps)
+              for (const auto& comp: compression_types)
                 {
-                  for(std::vector<dimension_size_type>::const_iterator wid = tilesizes.begin(); wid != tilesizes.end(); ++wid)
-                    for(std::vector<dimension_size_type>::const_iterator ht = tilesizes.begin(); ht != tilesizes.end(); ++ht)
+                  for(auto wid : tilesizes)
+                    for(auto ht : tilesizes)
                       {
-                        for(std::vector<bool>::const_iterator opt = optimal.begin(); opt != optimal.end(); ++opt)
-                          for(std::vector<bool>::const_iterator ord = ordered.begin(); ord != ordered.end(); ++ord)
+                        for(auto opt : optimal)
+                          for(auto ord : ordered)
                             {
                               try
                                 {
                                   // Check PNG reference exists.
-                                  TIFFVariantTest::getPNGData(*imwid, *imht, *pt, *pc);
-                                  ret.push_back(PixelTestParameters(*imwid, *imht, *pt, ome::files::tiff::TILE, *pc, *pi, *comp, *wid, *ht, *opt, *ord));
+                                  TIFFVariantTest::getPNGData(imwid, imht, pt, pc);
+                                  ret.push_back(PixelTestParameters(imwid, imht, pt, ome::files::tiff::TILE, pc, pi, comp, wid, ht, opt, ord));
                                 }
                               catch(const std::exception&)
                                 {
                                 }
                             }
                       }
-                  for(std::vector<dimension_size_type>::const_iterator rows = stripsizes.begin(); rows != stripsizes.end(); ++rows)
+                  for(auto rows : stripsizes)
                     {
-                      for(std::vector<bool>::const_iterator opt = optimal.begin(); opt != optimal.end(); ++opt)
-                        for(std::vector<bool>::const_iterator ord = ordered.begin(); ord != ordered.end(); ++ord)
+                      for(auto opt : optimal)
+                        for(auto ord : ordered)
                           {
                             try
                               {
                                 // Check PNG reference exists.
-                                TIFFVariantTest::getPNGData(*imwid, *imht, *pt, *pc);
-                                ret.push_back(PixelTestParameters(*imwid, *imht, *pt, ome::files::tiff::STRIP, *pc, *pi, *comp, *imwid, *rows, *opt, *ord));
+                                TIFFVariantTest::getPNGData(imwid, imht, pt, pc);
+                                ret.push_back(PixelTestParameters(imwid, imht, pt, ome::files::tiff::STRIP, pc, pi, comp, imwid, rows, opt, ord));
                               }
                             catch(const std::exception&)
                               {
