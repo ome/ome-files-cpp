@@ -83,7 +83,7 @@ namespace ome
        * Get codec names registered with the TIFF library available
        * for a given pixel type.
        *
-       * @param pixetype the pixel type to compress.
+       * @param pixeltype the pixel type to compress.
        * @returns a list of available codec names.
        */
       const std::vector<std::string>&
