@@ -40,11 +40,11 @@
 #include <cstdio>
 #include <stdexcept>
 #include <tuple>
+#include <type_traits>
 #include <vector>
 
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
-#include <boost/type_traits.hpp>
 
 #include <ome/files/PixelProperties.h>
 #include <ome/files/tiff/Codec.h>
@@ -82,6 +82,16 @@ using namespace boost::filesystem;
 namespace
 {
 
+  /// Type trait for complex.
+  template <class T>
+  struct is_complex
+    : boost::false_type {};
+
+  /// Type trait for complex.
+  template <class T>
+  struct is_complex<std::complex<T>>
+    : boost::true_type {};
+
   struct DumpPixelBufferVisitor : public boost::static_visitor<>
   {
     typedef ::ome::files::PixelProperties<::ome::xml::model::enums::PixelType::BIT>::std_type bit_type;
@@ -93,8 +103,8 @@ namespace
     {}
 
     template <typename T>
-    typename boost::enable_if_c<
-      boost::is_integral<T>::value, float
+    typename std::enable_if<
+      std::is_integral<T>::value, float
       >::type
     dump(const std::shared_ptr<::ome::files::PixelBuffer<T>>& buf,
          const typename ::ome::files::PixelBuffer<T>::indices_type& idx) const
@@ -106,8 +116,8 @@ namespace
     }
 
     template <typename T>
-    typename boost::enable_if_c<
-      boost::is_floating_point<T>::value, float
+    typename std::enable_if<
+      std::is_floating_point<T>::value, float
       >::type
     dump(const std::shared_ptr<::ome::files::PixelBuffer<T>>& buf,
          const typename ::ome::files::PixelBuffer<T>::indices_type& idx) const
@@ -117,8 +127,8 @@ namespace
     }
 
     template <typename T>
-    typename boost::enable_if_c<
-      boost::is_complex<T>::value, float
+    typename std::enable_if<
+      is_complex<T>::value, float
       >::type
     dump(const std::shared_ptr<::ome::files::PixelBuffer<T>>& buf,
          const typename ::ome::files::PixelBuffer<T>::indices_type& idx) const

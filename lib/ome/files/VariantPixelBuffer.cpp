@@ -35,7 +35,7 @@
  * #L%
  */
 
-#include <boost/type_traits.hpp>
+#include <type_traits>
 
 #include <ome/files/VariantPixelBuffer.h>
 
@@ -269,8 +269,8 @@ namespace
     }
 
     template <int P>
-    typename boost::enable_if<
-      typename boost::is_same<
+    typename std::enable_if<
+      std::is_same<
         typename std::iterator_traits<InputIterator>::value_type,
         typename PixelProperties<P>::std_type
         >::value,
