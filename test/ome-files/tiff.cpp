@@ -881,17 +881,17 @@ public:
     ASSERT_FALSE((png_sig_cmp(header, 0, 8)));
 
     png_structp pngptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-    ASSERT_TRUE(pngptr != 0);
+    ASSERT_TRUE(pngptr != nullptr);
 
     png_infop infoptr = png_create_info_struct(pngptr);
     if (!infoptr)
       png_destroy_read_struct(&pngptr, 0, 0);
-    ASSERT_TRUE(infoptr != 0);
+    ASSERT_TRUE(infoptr != nullptr);
 
     png_infop endinfoptr = png_create_info_struct(pngptr);
     if (!endinfoptr)
       png_destroy_read_struct(&pngptr, 0, 0);
-    ASSERT_TRUE(endinfoptr != 0);
+    ASSERT_TRUE(endinfoptr != nullptr);
 
     int result = setjmp(png_jmpbuf(pngptr));
     ASSERT_FALSE((result));

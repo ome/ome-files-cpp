@@ -61,7 +61,7 @@ namespace ome
             std::shared_ptr<TIFFCodec> codecs(TIFFGetConfiguredCODECs(), _TIFFfree);
             if (codecs)
               {
-                for (const TIFFCodec *c = &*codecs; c->name != 0; ++c)
+                for (const TIFFCodec *c = &*codecs; c->name != nullptr; ++c)
                   {
                     Codec nc;
                     nc.name = c->name;
