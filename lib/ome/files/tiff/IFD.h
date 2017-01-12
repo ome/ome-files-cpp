@@ -449,6 +449,22 @@ namespace ome
         setPhotometricInterpretation(PhotometricInterpretation photometric);
 
         /**
+         * Get compression scheme.
+         *
+         * @returns the compression scheme.
+         */
+        Compression
+        getCompression() const;
+
+        /**
+         * Set compression scheme.
+         *
+         * @param compression the compression scheme.
+         */
+        void
+        setCompression(Compression compression);
+
+        /**
          * Read a whole image plane into a pixel buffer.
          *
          * @param buf the destination pixel buffer.

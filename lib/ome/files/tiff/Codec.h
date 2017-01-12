@@ -41,7 +41,9 @@
 #include <string>
 #include <vector>
 
-#include <ome/compat/cstdint.h>
+#include <ome/files/tiff/Types.h>
+
+#include <ome/xml/model/enums/PixelType.h>
 
 namespace ome
 {
@@ -58,17 +60,44 @@ namespace ome
         /// Codec name.
         std::string name;
         /// Codec number.
-        uint16_t    scheme;
+        Compression scheme;
       };
 
       /**
        * Get codecs registered with the TIFF library.
        *
-       * @returns a list of available codecs.
+       * @returns a list of available codecs (names and numbers).
        */
-      std::vector<Codec>
-      getConfiguredCodecs();
+      const std::vector<Codec>&
+      getCodecs();
 
+      /**
+       * Get codec names registered with the TIFF library.
+       *
+       * @returns a list of available codec names.
+       */
+      const std::vector<std::string>&
+      getCodecNames();
+
+      /**
+       * Get codec names registered with the TIFF library available
+       * for a given pixel type.
+       *
+       * @param pixeltype the pixel type to compress.
+       * @returns a list of available codec names.
+       */
+      const std::vector<std::string>&
+      getCodecNames(ome::xml::model::enums::PixelType pixeltype);
+
+      /**
+       * Get the compression scheme enumeration for a codec name.
+       *
+       * @param name the codec name
+       * @returns the compression scheme for the name, or
+       * COMPRESSION_NONE if invalid.
+       */
+      Compression
+      getCodecScheme(const std::string& name);
     }
   }
 }

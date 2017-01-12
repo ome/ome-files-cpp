@@ -44,6 +44,7 @@
 #include <ome/files/FormatTools.h>
 #include <ome/files/MetadataTools.h>
 #include <ome/files/out/MinimalTIFFWriter.h>
+#include <ome/files/tiff/Codec.h>
 #include <ome/files/tiff/IFD.h>
 #include <ome/files/tiff/TIFF.h>
 #include <ome/files/tiff/Util.h>
@@ -79,16 +80,18 @@ namespace ome
           p.suffixes = std::vector<boost::filesystem::path>(suffixes,
                                                             suffixes + boost::size(suffixes));
 
-
           const PixelType::value_map_type& pv = PixelType::values();
-          std::set<ome::xml::model::enums::PixelType> pixeltypes;
           for (PixelType::value_map_type::const_iterator i = pv.begin();
                i != pv.end();
                ++i)
             {
-              pixeltypes.insert(i->first);
+              const std::vector<std::string>& ptcodecs = tiff::getCodecNames(i->first);
+              std::set<std::string> codecset(ptcodecs.begin(), ptcodecs.end());
+              // Supported by default with no compression
+              codecset.insert("default");
+              p.compression_types.insert(codecset.begin(), codecset.end());
+              p.pixel_compression_types.insert(WriterProperties::pixel_compression_type_map::value_type(i->first, codecset));
             }
-          p.codec_pixel_types.insert(WriterProperties::codec_pixel_type_map::value_type("default", pixeltypes));
 
           return p;
         }
@@ -262,6 +265,10 @@ namespace ome
           ifd->setPhotometricInterpretation(tiff::RGB);
         else
           ifd->setPhotometricInterpretation(tiff::MIN_IS_BLACK);
+
+        const boost::optional<std::string> compression(getCompression());
+        if(compression)
+          ifd->setCompression(tiff::getCodecScheme(*compression));
       }
 
       void

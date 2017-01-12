@@ -144,26 +144,6 @@ operator<< (std::basic_ostream<charT,traits>& os,
 namespace
 {
 
-  ome::xml::model::enums::PixelType init_pt[] =
-    {
-      ome::xml::model::enums::PixelType::UINT8,
-      ome::xml::model::enums::PixelType::UINT16,
-      ome::xml::model::enums::PixelType::UINT32
-    };
-
-  ome::xml::model::enums::PixelType init_adv_pt[] =
-    {
-      ome::xml::model::enums::PixelType::DOUBLE,
-      ome::xml::model::enums::PixelType::COMPLEXDOUBLE,
-      ome::xml::model::enums::PixelType::BIT
-    };
-
-  std::set<ome::xml::model::enums::PixelType> default_pixel_types(init_pt,
-                                                                  init_pt + boost::size(init_pt));
-
-  std::set<ome::xml::model::enums::PixelType> advanced_pixel_types(init_adv_pt,
-                                                                   init_adv_pt + boost::size(init_adv_pt));
-
   WriterProperties
   test_properties()
   {
@@ -171,12 +151,26 @@ namespace
     p.suffixes.push_back("test");
     p.compression_suffixes.push_back("gz");
 
-    p.compression_types.insert("jpeg");
-    p.compression_types.insert("lzw");
-    p.compression_types.insert("rle");
+    const PixelType::value_map_type& pv = PixelType::values();
+    for (PixelType::value_map_type::const_iterator i = pv.begin();
+         i != pv.end();
+         ++i)
+      {
+        std::set<std::string> codecset;
+        if (i->first != PixelType::INT16 &&
+            i->first != PixelType::DOUBLE &&
+            i->first != PixelType::COMPLEXDOUBLE &&
+            i->first != PixelType::BIT)
+          codecset.insert("default");
+        codecset.insert("lzw");
+        if (i->first == PixelType::BIT)
+          codecset.insert("rle");
+        if (i->first == PixelType::INT8 || i->first == PixelType::UINT8)
+          codecset.insert("test-8bit-only");
 
-    p.codec_pixel_types.insert(WriterProperties::codec_pixel_type_map::value_type("default", default_pixel_types));
-    p.codec_pixel_types.insert(WriterProperties::codec_pixel_type_map::value_type("advanced", advanced_pixel_types));
+        p.compression_types.insert(codecset.begin(), codecset.end());
+        p.pixel_compression_types.insert(WriterProperties::pixel_compression_type_map::value_type(i->first, codecset));
+      }
 
     p.stacks = true;
 
@@ -557,19 +551,92 @@ TEST_P(FormatWriterTest, OutputSequential)
   EXPECT_TRUE(w.getWriteSequentially());
 }
 
+TEST_P(FormatWriterTest, CompressionTypes)
+{
+  const std::set<std::string>& ctypes = w.getCompressionTypes();
+
+  std::cout << "Supported compression types:\n";
+  for (std::set<std::string>::const_iterator i = ctypes.begin();
+       i != ctypes.end();
+       ++i)
+    {
+      std::cout << "  " << *i << '\n';
+    }
+
+  // Dump per-pixel type codec list
+  const PixelType::value_map_type& pv = PixelType::values();
+  for (PixelType::value_map_type::const_iterator i = pv.begin();
+       i != pv.end();
+       ++i)
+    {
+      std::cout << "Pixel Type: " << i->second << '\n';
+      const std::set<std::string>& types = w.getCompressionTypes(i->first);
+      for (std::set<std::string>::const_iterator t = types.begin();
+           t != types.end();
+           ++t)
+        std::cout << "  " << *t << '\n';
+    }
+}
+
 TEST_P(FormatWriterTest, PixelTypesDefault)
 {
+  std::set<ome::xml::model::enums::PixelType> default_pixel_types;
+  const PixelType::value_map_type& pv = PixelType::values();
+  for (PixelType::value_map_type::const_iterator i = pv.begin();
+       i != pv.end();
+       ++i)
+    {
+      if (i->first != PixelType::INT16 &&
+          i->first != PixelType::DOUBLE &&
+          i->first != PixelType::COMPLEXDOUBLE &&
+          i->first != PixelType::BIT)
+      default_pixel_types.insert(i->first);
+    }
+
   const std::set<ome::xml::model::enums::PixelType>& pt = w.getPixelTypes();
   EXPECT_EQ(default_pixel_types, pt);
 }
 
 TEST_P(FormatWriterTest, PixelTypesByCodec)
 {
-  const std::set<ome::xml::model::enums::PixelType>& dpt = w.getPixelTypes("default");
+  const PixelType::value_map_type& pv = PixelType::values();
+
+  std::set<ome::xml::model::enums::PixelType> all_pixel_types;
+  for (PixelType::value_map_type::const_iterator i = pv.begin();
+       i != pv.end();
+       ++i)
+    all_pixel_types.insert(i->first);
+
+  std::set<ome::xml::model::enums::PixelType> default_pixel_types;
+  for (PixelType::value_map_type::const_iterator i = pv.begin();
+       i != pv.end();
+       ++i)
+    {
+      if (i->first != PixelType::INT16 &&
+          i->first != PixelType::DOUBLE &&
+          i->first != PixelType::COMPLEXDOUBLE &&
+          i->first != PixelType::BIT)
+      default_pixel_types.insert(i->first);
+    }
+
+  const std::set<ome::xml::model::enums::PixelType> dpt = w.getPixelTypes("default");
   EXPECT_EQ(default_pixel_types, dpt);
-  const std::set<ome::xml::model::enums::PixelType>& apt = w.getPixelTypes("advanced");
-  EXPECT_EQ(advanced_pixel_types, apt);
-  const std::set<ome::xml::model::enums::PixelType>& ipt = w.getPixelTypes("invalid");
+
+  const std::set<ome::xml::model::enums::PixelType> lzw = w.getPixelTypes("lzw");
+  EXPECT_EQ(all_pixel_types, lzw);
+
+  std::set<ome::xml::model::enums::PixelType> rle_pixel_types;
+  rle_pixel_types.insert(PixelType::BIT);
+  const std::set<ome::xml::model::enums::PixelType> rle = w.getPixelTypes("rle");
+  EXPECT_EQ(rle_pixel_types, rle);
+
+  std::set<ome::xml::model::enums::PixelType> test_8bit_pixel_types;
+  test_8bit_pixel_types.insert(PixelType::INT8);
+  test_8bit_pixel_types.insert(PixelType::UINT8);
+  const std::set<ome::xml::model::enums::PixelType> test_8bit = w.getPixelTypes("test-8bit-only");
+  EXPECT_EQ(test_8bit_pixel_types, test_8bit);
+
+  const std::set<ome::xml::model::enums::PixelType> ipt = w.getPixelTypes("invalid");
   EXPECT_TRUE(ipt.empty());
 }
 
@@ -594,13 +661,21 @@ TEST_P(FormatWriterTest, SupportedPixelTypeByCodec)
   EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::BIT, "default"));
   EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::INT16, "default"));
 
-  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT8, "advanced"));
-  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT16, "advanced"));
-  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT32, "advanced"));
-  EXPECT_TRUE(w.isSupportedType(ome::xml::model::enums::PixelType::DOUBLE, "advanced"));
-  EXPECT_TRUE(w.isSupportedType(ome::xml::model::enums::PixelType::COMPLEXDOUBLE, "advanced"));
-  EXPECT_TRUE(w.isSupportedType(ome::xml::model::enums::PixelType::BIT, "advanced"));
-  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::INT16, "advanced"));
+  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT8, "rle"));
+  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT16, "rle"));
+  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT32, "rle"));
+  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::DOUBLE, "rle"));
+  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::COMPLEXDOUBLE, "rle"));
+  EXPECT_TRUE(w.isSupportedType(ome::xml::model::enums::PixelType::BIT, "rle"));
+  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::INT16, "rle"));
+
+  EXPECT_TRUE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT8, "test-8bit-only"));
+  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT16, "test-8bit-only"));
+  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT32, "test-8bit-only"));
+  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::DOUBLE, "test-8bit-only"));
+  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::COMPLEXDOUBLE, "test-8bit-only"));
+  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::BIT, "test-8bit-only"));
+  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::INT16, "test-8bit-only"));
 
   EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT8, "invalid"));
   EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT16, "invalid"));

@@ -42,6 +42,7 @@
 #include <boost/filesystem.hpp>
 
 #include <ome/files/Types.h>
+#include <ome/files/tiff/Types.h>
 
 #include <ome/compat/regex.h>
 
@@ -50,7 +51,7 @@
 
 #include <vector>
 
-struct TileTestParameters
+struct TIFFTestParameters
 {
   bool tile;
   std::string file;
@@ -60,23 +61,25 @@ struct TileTestParameters
   ome::files::dimension_size_type imagelength;
   ome::files::dimension_size_type tilewidth;
   ome::files::dimension_size_type tilelength;
+  ome::files::tiff::Compression compression;
 };
 
 template<class charT, class traits>
 inline std::basic_ostream<charT,traits>&
 operator<< (std::basic_ostream<charT,traits>& os,
-            const TileTestParameters& p)
+            const TIFFTestParameters& p)
 {
   return os << p.file << " [" << p.wfile << "] ("
             << p.imagewidth << "x" << p.imagelength
             << (p.imageplanar ? " planar" : " chunky")
             << (p.tile ? " tiled " : " strips ")
             << p.tilewidth << "x" << p.tilelength
+            << " compression " << p.compression
             << ")";
 }
 
-extern std::vector<TileTestParameters>
-find_tile_tests();
+extern std::vector<TIFFTestParameters>
+find_tiff_tests();
 
 #endif // TEST_TIFFSAMPLES_H
 

@@ -62,33 +62,11 @@ using ome::files::out::MinimalTIFFWriter;
 using ome::files::tiff::IFD;
 using ome::files::tiff::TIFF;
 
+using ome::xml::model::enums::PixelType;
+
 using namespace boost::filesystem;
 
-class TIFFTestParameters
-{
-public:
-
-  std::string file;
-  dimension_size_type sizeT;
-
-  TIFFTestParameters(const std::string& file,
-                     dimension_size_type sizeT):
-    file(file),
-    sizeT(sizeT)
-  {}
-};
-
-template<class charT, class traits>
-inline std::basic_ostream<charT,traits>&
-operator<< (std::basic_ostream<charT,traits>& os,
-            const TIFFTestParameters& tp)
-{
-  os << tp.file;
-
-  return os;
-}
-
-class TIFFWriterTest : public ::testing::TestWithParam<TileTestParameters>
+class TIFFWriterTest : public ::testing::TestWithParam<TIFFTestParameters>
 {
 public:
   ome::compat::shared_ptr<TIFF> tiff;
@@ -103,7 +81,7 @@ public:
   void
   SetUp()
   {
-    const TileTestParameters& params = GetParam();
+    const TIFFTestParameters& params = GetParam();
 
     path dir(PROJECT_BINARY_DIR "/test/ome-files/data");
     testfile = dir / (std::string("minimaltiffwriter-") + path(params.file).filename().string());
@@ -128,6 +106,44 @@ public:
       boost::filesystem::remove(testfile);
   }
 };
+
+TEST(TIFFWriter, CompressionTypes)
+{
+  MinimalTIFFWriter w;
+  const std::set<std::string>& ctypes = w.getCompressionTypes();
+
+  std::cout << "Supported compression types:\n";
+  for (std::set<std::string>::const_iterator i = ctypes.begin();
+       i != ctypes.end();
+       ++i)
+    {
+      std::cout << "  " << *i << '\n';
+    }
+
+  // Dump per-pixel type codec list
+  const PixelType::value_map_type& pv = PixelType::values();
+  for (PixelType::value_map_type::const_iterator i = pv.begin();
+       i != pv.end();
+       ++i)
+    {
+      std::cout << "Pixel Type: " << i->second << '\n';
+      const std::set<std::string>& types = w.getCompressionTypes(i->first);
+      for (std::set<std::string>::const_iterator t = types.begin();
+           t != types.end();
+           ++t)
+        std::cout << "  " << *t << '\n';
+    }
+}
+
+TEST(TIFFWriter, SupportedCompressionTypes)
+{
+  MinimalTIFFWriter w;
+  EXPECT_TRUE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT8, "default"));
+  EXPECT_TRUE(w.isSupportedType(ome::xml::model::enums::PixelType::UINT8, "Deflate"));
+  EXPECT_TRUE(w.isSupportedType(ome::xml::model::enums::PixelType::BIT, "PackBits"));
+  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::INT16, "PackBits"));
+  EXPECT_FALSE(w.isSupportedType(ome::xml::model::enums::PixelType::INT16, "invalid"));
+}
 
 TEST_P(TIFFWriterTest, setId)
 {
@@ -180,7 +196,7 @@ TEST_P(TIFFWriterTest, setId)
   tiffwriter.close();
 }
 
-std::vector<TileTestParameters> params(find_tile_tests());
+std::vector<TIFFTestParameters> params(find_tiff_tests());
 
 // Disable missing-prototypes warning for INSTANTIATE_TEST_CASE_P;
 // this is solely to work around a missing prototype in gtest.

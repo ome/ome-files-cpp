@@ -41,6 +41,7 @@
 #include <vector>
 
 #include <boost/filesystem.hpp>
+#include <boost/optional.hpp>
 #include <boost/type_traits.hpp>
 
 #include <ome/files/PixelProperties.h>
@@ -194,7 +195,7 @@ namespace
 
 }
 
-std::vector<TileTestParameters> tile_params(find_tile_tests());
+std::vector<TIFFTestParameters> tile_params(find_tiff_tests());
 
 class TIFFTest : public ::testing::Test
 {
@@ -813,12 +814,12 @@ TEST(TIFFCodec, ListCodecs)
   // can vary, so we don't attempt to validate specific codecs are
   // present here.
 
-  std::vector<Codec> codecs = ome::files::tiff::getConfiguredCodecs();
+  std::vector<Codec> codecs = ome::files::tiff::getCodecs();
   for (std::vector<Codec>::const_iterator c = codecs.begin();
        c != codecs.end();
        ++c)
     {
-      // std::cout << "C: " << c->name << " = " << c->scheme << '\n';
+      std::cout << c->name << " = " << c->scheme << '\n';
     }
 }
 
@@ -845,7 +846,7 @@ struct compare_tuple
   }
 };
 
-class TIFFTileTest : public ::testing::TestWithParam<TileTestParameters>
+class TIFFVariantTest : public ::testing::TestWithParam<TIFFTestParameters>
 {
 public:
   ome::compat::shared_ptr<TIFF> tiff;
@@ -1000,7 +1001,7 @@ public:
 
   virtual void SetUp()
   {
-    const TileTestParameters& params = GetParam();
+    const TIFFTestParameters& params = GetParam();
 
     ASSERT_NO_THROW(tiff = TIFF::open(params.file, "r"));
     ASSERT_TRUE(static_cast<bool>(tiff));
@@ -1015,12 +1016,12 @@ public:
 
 };
 
-TIFFTileTest::pngdata_map_type TIFFTileTest::pngdata_map;
+TIFFVariantTest::pngdata_map_type TIFFVariantTest::pngdata_map;
 
 // Check basic tile metadata
-TEST_P(TIFFTileTest, TileInfo)
+TEST_P(TIFFVariantTest, TileInfo)
 {
-  const TileTestParameters& params = GetParam();
+  const TIFFTestParameters& params = GetParam();
   TileInfo info = ifd->getTileInfo();
 
   EXPECT_EQ(params.tilewidth, info.tileWidth());
@@ -1046,9 +1047,9 @@ TEST_P(TIFFTileTest, TileInfo)
 }
 
 // Check that the first tile matches the expected tile size
-TEST_P(TIFFTileTest, TilePlaneRegion0)
+TEST_P(TIFFVariantTest, TilePlaneRegion0)
 {
-  const TileTestParameters& params = GetParam();
+  const TIFFTestParameters& params = GetParam();
   TileInfo info = ifd->getTileInfo();
 
   PlaneRegion full(0, 0, iwidth, iheight);
@@ -1076,9 +1077,9 @@ TEST_P(TIFFTileTest, TilePlaneRegion0)
 
 // Check tiling of whole image including edge overlaps being correctly
 // computed and all tiles being accounted for.
-TEST_P(TIFFTileTest, PlaneArea1)
+TEST_P(TIFFVariantTest, PlaneArea1)
 {
-  const TileTestParameters& params = GetParam();
+  const TIFFTestParameters& params = GetParam();
   TileInfo info = ifd->getTileInfo();
 
   PlaneRegion full(0, 0, iwidth, iheight);
@@ -1122,9 +1123,9 @@ TEST_P(TIFFTileTest, PlaneArea1)
 
 // Check tiling of multiple-of-16 subrange including edge overlaps
 // being correctly computed and all tiles being accounted for.
-TEST_P(TIFFTileTest, PlaneArea2)
+TEST_P(TIFFVariantTest, PlaneArea2)
 {
-  const TileTestParameters& params = GetParam();
+  const TIFFTestParameters& params = GetParam();
   TileInfo info = ifd->getTileInfo();
 
   PlaneRegion partial(16U, 16U, iwidth - 32U, iheight - 32U);
@@ -1166,9 +1167,9 @@ TEST_P(TIFFTileTest, PlaneArea2)
 
 // Check tiling of non-multiple-of-16 subrange including edge overlaps
 // being correctly computed and all tiles being accounted for.
-TEST_P(TIFFTileTest, PlaneArea3)
+TEST_P(TIFFVariantTest, PlaneArea3)
 {
-  const TileTestParameters& params = GetParam();
+  const TIFFTestParameters& params = GetParam();
   TileInfo info = ifd->getTileInfo();
 
   PlaneRegion partial(7U, 18U, iwidth - 18U, iheight - 21U);
@@ -1240,17 +1241,17 @@ namespace
   }
 }
 
-TEST_P(TIFFTileTest, PlaneRead)
+TEST_P(TIFFVariantTest, PlaneRead)
 {
-  const TileTestParameters& params = GetParam();
+  const TIFFTestParameters& params = GetParam();
 
-  const VariantPixelBuffer& buf = TIFFTileTest::getPNGData(iwidth, iheight,
-                                                           PT::UINT8,
-                                                           planarconfig);
+  const VariantPixelBuffer& buf = TIFFVariantTest::getPNGData(iwidth, iheight,
+                                                              PT::UINT8,
+                                                              planarconfig);
   read_test(iwidth, iheight, params.file, buf);
 }
 
-TEST_P(TIFFTileTest, PlaneReadAlignedTileOrdered)
+TEST_P(TIFFVariantTest, PlaneReadAlignedTileOrdered)
 {
   TileInfo info = ifd->getTileInfo();
 
@@ -1272,7 +1273,7 @@ TEST_P(TIFFTileTest, PlaneReadAlignedTileOrdered)
     }
 }
 
-TEST_P(TIFFTileTest, PlaneReadAlignedTileRandom)
+TEST_P(TIFFVariantTest, PlaneReadAlignedTileRandom)
 {
   TileInfo info = ifd->getTileInfo();
 
@@ -1295,7 +1296,7 @@ TEST_P(TIFFTileTest, PlaneReadAlignedTileRandom)
     }
 }
 
-TEST_P(TIFFTileTest, PlaneReadUnalignedTileOrdered)
+TEST_P(TIFFVariantTest, PlaneReadUnalignedTileOrdered)
 {
   TileInfo info = ifd->getTileInfo();
 
@@ -1324,7 +1325,7 @@ TEST_P(TIFFTileTest, PlaneReadUnalignedTileOrdered)
     }
 }
 
-TEST_P(TIFFTileTest, PlaneReadUnalignedTileRandom)
+TEST_P(TIFFVariantTest, PlaneReadUnalignedTileRandom)
 {
   TileInfo info = ifd->getTileInfo();
 
@@ -1363,6 +1364,7 @@ public:
   ome::files::tiff::TileType                  tiletype;
   ome::files::tiff::PlanarConfiguration       planarconfig;
   ome::files::tiff::PhotometricInterpretation photometricinterp;
+  boost::optional<std::string>                compression;
   dimension_size_type                         tilewidth;
   dimension_size_type                         tileheight;
   bool                                        optimal;
@@ -1376,6 +1378,7 @@ public:
     tiletype(ome::files::tiff::TILE),
     planarconfig(ome::files::tiff::CONTIG),
     photometricinterp(ome::files::tiff::MIN_IS_BLACK),
+    compression(),
     tilewidth(0U),
     tileheight(0U),
     optimal(true),
@@ -1390,6 +1393,7 @@ public:
                       ome::files::tiff::TileType tiletype,
                       ome::files::tiff::PlanarConfiguration planarconfig,
                       ome::files::tiff::PhotometricInterpretation photometricinterp,
+                      boost::optional<std::string> compression,
                       dimension_size_type tilewidth,
                       dimension_size_type tileheight,
                       bool optimal,
@@ -1400,6 +1404,7 @@ public:
     tiletype(tiletype),
     planarconfig(planarconfig),
     photometricinterp(photometricinterp),
+    compression(compression),
     tilewidth(tilewidth),
     tileheight(tileheight),
     optimal(optimal),
@@ -1411,6 +1416,7 @@ public:
       << imagewidth << 'x' << imageheight
       << (planarconfig == ome::files::tiff::CONTIG ? "chunky" : "planar") << '-'
       << "pi" << photometricinterp << '-'
+      << "comp" << (compression ? *compression : std::string("NoneDefault")) << '-'
       << (tiletype == ome::files::tiff::TILE ? "tile" : "strip") << '-';
     if (tiletype == ome::files::tiff::TILE)
       f << tilewidth << 'x' << tileheight;
@@ -1451,10 +1457,10 @@ class PixelTest : public ::testing::TestWithParam<PixelTestParameters>
 TEST_P(PixelTest, WriteTIFF)
 {
   const PixelTestParameters& params = GetParam();
-  const VariantPixelBuffer& pixels(TIFFTileTest::getPNGData(params.imagewidth,
-                                                            params.imageheight,
-                                                            params.pixeltype,
-                                                            params.planarconfig));
+  const VariantPixelBuffer& pixels(TIFFVariantTest::getPNGData(params.imagewidth,
+                                                               params.imageheight,
+                                                               params.pixeltype,
+                                                               params.planarconfig));
   const VariantPixelBuffer::size_type *shape = pixels.shape();
 
   dimension_size_type exp_size;
@@ -1513,6 +1519,10 @@ TEST_P(PixelTest, WriteTIFF)
     ASSERT_NO_THROW(wifd->setSamplesPerPixel(shape[ome::files::DIM_SUBCHANNEL]));
     ASSERT_NO_THROW(wifd->setPlanarConfiguration(params.planarconfig));
     ASSERT_NO_THROW(wifd->setPhotometricInterpretation(params.photometricinterp));
+    if(params.compression)
+      {
+        ASSERT_NO_THROW(wifd->setCompression(ome::files::tiff::getCodecScheme(*params.compression)));
+      }
 
     // Verify IFD tags
     EXPECT_EQ(shape[ome::files::DIM_SPATIAL_X], wifd->getImageWidth());
@@ -1602,6 +1612,15 @@ TEST_P(PixelTest, WriteTIFF)
     EXPECT_EQ(shape[ome::files::DIM_SUBCHANNEL], ifd->getSamplesPerPixel());
     EXPECT_EQ(params.planarconfig, ifd->getPlanarConfiguration());
     EXPECT_EQ(params.photometricinterp, ifd->getPhotometricInterpretation());
+    if(params.compression)
+      {
+        EXPECT_EQ(ome::files::tiff::getCodecScheme(*params.compression),
+                  ifd->getCompression());
+      }
+    else
+      {
+        EXPECT_EQ(ome::files::tiff::COMPRESSION_NONE, ifd->getCompression());
+      }
 
     VariantPixelBuffer vb;
     ifd->readImage(vb);
@@ -1673,6 +1692,12 @@ namespace
     ordered.push_back(true);
     ordered.push_back(false);
 
+    std::vector<boost::optional<std::string> > compression_types;
+    compression_types.push_back(boost::optional<std::string>());
+    compression_types.push_back(boost::optional<std::string>("Deflate"));
+    compression_types.push_back(boost::optional<std::string>("LZW"));
+    compression_types.push_back(boost::optional<std::string>("None"));
+
     const PT::value_map_type& pixeltypemap = PT::values();
     std::vector<PT> pixeltypes;
     std::transform(pixeltypemap.begin(), pixeltypemap.end(), std::back_inserter(pixeltypes), ptkey);
@@ -1682,9 +1707,26 @@ namespace
         for (std::vector<PT>::const_iterator pt = pixeltypes.begin(); pt != pixeltypes.end(); ++pt)
           for (std::vector<ome::files::tiff::PlanarConfiguration>::const_iterator pc = planarconfigs.begin(); pc != planarconfigs.end(); ++pc)
             for (std::vector<ome::files::tiff::PhotometricInterpretation>::const_iterator pi = photometricinterps.begin(); pi != photometricinterps.end(); ++pi)
-              {
-                for(std::vector<dimension_size_type>::const_iterator wid = tilesizes.begin(); wid != tilesizes.end(); ++wid)
-                  for(std::vector<dimension_size_type>::const_iterator ht = tilesizes.begin(); ht != tilesizes.end(); ++ht)
+              for (std::vector<boost::optional<std::string> >::const_iterator comp = compression_types.begin(); comp != compression_types.end(); ++comp)
+                {
+                  for(std::vector<dimension_size_type>::const_iterator wid = tilesizes.begin(); wid != tilesizes.end(); ++wid)
+                    for(std::vector<dimension_size_type>::const_iterator ht = tilesizes.begin(); ht != tilesizes.end(); ++ht)
+                      {
+                        for(std::vector<bool>::const_iterator opt = optimal.begin(); opt != optimal.end(); ++opt)
+                          for(std::vector<bool>::const_iterator ord = ordered.begin(); ord != ordered.end(); ++ord)
+                            {
+                              try
+                                {
+                                  // Check PNG reference exists.
+                                  TIFFVariantTest::getPNGData(*imwid, *imht, *pt, *pc);
+                                  ret.push_back(PixelTestParameters(*imwid, *imht, *pt, ome::files::tiff::TILE, *pc, *pi, *comp, *wid, *ht, *opt, *ord));
+                                }
+                              catch(const std::exception&)
+                                {
+                                }
+                            }
+                      }
+                  for(std::vector<dimension_size_type>::const_iterator rows = stripsizes.begin(); rows != stripsizes.end(); ++rows)
                     {
                       for(std::vector<bool>::const_iterator opt = optimal.begin(); opt != optimal.end(); ++opt)
                         for(std::vector<bool>::const_iterator ord = ordered.begin(); ord != ordered.end(); ++ord)
@@ -1692,31 +1734,15 @@ namespace
                             try
                               {
                                 // Check PNG reference exists.
-                                TIFFTileTest::getPNGData(*imwid, *imht, *pt, *pc);
-                                ret.push_back(PixelTestParameters(*imwid, *imht, *pt, ome::files::tiff::TILE, *pc, *pi, *wid, *ht, *opt, *ord));
+                                TIFFVariantTest::getPNGData(*imwid, *imht, *pt, *pc);
+                                ret.push_back(PixelTestParameters(*imwid, *imht, *pt, ome::files::tiff::STRIP, *pc, *pi, *comp, *imwid, *rows, *opt, *ord));
                               }
                             catch(const std::exception&)
                               {
                               }
                           }
                     }
-                for(std::vector<dimension_size_type>::const_iterator rows = stripsizes.begin(); rows != stripsizes.end(); ++rows)
-                  {
-                    for(std::vector<bool>::const_iterator opt = optimal.begin(); opt != optimal.end(); ++opt)
-                      for(std::vector<bool>::const_iterator ord = ordered.begin(); ord != ordered.end(); ++ord)
-                        {
-                          try
-                            {
-                              // Check PNG reference exists.
-                              TIFFTileTest::getPNGData(*imwid, *imht, *pt, *pc);
-                              ret.push_back(PixelTestParameters(*imwid, *imht, *pt, ome::files::tiff::STRIP, *pc, *pi, *imwid, *rows, *opt, *ord));
-                            }
-                          catch(const std::exception&)
-                            {
-                            }
-                        }
-                  }
-              }
+                }
 
     std::random_shuffle(ret.begin(), ret.end());
 #ifdef EXTENDED_TESTS
@@ -1743,5 +1769,5 @@ std::vector<PixelTestParameters> pixel_params(pixel_tests());
 #  pragma GCC diagnostic ignored "-Wmissing-declarations"
 #endif
 
-INSTANTIATE_TEST_CASE_P(TileVariants, TIFFTileTest, ::testing::ValuesIn(tile_params));
+INSTANTIATE_TEST_CASE_P(TIFFVariants, TIFFVariantTest, ::testing::ValuesIn(tile_params));
 INSTANTIATE_TEST_CASE_P(PixelVariants, PixelTest, ::testing::ValuesIn(pixel_params));
