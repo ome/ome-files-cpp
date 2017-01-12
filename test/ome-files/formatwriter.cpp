@@ -40,6 +40,8 @@
 
 #include <boost/range/size.hpp>
 
+#include <ome/compat/memory.h>
+
 #include <ome/files/FormatWriter.h>
 #include <ome/files/MetadataTools.h>
 #include <ome/files/VariantPixelBuffer.h>
