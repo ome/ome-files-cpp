@@ -44,6 +44,8 @@
 
 #include <boost/optional.hpp>
 
+#include <ome/compat/memory.h>
+
 #include <ome/files/CoreMetadata.h>
 #include <ome/files/FileInfo.h>
 #include <ome/files/FormatHandler.h>
