@@ -570,6 +570,7 @@ namespace ome
       dimension_size_type
       FormatReader::getRGBChannelCount(dimension_size_type channel) const
       {
+        assertId(currentId, true);
         return getCoreMetadata(getCoreIndex()).sizeC.at(channel);
       }
 
