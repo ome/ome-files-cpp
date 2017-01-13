@@ -165,7 +165,7 @@ C++ interfaces are classes with:
 
 - No instance variables
 - Pure virtual methods
-- `protected`` default constructor
+- ``protected`` default constructor
 - ``public virtual`` destructor
 - Deleted copy constructor and assignment operator
 
