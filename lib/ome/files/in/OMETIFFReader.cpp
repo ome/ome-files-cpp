@@ -809,7 +809,11 @@ namespace ome
 #else // Little endian
                 coreMeta->littleEndian = true;
 #endif
-                coreMeta->interleaved = false;
+
+                // This doesn't match the reality, but since subchannels are
+                // addressed as planes this is needed.
+                coreMeta->interleaved = (pifd->getPlanarConfiguration() == tiff::CONTIG);
+
                 coreMeta->indexed = false;
                 if (photometric == tiff::PALETTE)
                   {
