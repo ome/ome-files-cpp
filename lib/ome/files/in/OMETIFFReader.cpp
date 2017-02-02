@@ -1405,7 +1405,7 @@ namespace ome
       void
       OMETIFFReader::addTIFF(const boost::filesystem::path& tiff)
       {
-        tiffs.insert(std::make_pair(tiff, std::pair<ome::compat::shared_ptr<tiff::TIFF>, bool>(ome::compat::shared_ptr<tiff::TIFF>(), false)));
+        tiffs.insert(std::make_pair(tiff, ome::compat::shared_ptr<tiff::TIFF>()));
       }
 
       const ome::compat::shared_ptr<const ome::files::tiff::TIFF>
@@ -1426,19 +1426,18 @@ namespace ome
         // is uninitialised; true is invalid.  Used to prevent
         // repeated initialisation when the file is broken or
         // nonexistent.
-        if (!i->second.first || !i->second.second)
+        if (!i->second)
           {
             try
               {
-                i->second.first = tiff::TIFF::open(i->first, "r");
+                i->second = tiff::TIFF::open(i->first, "r");
               }
             catch (const ome::files::tiff::Exception&)
               {
-                i->second.second = true;
               }
           }
 
-        if (!i->second.first)
+        if (!i->second)
           {
             BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
               << "Failed to open TIFF " << i->first.string();
@@ -1447,7 +1446,7 @@ namespace ome
             throw FormatException(fmt.str());
           }
 
-        return i->second.first;
+        return i->second;
       }
 
       bool
@@ -1461,10 +1460,10 @@ namespace ome
       OMETIFFReader::closeTIFF(const boost::filesystem::path& tiff)
       {
         tiff_map::iterator i = tiffs.find(tiff);
-        if (i->second.first)
+        if (i->second)
           {
-            i->second.first->close();
-            i->second.first = ome::compat::shared_ptr<ome::files::tiff::TIFF>();
+            i->second->close();
+            i->second = ome::compat::shared_ptr<ome::files::tiff::TIFF>();
           }
       }
 
