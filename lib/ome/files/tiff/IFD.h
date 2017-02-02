@@ -101,6 +101,8 @@ namespace ome
          * @param tiff the source TIFF.
          * @param index the directory index.
          * @returns the open IFD.
+         *
+         * @deprecated Use openOffset() instead.
          */
         static ome::compat::shared_ptr<IFD>
         openIndex(ome::compat::shared_ptr<TIFF>& tiff,
