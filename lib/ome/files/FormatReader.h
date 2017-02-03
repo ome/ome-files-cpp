@@ -54,6 +54,7 @@
 #include <ome/files/Types.h>
 
 #include <ome/compat/array.h>
+#include <ome/compat/memory.h>
 
 #include <ome/xml/meta/MetadataStore.h>
 
