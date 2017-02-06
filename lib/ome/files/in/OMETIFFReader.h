@@ -81,7 +81,7 @@ namespace ome
         typedef std::map<boost::filesystem::path, boost::filesystem::path> invalid_file_map;
 
         /// Map filename to open TIFF handle.
-        typedef std::map<boost::filesystem::path, std::pair<ome::compat::shared_ptr<ome::files::tiff::TIFF>, bool> > tiff_map;
+        typedef std::map<boost::filesystem::path, ome::compat::shared_ptr<ome::files::tiff::TIFF>> tiff_map;
 
         /// UUID to filename mapping.
         uuid_file_map files;

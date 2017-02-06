@@ -38,6 +38,9 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdarg>
+#include <vector>
+
+#include <fcntl.h> // For O_RDONLY on Unix and Windows
 
 // Include before boost headers to ensure the MPL limits get defined.
 #include <ome/common/config.h>
@@ -112,8 +115,8 @@ namespace ome
       public:
         /// The libtiff file handle.
         ::TIFF *tiff;
-        /// The number of IFDs.
-        directory_index_type directoryCount;
+        /// Directory offsets
+        std::vector<offset_type> offsets;
 
         /**
          * The constructor.
@@ -126,7 +129,7 @@ namespace ome
         Impl(const boost::filesystem::path& filename,
              const std::string&             mode):
           tiff(),
-          directoryCount(0)
+          offsets()
         {
           Sentry sentry;
 
@@ -195,6 +198,19 @@ namespace ome
         impl(ome::compat::shared_ptr<Impl>(new Impl(filename, mode)))
       {
         registerImageJTags();
+
+        // When reading, cache all directory offsets.  When writing,
+        // we don't have any offsets until we write a directory, so
+        // ignore caching entirely.
+        if(TIFFGetMode(impl->tiff) == O_RDONLY)
+          {
+            do
+              {
+                offset_type offset = static_cast<offset_type>(TIFFCurrentDirOffset(impl->tiff));
+                impl->offsets.push_back(offset);
+              }
+            while (TIFFReadDirectory(impl->tiff) == 1);
+          }
       }
 
       TIFF::~TIFF()
@@ -239,27 +255,23 @@ namespace ome
       directory_index_type
       TIFF::directoryCount() const
       {
-        if (!impl->directoryCount)
-          {
-            directory_index_type nIFD = 0U;
-            for (const_iterator i = begin();
-                 i != end();
-                 ++i, ++nIFD);
-            impl->directoryCount = nIFD;
-          }
-        return impl->directoryCount;
+        return impl->offsets.size();
       }
 
       ome::compat::shared_ptr<IFD>
       TIFF::getDirectoryByIndex(directory_index_type index) const
       {
-        Sentry sentry;
-
-        if (!TIFFSetDirectory(impl->tiff, index))
-          sentry.error();
-
-        ome::compat::shared_ptr<TIFF> t(ome::compat::const_pointer_cast<TIFF>(shared_from_this()));
-        return IFD::openIndex(t, index);
+        offset_type offset;
+        try
+          {
+            offset = impl->offsets.at(index);
+          }
+        catch (const std::out_of_range& e)
+          {
+            // Invalid index.
+            throw Exception(e.what());
+          }
+        return getDirectoryByOffset(offset);
       }
 
       ome::compat::shared_ptr<IFD>
@@ -267,11 +279,10 @@ namespace ome
       {
         Sentry sentry;
 
-        if (!TIFFSetSubDirectory(impl->tiff, offset))
-          sentry.error();
-
         ome::compat::shared_ptr<TIFF> t(ome::compat::const_pointer_cast<TIFF>(shared_from_this()));
-        return IFD::openOffset(t, offset);
+        ome::compat::shared_ptr<IFD> ifd = IFD::openOffset(t, offset);
+        ifd->makeCurrent(); // Validate offset.
+        return ifd;
       }
 
       ome::compat::shared_ptr<IFD>
