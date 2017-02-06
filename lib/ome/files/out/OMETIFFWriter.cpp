@@ -659,6 +659,10 @@ namespace ome
         else
           ifd->setPhotometricInterpretation(tiff::MIN_IS_BLACK);
 
+        const boost::optional<std::string> compression(getCompression());
+        if(compression)
+          ifd->setCompression(tiff::getCodecScheme(*compression));
+
         if (currentTIFF->second.ifdCount == 0)
           ifd->getField(ome::files::tiff::IMAGEDESCRIPTION).set(default_description);
       }
