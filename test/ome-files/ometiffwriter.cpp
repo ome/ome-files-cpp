@@ -126,6 +126,7 @@ TEST_P(TIFFWriterTest, setId)
   bool interleaved = true;
 
   tiffwriter.setInterleaved(interleaved);
+  tiffwriter.setCompression("Deflate");
 
   ASSERT_NO_THROW(tiffwriter.setId(testfile));
 
