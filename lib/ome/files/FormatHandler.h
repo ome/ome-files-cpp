@@ -257,15 +257,13 @@ namespace ome
         if (checkSuffix(name, suffixes))
           return true;
 
-        for (const auto& suffix : compression_suffixes)
+        for (const auto& suffix : suffixes)
           {
-            for (std::vector<boost::filesystem::path>::const_iterator si = suffixes.begin();
-                 si != suffixes.end();
-                 ++si)
+            for (const auto& compsuffix : compression_suffixes)
               {
-                boost::filesystem::path fullsuffix(*si);
+                boost::filesystem::path fullsuffix(suffix);
                 fullsuffix += boost::filesystem::path(".");
-                fullsuffix += suffix;
+                fullsuffix += compsuffix;
 
                 if (checkSuffix(name, fullsuffix))
                   return true;
