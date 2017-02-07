@@ -651,10 +651,7 @@ namespace ome
         // up to a width of 2048 after which tiles are used.
         if(getSizeX() == 0)
           {
-            // To avoid divide by zero.
-            ifd->setTileType(tiff::STRIP);
-            ifd->setTileWidth(getSizeX());
-            ifd->setTileHeight(1U);
+            throw FormatException("Can't set strip or tile size: SizeX is 0");
           }
         else if(getSizeX() < 2048)
           {
