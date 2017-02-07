@@ -240,9 +240,32 @@ namespace ome
         ifd->setImageWidth(getSizeX());
         ifd->setImageHeight(getSizeY());
 
-        ifd->setTileType(tiff::STRIP);
-        ifd->setTileWidth(getSizeX());
-        ifd->setTileHeight(1U);
+        // Default strip or tile size.  We base this upon a default
+        // chunk size of 64KiB for greyscale images, which will
+        // increase to 192KiB for 3 sample RGB images.  We use strips
+        // up to a width of 2048 after which tiles are used.
+        if(getSizeX() == 0)
+          {
+            // To avoid divide by zero.
+            ifd->setTileType(tiff::STRIP);
+            ifd->setTileWidth(getSizeX());
+            ifd->setTileHeight(1U);
+          }
+        else if(getSizeX() < 2048)
+          {
+            // Default to strips, mainly for compatibility with
+            // readers which don't support tiles.
+            ifd->setTileType(tiff::STRIP);
+            ifd->setTileWidth(getSizeX());
+            ifd->setTileHeight(65536U / getSizeX());
+          }
+        else
+          {
+            // Default to tiles.
+            ifd->setTileType(tiff::TILE);
+            ifd->setTileWidth(256U);
+            ifd->setTileHeight(256U);
+          }
 
         ome::compat::array<dimension_size_type, 3> coords = getZCTCoords(getPlane());
 
