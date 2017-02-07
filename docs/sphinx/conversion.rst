@@ -289,12 +289,6 @@ memory is freed by the :cpp:class:`std::shared_ptr` destructor which
 is run at the end of the block scope, on explicit :c:type:`return`, or
 when cleaned up by exception stack unwinding.
 
-.. note::
-
-    :cpp:class:`std::shared_ptr` is either a class:`std::shared_ptr`
-    :cpp:or a :cpp:class:`boost::shared_ptr`, depending upon whether
-    :cpp:C++11 features are avaiable or not, respectively.
-
 - :cpp:class:`shared_ptr` object lifetime manages the resource
 - ``new`` replaced with :cpp:class:`std::make_shared`
 - May be used as class members; lifetime is tied to class instance
