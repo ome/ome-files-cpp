@@ -60,6 +60,7 @@
 
 #include <ome/xml/meta/Convert.h>
 #include <ome/xml/meta/MetadataException.h>
+#include <ome/xml/meta/OMEXMLMetadataModel.h>
 #include <ome/xml/meta/OMEXMLMetadataRoot.h>
 
 #include <ome/xml/model/Annotation.h>
@@ -88,8 +89,10 @@ using boost::format;
 using ome::xml::meta::Metadata;
 using ome::xml::meta::MetadataException;
 using ome::xml::meta::MetadataStore;
+using ome::xml::meta::MetadataModel;
 using ome::xml::meta::MetadataRoot;
 using ome::xml::meta::OMEXMLMetadata;
+using ome::xml::meta::OMEXMLMetadataModel;
 using ome::xml::meta::OMEXMLMetadataRoot;
 
 using ome::xml::model::Image;
@@ -260,9 +263,8 @@ namespace ome
         }
 
       ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta(ome::compat::make_shared< ::ome::xml::meta::OMEXMLMetadata>());
-      ome::xml::model::detail::OMEModel model;
-      ome::compat::shared_ptr<ome::xml::meta::OMEXMLMetadataRoot> root(ome::compat::dynamic_pointer_cast<ome::xml::meta::OMEXMLMetadataRoot>(meta->getRoot()));
-      root->update(docroot, model);
+      ome::compat::shared_ptr<ome::xml::meta::OMEXMLMetadataModel> model(ome::compat::dynamic_pointer_cast<ome::xml::meta::OMEXMLMetadataModel>(meta->getModel()));
+      model->update(docroot);
 
       return meta;
     }
@@ -350,6 +352,15 @@ namespace ome
 
       ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta(ome::compat::dynamic_pointer_cast< ::ome::xml::meta::OMEXMLMetadata>(createOMEXMLMetadata(document)));
       return meta ? meta->getRoot() : ome::compat::shared_ptr< ::ome::xml::meta::MetadataRoot>();
+    }
+
+    ome::compat::shared_ptr< ::ome::xml::meta::MetadataModel>
+    createOMEXMLModel(const std::string& document)
+    {
+      /// @todo Implement model transforms.
+
+      ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> meta(ome::compat::dynamic_pointer_cast< ::ome::xml::meta::OMEXMLMetadata>(createOMEXMLMetadata(document)));
+      return meta ? meta->getModel() : ome::compat::shared_ptr< ::ome::xml::meta::MetadataModel>();
     }
 
     ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>
@@ -711,11 +722,11 @@ namespace ome
     {
       if (resolve)
         omexml.resolveReferences();
-      ome::compat::shared_ptr<MetadataRoot> root(omexml.getRoot());
-      ome::compat::shared_ptr<OMEXMLMetadataRoot> omexmlroot(ome::compat::dynamic_pointer_cast<OMEXMLMetadataRoot>(root));
-      if (omexmlroot)
+      ome::compat::shared_ptr<MetadataModel> model(omexml.getModel());
+      ome::compat::shared_ptr<OMEXMLMetadataModel> omexmlmodel(ome::compat::dynamic_pointer_cast<OMEXMLMetadataModel>(model));
+      if (omexmlmodel)
         {
-          ome::compat::shared_ptr<Image> image = omexmlroot->getImage(series);
+          ome::compat::shared_ptr<Image> image = omexmlmodel->getImage(series);
           if (image)
             {
               ome::compat::shared_ptr<Pixels> pixels = image->getPixels();
@@ -757,12 +768,12 @@ namespace ome
       // @todo Implement Modulo retrieval.
       ::ome::xml::meta::OMEXMLMetadata& momexml(const_cast< ::ome::xml::meta::OMEXMLMetadata&>(omexml));
 
-      ome::compat::shared_ptr<OMEXMLMetadataRoot> root =
-        ome::compat::dynamic_pointer_cast<OMEXMLMetadataRoot>(momexml.getRoot());
-      if (!root) // Should never occur
-        throw std::logic_error("OMEXMLMetadata does not have an OMEXMLMetadataRoot");
+      ome::compat::shared_ptr<OMEXMLMetadataModel> model =
+        ome::compat::dynamic_pointer_cast<OMEXMLMetadataModel>(momexml.getModel());
+      if (!model) // Should never occur
+        throw std::logic_error("OMEXMLMetadata does not have an OMEXMLMetadataModel");
 
-      ome::compat::shared_ptr< ::ome::xml::model::Image> mimage(root->getImage(image));
+      ome::compat::shared_ptr< ::ome::xml::model::Image> mimage(model->getImage(image));
       if (!mimage)
         throw std::runtime_error("Image does not exist in OMEXMLMetadata");
 
@@ -838,8 +849,8 @@ namespace ome
       try
         {
           MetadataStore& store(dynamic_cast<MetadataStore&>(retrieve));
-          if (!store.getRoot())
-            throw FormatException("Metadata object has null root; call createRoot() first");
+          if (!store.getModel())
+            throw FormatException("Metadata object has null model; call createModel() first");
         }
       catch (const std::bad_cast&)
         {
@@ -876,10 +887,10 @@ namespace ome
     removeBinData(::ome::xml::meta::OMEXMLMetadata& omexml)
     {
       omexml.resolveReferences();
-      ome::compat::shared_ptr<ome::xml::meta::OMEXMLMetadataRoot> root(ome::compat::dynamic_pointer_cast<ome::xml::meta::OMEXMLMetadataRoot>(omexml.getRoot()));
-      if (root)
+      ome::compat::shared_ptr<ome::xml::meta::OMEXMLMetadataModel> model(ome::compat::dynamic_pointer_cast<ome::xml::meta::OMEXMLMetadataModel>(omexml.getModel()));
+      if (model)
         {
-          std::vector<ome::compat::shared_ptr<ome::xml::model::Image> >& images(root->getImageList());
+          std::vector<ome::compat::shared_ptr<ome::xml::model::Image> >& images(model->getImageList());
           for(std::vector<ome::compat::shared_ptr<ome::xml::model::Image> >::const_iterator image = images.begin();
               image != images.end();
               ++image)
@@ -907,10 +918,10 @@ namespace ome
     removeTiffData(::ome::xml::meta::OMEXMLMetadata& omexml)
     {
       omexml.resolveReferences();
-      ome::compat::shared_ptr<ome::xml::meta::OMEXMLMetadataRoot> root(ome::compat::dynamic_pointer_cast<ome::xml::meta::OMEXMLMetadataRoot>(omexml.getRoot()));
-      if (root)
+      ome::compat::shared_ptr<ome::xml::meta::OMEXMLMetadataModel> model(ome::compat::dynamic_pointer_cast<ome::xml::meta::OMEXMLMetadataModel>(omexml.getModel()));
+      if (model)
         {
-          std::vector<ome::compat::shared_ptr<ome::xml::model::Image> >& images(root->getImageList());
+          std::vector<ome::compat::shared_ptr<ome::xml::model::Image> >& images(model->getImageList());
           for(std::vector<ome::compat::shared_ptr<ome::xml::model::Image> >::const_iterator image = images.begin();
               image != images.end();
               ++image)
@@ -940,10 +951,10 @@ namespace ome
                    dimension_size_type               sizeC)
     {
       omexml.resolveReferences();
-      ome::compat::shared_ptr<ome::xml::meta::OMEXMLMetadataRoot> root(ome::compat::dynamic_pointer_cast<ome::xml::meta::OMEXMLMetadataRoot>(omexml.getRoot()));
-      if (root)
+      ome::compat::shared_ptr<ome::xml::meta::OMEXMLMetadataModel> model(ome::compat::dynamic_pointer_cast<ome::xml::meta::OMEXMLMetadataModel>(omexml.getModel()));
+      if (model)
         {
-          ome::compat::shared_ptr<ome::xml::model::Image>& imageref(root->getImage(image));
+          ome::compat::shared_ptr<ome::xml::model::Image>& imageref(model->getImage(image));
           if (image)
             {
               ome::compat::shared_ptr<ome::xml::model::Pixels> pixels(imageref->getPixels());
@@ -966,10 +977,10 @@ namespace ome
     {
       MetadataMap map;
 
-      ome::compat::shared_ptr<ome::xml::meta::OMEXMLMetadataRoot> root(ome::compat::dynamic_pointer_cast<ome::xml::meta::OMEXMLMetadataRoot>(omexml.getRoot()));
-      if (root)
+      ome::compat::shared_ptr<ome::xml::meta::OMEXMLMetadataModel> model(ome::compat::dynamic_pointer_cast<ome::xml::meta::OMEXMLMetadataModel>(omexml.getModel()));
+      if (model)
         {
-          ome::compat::shared_ptr<StructuredAnnotations> sa(root->getStructuredAnnotations());
+          ome::compat::shared_ptr<StructuredAnnotations> sa(model->getStructuredAnnotations());
           if (sa)
             {
               for (OMEXMLMetadata::index_type i = 0; i < sa->sizeOfXMLAnnotationList(); ++i)
@@ -1054,10 +1065,10 @@ namespace ome
 
       MetadataMap flat(metadata.flatten());
 
-      ome::compat::shared_ptr<ome::xml::meta::OMEXMLMetadataRoot> root(ome::compat::dynamic_pointer_cast<ome::xml::meta::OMEXMLMetadataRoot>(omexml.getRoot()));
-      if (root)
+      ome::compat::shared_ptr<ome::xml::meta::OMEXMLMetadataModel> model(ome::compat::dynamic_pointer_cast<ome::xml::meta::OMEXMLMetadataModel>(omexml.getModel()));
+      if (model)
         {
-          ome::compat::shared_ptr<StructuredAnnotations> sa(root->getStructuredAnnotations());
+          ome::compat::shared_ptr<StructuredAnnotations> sa(model->getStructuredAnnotations());
           if (!sa)
             sa = ome::compat::make_shared<StructuredAnnotations>();
           OMEXMLMetadata::index_type annotationIndex = sa->sizeOfXMLAnnotationList();
@@ -1092,7 +1103,7 @@ namespace ome
               sa->addXMLAnnotation(xmlorig);
             }
 
-          root->setStructuredAnnotations(sa);
+          model->setStructuredAnnotations(sa);
         }
     }
 
