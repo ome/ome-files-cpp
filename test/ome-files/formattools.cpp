@@ -50,8 +50,8 @@ using ome::files::getIndex;
 using ome::files::getZCTCoords;
 using ome::xml::model::enums::DimensionOrder;
 
-typedef ome::compat::array<dimension_size_type, 3> dims;
-typedef ome::compat::array<dimension_size_type, 6> moddims;
+typedef std::array<dimension_size_type, 3> dims;
+typedef std::array<dimension_size_type, 6> moddims;
 
 namespace std
 {
@@ -219,14 +219,12 @@ namespace
     modsizes[5] = 5;
     dimension_size_type totalsize = sizes[0] * sizes[1] * sizes[2];
 
-    for (DimensionOrder::value_map_type::const_iterator order = orders.begin();
-         order != orders.end();
-         ++order)
+    for (const auto& order : orders)
       {
         dimension_size_type d0size, d1size, d2size;
         dimension_size_type md0size, md1size, md2size;
 
-        switch(order->first)
+        switch(order.first)
           {
           case DimensionOrder::XYZCT:
             d0size = sizes[0];
@@ -293,7 +291,7 @@ namespace
                 dims coords;
                 moddims modcoords;
 
-                switch(order->first)
+                switch(order.first)
                   {
                   case DimensionOrder::XYZCT:
                     coords[0] = d0;
@@ -371,11 +369,11 @@ namespace
 
                 if (verbose())
                   std::cerr << "DO="
-                            << order->second
+                            << order.second
                             << "(" << coords[0] << "," << coords[1] << "," << coords[2]
                             << "(" << modcoords[0] << "," << modcoords[1] << "," << modcoords[2] << modcoords[3] << "," << modcoords[4] << "," << modcoords[5] <<")\n";
 
-                params.push_back(DimensionTestParameters(order->second, sizes, modsizes, totalsize, coords, modcoords, index));
+                params.push_back(DimensionTestParameters(order.second, sizes, modsizes, totalsize, coords, modcoords, index));
                 ++index;
               }
       }

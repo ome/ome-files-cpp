@@ -63,20 +63,16 @@ namespace ome
       namespace
       {
 
-        // Note that tf2, tf8 and btf are all extensions for "bigTIFF"
-        // (2nd generation TIFF, TIFF with 8-byte offsets and big TIFF
-        // respectively).
-        const char *suffixes[] = {"tif", "tiff", "tf2", "tf8", "btf"};
-        const char *companion_suffixes_array[] = {"txt", "xml"};
-
         ReaderProperties
         tiff_properties()
         {
           ReaderProperties p("MinimalTIFF",
                              "Baseline Tagged Image File Format");
 
-          p.suffixes = std::vector<boost::filesystem::path>(suffixes,
-                                                            suffixes + boost::size(suffixes));
+          // Note that tf2, tf8 and btf are all extensions for
+          // "bigTIFF" (2nd generation TIFF, TIFF with 8-byte offsets
+          // and big TIFF respectively).
+          p.suffixes = {"tif", "tiff", "tf2", "tf8", "btf"};
           p.metadata_levels.insert(MetadataOptions::METADATA_MINIMUM);
           p.metadata_levels.insert(MetadataOptions::METADATA_NO_OVERLAYS);
           p.metadata_levels.insert(MetadataOptions::METADATA_ALL);
@@ -86,8 +82,7 @@ namespace ome
 
         const ReaderProperties props(tiff_properties());
 
-        std::vector<std::string> companion_suffixes(companion_suffixes_array,
-                                                    companion_suffixes_array + boost::size(companion_suffixes_array));
+        const std::vector<std::string> companion_suffixes{"txt", "xml"};
 
       }
 
@@ -124,11 +119,11 @@ namespace ome
         return static_cast<bool>(TIFF::open(name, "r"));
       }
 
-      const ome::compat::shared_ptr<const tiff::IFD>
+      const std::shared_ptr<const tiff::IFD>
       MinimalTIFFReader::ifdAtIndex(dimension_size_type plane) const
       {
         dimension_size_type ifdidx = tiff::ifdIndex(seriesIFDRange, getSeries(), plane);
-        const ome::compat::shared_ptr<const IFD>& ifd(tiff->getDirectoryByIndex(static_cast<tiff::directory_index_type>(ifdidx)));
+        const std::shared_ptr<const IFD>& ifd(tiff->getDirectoryByIndex(static_cast<tiff::directory_index_type>(ifdidx)));
 
         return ifd;
       }
@@ -185,8 +180,8 @@ namespace ome
       {
         core.clear();
 
-        ome::compat::shared_ptr<const tiff::IFD> prev_ifd;
-        ome::compat::shared_ptr<CoreMetadata> prev_core;
+        std::shared_ptr<const tiff::IFD> prev_ifd;
+        std::shared_ptr<CoreMetadata> prev_core;
 
         dimension_size_type current_ifd = 0U;
 
@@ -227,7 +222,7 @@ namespace ome
       {
         assertId(currentId, true);
 
-        const ome::compat::shared_ptr<const IFD>& ifd(ifdAtIndex(plane));
+        const std::shared_ptr<const IFD>& ifd(ifdAtIndex(plane));
 
         try
           {
@@ -251,18 +246,18 @@ namespace ome
       {
         assertId(currentId, true);
 
-        const ome::compat::shared_ptr<const IFD>& ifd(ifdAtIndex(plane));
+        const std::shared_ptr<const IFD>& ifd(ifdAtIndex(plane));
 
         ifd->readImage(buf, x, y, w, h);
       }
 
-      ome::compat::shared_ptr<ome::files::tiff::TIFF>
+      std::shared_ptr<ome::files::tiff::TIFF>
       MinimalTIFFReader::getTIFF()
       {
         return tiff;
       }
 
-      const ome::compat::shared_ptr<ome::files::tiff::TIFF>
+      const std::shared_ptr<ome::files::tiff::TIFF>
       MinimalTIFFReader::getTIFF() const
       {
         return tiff;

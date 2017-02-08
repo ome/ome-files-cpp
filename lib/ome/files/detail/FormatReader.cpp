@@ -97,7 +97,7 @@ namespace ome
         indexedAsRGB(false),
         group(true),
         domains(),
-        metadataStore(ome::compat::make_shared<DummyMetadata>()),
+        metadataStore(std::make_shared<DummyMetadata>()),
         metadataOptions()
       {
         assertId(currentId, false);
@@ -142,13 +142,8 @@ namespace ome
       {
         if (currentId)
           {
-            const std::vector<path>& s = getUsedFiles();
-            for (std::vector<path>::const_iterator i = s.begin();
-                 i != s.end();
-                 ++i)
-              {
-                if (id == *i) return;
-              }
+            for (const auto& file : getUsedFiles())
+              if (id == file) return;
           }
 
         coreIndex = 0;
@@ -158,7 +153,7 @@ namespace ome
         metadata.clear();
 
         core.clear();
-        core.push_back(ome::compat::make_shared<CoreMetadata>());
+        core.push_back(std::make_shared<CoreMetadata>());
 
         // reinitialize the MetadataStore
         // NB: critical for metadata conversion to work properly!
@@ -176,13 +171,11 @@ namespace ome
 
             /// @todo: Use a set rather than a list?
             const std::vector<path>& s = getUsedFiles();
-            for (std::vector<path>::const_iterator i = s.begin();
-                 i != s.end();
-                 ++i)
+            for (const auto& file : getUsedFiles())
               {
                 try
                   {
-                    path usedfile = boost::filesystem::canonical(path(*i));
+                    path usedfile = boost::filesystem::canonical(file);
                     if (thisfile == usedfile)
                       {
                         used = true;
@@ -358,7 +351,7 @@ namespace ome
                               dimension_size_type scanlinePad,
                               dimension_size_type samples)
       {
-        ome::compat::array<VariantPixelBuffer::size_type, 9> shape, dest_shape;
+        std::array<VariantPixelBuffer::size_type, 9> shape, dest_shape;
         shape[DIM_SPATIAL_X] = w;
         shape[DIM_SPATIAL_Y] = h;
         shape[DIM_SUBCHANNEL] = samples;
@@ -388,12 +381,12 @@ namespace ome
         boost::apply_visitor(v, dest.vbuffer());
       }
 
-      ome::compat::shared_ptr< ::ome::xml::meta::MetadataStore>
+      std::shared_ptr<::ome::xml::meta::MetadataStore>
       FormatReader::makeFilterMetadata()
       {
-        // While ome::compat::make_shared<> works, here, boost::make_shared<>
+        // While std::make_shared<> works, here, boost::make_shared<>
         // does not, so use new directly.
-        return ome::compat::shared_ptr< ::ome::xml::meta::MetadataStore>
+        return std::shared_ptr<::ome::xml::meta::MetadataStore>
           (new FilterMetadata(getMetadataStore(), isMetadataFiltered()));
       }
 
@@ -633,12 +626,12 @@ namespace ome
         return getCoreMetadata(getCoreIndex()).moduloC;
       }
 
-      ome::compat::array<dimension_size_type, 2>
+      std::array<dimension_size_type, 2>
       FormatReader::getThumbSize() const
       {
         assertId(currentId, true);
 
-        ome::compat::array<dimension_size_type, 2> ret;
+        std::array<dimension_size_type, 2> ret;
         ret[0] = getCoreMetadata(getCoreIndex()).thumbSizeX;
         ret[1] = getCoreMetadata(getCoreIndex()).thumbSizeY;
 
@@ -765,7 +758,7 @@ namespace ome
       FormatReader::close(bool fileOnly)
       {
         if (in)
-          in = ome::compat::shared_ptr<std::istream>(); // set to null.
+          in = std::shared_ptr<std::istream>(); // set to null.
         if (!fileOnly)
           {
             currentId = boost::none;
@@ -883,13 +876,8 @@ namespace ome
         for (dimension_size_type i = 0; i < getSeriesCount(); ++i)
           {
             setSeries(i);
-            std::vector<path> s = getSeriesUsedFiles(noPixels);
-            for (std::vector<path>::const_iterator file = s.begin();
-                 file != s.end();
-                 ++file)
-              {
-                files.insert(*file);
-              }
+            for (const auto& file : getSeriesUsedFiles(noPixels))
+              files.insert(file);
           }
         return std::vector<path>(files.begin(), files.end());
       }
@@ -909,12 +897,10 @@ namespace ome
         std::vector<path> files = getUsedFiles(noPixels);
         std::vector<FileInfo> infos(files.size());
 
-        for (std::vector<path>::iterator file = files.begin();
-             file != files.end();
-             ++file)
+        for (const auto& file : files)
           {
             FileInfo info;
-            info.filename = *file;
+            info.filename = file;
             info.reader = getFormat();
             info.usedToInitialize = false;
 
@@ -922,7 +908,7 @@ namespace ome
             if (currentid)
               {
                 path current = boost::filesystem::canonical(currentid.get());
-                path thisfile = boost::filesystem::canonical(*file);
+                path thisfile = boost::filesystem::canonical(file);
 
                 info.usedToInitialize = (thisfile == current);
               }
@@ -938,12 +924,10 @@ namespace ome
         std::vector<path> files = getSeriesUsedFiles(noPixels);
         std::vector<FileInfo> infos(files.size());
 
-        for (std::vector<path>::iterator file = files.begin();
-             file != files.end();
-             ++file)
+        for (const auto& file : files)
           {
             FileInfo info;
-            info.filename = *file;
+            info.filename = file;
             info.reader = getFormat();
             info.usedToInitialize = false;
 
@@ -951,7 +935,7 @@ namespace ome
             if (currentid)
               {
                 path current = boost::filesystem::canonical(currentid.get());
-                path thisfile = boost::filesystem::canonical(*file);
+                path thisfile = boost::filesystem::canonical(file);
 
                 info.usedToInitialize = (thisfile == current);
               }
@@ -1002,7 +986,7 @@ namespace ome
                                          moduloZ, moduloC, moduloT);
       }
 
-      ome::compat::array<dimension_size_type, 3>
+      std::array<dimension_size_type, 3>
       FormatReader::getZCTCoords(dimension_size_type index) const
       {
         assertId(currentId, true);
@@ -1014,7 +998,7 @@ namespace ome
                                              index);
       }
 
-      ome::compat::array<dimension_size_type, 6>
+      std::array<dimension_size_type, 6>
       FormatReader::getZCTModuloCoords(dimension_size_type index) const
       {
         assertId(currentId, true);
@@ -1055,7 +1039,7 @@ namespace ome
         return getCoreMetadata(getCoreIndex()).seriesMetadata;
       }
 
-      const std::vector<ome::compat::shared_ptr< ::ome::files::CoreMetadata> >&
+      const std::vector<std::shared_ptr<::ome::files::CoreMetadata>>&
       FormatReader::getCoreMetadataList() const
       {
         assertId(currentId, true);
@@ -1076,7 +1060,7 @@ namespace ome
       }
 
       void
-      FormatReader::setMetadataStore(ome::compat::shared_ptr< ::ome::xml::meta::MetadataStore>& store)
+      FormatReader::setMetadataStore(std::shared_ptr<::ome::xml::meta::MetadataStore>& store)
       {
         assertId(currentId, false);
 
@@ -1086,22 +1070,22 @@ namespace ome
         metadataStore = store;
       }
 
-      const ome::compat::shared_ptr< ::ome::xml::meta::MetadataStore>&
+      const std::shared_ptr<::ome::xml::meta::MetadataStore>&
       FormatReader::getMetadataStore() const
       {
         return metadataStore;
       }
 
-      ome::compat::shared_ptr< ::ome::xml::meta::MetadataStore>&
+      std::shared_ptr<::ome::xml::meta::MetadataStore>&
       FormatReader::getMetadataStore()
       {
         return metadataStore;
       }
 
-      std::vector<ome::compat::shared_ptr< ::ome::files::FormatReader> >
+      std::vector<std::shared_ptr<::ome::files::FormatReader>>
       FormatReader::getUnderlyingReaders() const
       {
-        return std::vector<ome::compat::shared_ptr< ::ome::files::FormatReader> >();
+        return std::vector<std::shared_ptr<::ome::files::FormatReader>>();
       }
 
       bool
@@ -1378,8 +1362,8 @@ namespace ome
           {
             initFile(canonicalpath);
 
-            const ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata>& store =
-              ome::compat::dynamic_pointer_cast< ::ome::xml::meta::OMEXMLMetadata>(getMetadataStore());
+            const std::shared_ptr<::ome::xml::meta::OMEXMLMetadata>& store =
+              std::dynamic_pointer_cast<::ome::xml::meta::OMEXMLMetadata>(getMetadataStore());
             if(store)
               {
                 if(saveOriginalMetadata)

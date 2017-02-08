@@ -91,32 +91,25 @@ namespace ome
       namespace
       {
 
-        // Note that tf2, tf8 and btf are all extensions for "bigTIFF"
-        // (2nd generation TIFF, TIFF with 8-byte offsets and big TIFF
-        // respectively).
-        const char *suffixes[] = {"ome.tif", "ome.tiff", "ome.tf2", "ome.tf8", "ome.btf"};
-        const char *companion_suffixes_array[] = {"companion.ome"};
-
         WriterProperties
         tiff_properties()
         {
           WriterProperties p("OME-TIFF",
                              "Open Microscopy Environment TIFF");
 
-          p.suffixes = std::vector<boost::filesystem::path>(suffixes,
-                                                            suffixes + boost::size(suffixes));
+          // Note that tf2, tf8 and btf are all extensions for
+          // "bigTIFF" (2nd generation TIFF, TIFF with 8-byte offsets
+          // and big TIFF respectively).
+          p.suffixes = {"ome.tif", "ome.tiff", "ome.tf2", "ome.tf8", "ome.btf"};
 
-          const PixelType::value_map_type& pv = PixelType::values();
-          for (PixelType::value_map_type::const_iterator i = pv.begin();
-               i != pv.end();
-               ++i)
+          for (const auto& pixeltype : PixelType::values())
             {
-              const std::vector<std::string>& ptcodecs = tiff::getCodecNames(i->first);
+              const std::vector<std::string>& ptcodecs = tiff::getCodecNames(pixeltype.first);
               std::set<std::string> codecset(ptcodecs.begin(), ptcodecs.end());
               // Supported by default with no compression
               codecset.insert("default");
               p.compression_types.insert(codecset.begin(), codecset.end());
-              p.pixel_compression_types.insert(WriterProperties::pixel_compression_type_map::value_type(i->first, codecset));
+              p.pixel_compression_types.insert(WriterProperties::pixel_compression_type_map::value_type(pixeltype.first, codecset));
             }
 
           return p;
@@ -124,8 +117,7 @@ namespace ome
 
         const WriterProperties props(tiff_properties());
 
-        std::vector<path> companion_suffixes(companion_suffixes_array,
-                                             companion_suffixes_array + boost::size(companion_suffixes_array));
+        const std::vector<path> companion_suffixes{"companion.ome"};
 
         const std::string default_description("OME-TIFF");
 
@@ -411,7 +403,7 @@ namespace ome
 
       }
 
-      OMETIFFWriter::TIFFState::TIFFState(ome::compat::shared_ptr<ome::files::tiff::TIFF>& tiff):
+      OMETIFFWriter::TIFFState::TIFFState(std::shared_ptr<ome::files::tiff::TIFF>& tiff):
         uuid(boost::uuids::to_string(boost::uuids::random_generator()())),
         tiff(tiff),
         ifdCount(0U)
@@ -469,7 +461,7 @@ namespace ome
 
             // Create OME-XML metadata.
             originalMetadataRetrieve = metadataRetrieve;
-            omeMeta = ome::compat::make_shared<OMEXMLMetadata>();
+            omeMeta = std::make_shared<OMEXMLMetadata>();
             convert(*metadataRetrieve, *omeMeta);
             omeMeta->resolveReferences();
             metadataRetrieve = omeMeta;
@@ -517,7 +509,7 @@ namespace ome
             flags += 'w';
 
             // Get expected size of pixel data.
-            ome::compat::shared_ptr<const ::ome::xml::meta::MetadataRetrieve> mr(getMetadataRetrieve());
+            std::shared_ptr<const ::ome::xml::meta::MetadataRetrieve> mr(getMetadataRetrieve());
             storage_size_type pixelSize = significantPixelSize(*mr);
 
             if (enableBigTIFF(bigTIFF, pixelSize, canonicalpath, logger))
@@ -528,7 +520,7 @@ namespace ome
         if (i == tiffs.end())
           {
             detail::FormatWriter::setId(canonicalpath);
-            ome::compat::shared_ptr<ome::files::tiff::TIFF> tiff(ome::files::tiff::TIFF::open(canonicalpath, flags));
+            std::shared_ptr<ome::files::tiff::TIFF> tiff(ome::files::tiff::TIFF::open(canonicalpath, flags));
             std::pair<tiff_map::iterator,bool> result =
               tiffs.insert(tiff_map::value_type(*currentId, TIFFState(tiff)));
             if (result.second) // should always be true
@@ -563,25 +555,21 @@ namespace ome
                 // Create UUID and TiffData elements for each series.
                 fillMetadata();
 
-                for (tiff_map::const_iterator t = tiffs.begin();
-                     t != tiffs.end();
-                     ++t)
+                for (auto& tiff : tiffs)
                   {
                     // Get OME-XML for this TIFF file.
-                    std::string xml = getOMEXML(t->first);
+                    std::string xml = getOMEXML(tiff.first);
                     // Make sure file is closed before we modify it outside libtiff.
-                    t->second.tiff->close();
+                    tiff.second.tiff->close();
 
                     // Save OME-XML in the TIFF.
-                    saveComment(t->first, xml);
+                    saveComment(tiff.first, xml);
                   }
               }
 
             // Close any open TIFFs.
-            for (tiff_map::const_iterator t = tiffs.begin();
-                 t != tiffs.end();
-                 ++t)
-              t->second.tiff->close();
+            for (auto& tiff : tiffs)
+              tiff.second.tiff->close();
 
             files.clear();
             tiffs.clear();
@@ -639,7 +627,7 @@ namespace ome
       OMETIFFWriter::setupIFD() const
       {
         // Get current IFD.
-        ome::compat::shared_ptr<tiff::IFD> ifd (currentTIFF->second.tiff->getCurrentDirectory());
+        std::shared_ptr<tiff::IFD> ifd (currentTIFF->second.tiff->getCurrentDirectory());
 
         // Default to single strips for now.
         ifd->setImageWidth(getSizeX());
@@ -649,7 +637,7 @@ namespace ome
         ifd->setTileWidth(getSizeX());
         ifd->setTileHeight(1U);
 
-        ome::compat::array<dimension_size_type, 3> coords = getZCTCoords(getPlane());
+        std::array<dimension_size_type, 3> coords = getZCTCoords(getPlane());
 
         dimension_size_type channel = coords[1];
 
@@ -692,7 +680,7 @@ namespace ome
         setPlane(plane);
 
         // Get current IFD.
-        ome::compat::shared_ptr<tiff::IFD> ifd (currentTIFF->second.tiff->getCurrentDirectory());
+        std::shared_ptr<tiff::IFD> ifd (currentTIFF->second.tiff->getCurrentDirectory());
 
         // Get plane metadata.
         detail::OMETIFFPlane& planeMeta(seriesState.at(getSeries()).planes.at(plane));
@@ -713,18 +701,11 @@ namespace ome
           throw std::logic_error("OMEXMLMetadata null");
 
         dimension_size_type badPlanes = 0U;
-        for (series_list::const_iterator series = seriesState.begin();
-             series != seriesState.end();
-             ++series)
-          {
-            for (std::vector<detail::OMETIFFPlane>::const_iterator plane = series->planes.begin();
-                 plane != series->planes.end();
-                 ++plane)
-              {
-                if (plane->status != detail::OMETIFFPlane::PRESENT) // Plane not written.
-                  ++badPlanes;
-              }
-          }
+        for (const auto& series : seriesState)
+          for (const auto& plane : series.planes)
+            if (plane.status != detail::OMETIFFPlane::PRESENT) // Plane not written.
+              ++badPlanes;
+
         if (badPlanes)
           {
             boost::format fmt
@@ -750,7 +731,7 @@ namespace ome
 
             for (dimension_size_type plane = 0U; plane < imageCount; ++plane)
               {
-                ome::compat::array<dimension_size_type, 3> coords =
+                std::array<dimension_size_type, 3> coords =
                   ome::files::getZCTCoords(dimOrder, sizeZ, effC, sizeT, imageCount, plane);
                 const detail::OMETIFFPlane& planeState(seriesState.at(series).planes.at(plane));
 

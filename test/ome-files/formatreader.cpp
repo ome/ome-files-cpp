@@ -71,8 +71,8 @@ using ome::xml::meta::OMEXMLMetadata;
 using ome::xml::model::enums::PixelType;
 
 typedef ome::xml::model::enums::PixelType PT;
-typedef ome::compat::array<dimension_size_type, 3> dim;
-typedef ome::compat::array<dimension_size_type, 6> moddim;
+typedef std::array<dimension_size_type, 3> dim;
+typedef std::array<dimension_size_type, 6> moddim;
 
 class FormatReaderTestParameters
 {
@@ -144,10 +144,10 @@ protected:
     return in == "Valid file content\n";
   }
 
-  ome::compat::shared_ptr<CoreMetadata>
+  std::shared_ptr<CoreMetadata>
   makeCore()
   {
-    ome::compat::shared_ptr<CoreMetadata> c(ome::compat::make_shared<CoreMetadata>());
+    std::shared_ptr<CoreMetadata> c(std::make_shared<CoreMetadata>());
 
     c->sizeX = 512;
     c->sizeY = 1024;
@@ -211,7 +211,7 @@ protected:
         // 5 series, 3 with subresolutions
         core.clear();
         {
-          ome::compat::shared_ptr<CoreMetadata> c(makeCore());
+          std::shared_ptr<CoreMetadata> c(makeCore());
           c->resolutionCount = 3;
           core.push_back(c);
           core.push_back(makeCore());
@@ -219,7 +219,7 @@ protected:
         }
 
         {
-          ome::compat::shared_ptr<CoreMetadata> c(makeCore());
+          std::shared_ptr<CoreMetadata> c(makeCore());
           c->resolutionCount = 2;
           core.push_back(c);
           core.push_back(makeCore());
@@ -229,7 +229,7 @@ protected:
         core.push_back(makeCore());
 
         {
-          ome::compat::shared_ptr<CoreMetadata> c(makeCore());
+          std::shared_ptr<CoreMetadata> c(makeCore());
           c->resolutionCount = 2;
           core.push_back(c);
           core.push_back(makeCore());
@@ -594,9 +594,9 @@ struct dims
     z(z), t(t), c(c)
   {}
 
-  operator ome::compat::array<dimension_size_type, 3>() const
+  operator std::array<dimension_size_type, 3>() const
   {
-    ome::compat::array<dimension_size_type, 3> ret;
+    std::array<dimension_size_type, 3> ret;
     ret[0] = z;
     ret[1] = c;
     ret[2] = t;
@@ -622,9 +622,9 @@ struct moddims
     z(z), t(t), c(c), mz(mz), mt(mt), mc(mc)
   {}
 
-  operator ome::compat::array<dimension_size_type, 6>() const
+  operator std::array<dimension_size_type, 6>() const
   {
-    ome::compat::array<dimension_size_type, 6> ret;
+    std::array<dimension_size_type, 6> ret;
     ret[0] = z;
     ret[1] = c;
     ret[2] = t;
@@ -650,39 +650,39 @@ TEST_P(FormatReaderTest, FlatSeries)
   EXPECT_EQ(0U, r.getResolution());
   EXPECT_NO_THROW(r.setResolution(0));
 
-  dims coords[] =
+  static const std::vector<dims> coords
     {
-      dims(0,  0, 0),
-      dims(1,  0, 0),
-      dims(0,  1, 0),
-      dims(0,  0, 1),
-      dims(1,  1, 0),
-      dims(1,  0, 1),
-      dims(0,  1, 1),
-      dims(1,  1, 1),
-      dims(3,  2, 1),
-      dims(12, 3, 0),
-      dims(8,  2, 1),
-      dims(19, 4, 1)
+      {0,  0, 0},
+      {1,  0, 0},
+      {0,  1, 0},
+      {0,  0, 1},
+      {1,  1, 0},
+      {1,  0, 1},
+      {0,  1, 1},
+      {1,  1, 1},
+      {3,  2, 1},
+      {12, 3, 0},
+      {8,  2, 1},
+      {19, 4, 1}
     };
 
-    moddims modcoords[] =
+  static const std::vector<moddims> modcoords
     {
-      moddims(0, 0, 0, 0, 0, 0),
-      moddims(0, 0, 0, 1, 0, 0),
-      moddims(0, 1, 0, 0, 0, 0),
-      moddims(0, 0, 1, 0, 0, 0),
-      moddims(0, 1, 0, 1, 0, 0),
-      moddims(0, 0, 1, 1, 0, 0),
-      moddims(0, 1, 1, 0, 0, 0),
-      moddims(0, 1, 1, 1, 0, 0),
-      moddims(0, 2, 1, 3, 0, 0),
-      moddims(2, 3, 0, 2, 0, 0),
-      moddims(1, 2, 1, 3, 0, 0),
-      moddims(3, 4, 1, 4, 0, 0)
+      {0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 1, 0, 0},
+      {0, 1, 0, 0, 0, 0},
+      {0, 0, 1, 0, 0, 0},
+      {0, 1, 0, 1, 0, 0},
+      {0, 0, 1, 1, 0, 0},
+      {0, 1, 1, 0, 0, 0},
+      {0, 1, 1, 1, 0, 0},
+      {0, 2, 1, 3, 0, 0},
+      {2, 3, 0, 2, 0, 0},
+      {1, 2, 1, 3, 0, 0},
+      {3, 4, 1, 4, 0, 0}
     };
 
-  dimension_size_type indexes[] =
+  static const std::vector<dimension_size_type> indexes
     {
       0,
       1,
@@ -698,8 +698,8 @@ TEST_P(FormatReaderTest, FlatSeries)
       199
     };
 
-  for (unsigned int i = 0;
-       i < boost::size(coords);
+  for (std::vector<dims>::size_type i = 0;
+       i < coords.size();
        ++i)
     {
       const dim coord(static_cast<dim>(coords[i]));
@@ -712,8 +712,8 @@ TEST_P(FormatReaderTest, FlatSeries)
       EXPECT_TRUE(coord == ncoord);
     }
 
-  for (unsigned int i = 0;
-       i < boost::size(modcoords);
+  for (std::vector<moddims>::size_type i = 0;
+       i < modcoords.size();
        ++i)
     {
       const moddim coord(static_cast<moddim>(modcoords[i]));
@@ -746,9 +746,9 @@ TEST_P(FormatReaderTest, SubresolutionFlattenedSeries)
 
   EXPECT_EQ(0U, r.getIndex(0, 0, 0));
   EXPECT_EQ(0U, r.getIndex(0, 0, 0, 0, 0, 0));
-  ome::compat::array<dimension_size_type, 3> coords;
+  std::array<dimension_size_type, 3> coords;
   coords[0] = coords[1] = coords[2] = 0;
-  ome::compat::array<dimension_size_type, 6> modcoords;
+  std::array<dimension_size_type, 6> modcoords;
   modcoords[0] = modcoords[1] = modcoords[2] = modcoords[3] = modcoords[4] = modcoords[5] = 0;
 
   // EXPECT_EQ should work here, but fails for Boost 1.42; works
@@ -777,9 +777,9 @@ TEST_P(FormatReaderTest, SubresolutionUnflattenedSeries)
 
   EXPECT_EQ(0U, r.getIndex(0, 0, 0));
   EXPECT_EQ(0U, r.getIndex(0, 0, 0, 0, 0, 0));
-  ome::compat::array<dimension_size_type, 3> coords;
+  std::array<dimension_size_type, 3> coords;
   coords[0] = coords[1] = coords[2] = 0;
-  ome::compat::array<dimension_size_type, 6> modcoords;
+  std::array<dimension_size_type, 6> modcoords;
   modcoords[0] = modcoords[1] = modcoords[2] = modcoords[3] = modcoords[4] = modcoords[5] = 0;
 
   // EXPECT_EQ should work here, but fails for Boost 1.42; works
@@ -978,17 +978,17 @@ TEST_P(FormatReaderTest, FlatMetadata)
 
 TEST_P(FormatReaderTest, DefaultMetadataStore)
 {
-  ome::compat::shared_ptr<MetadataStore> store(ome::compat::make_shared<OMEXMLMetadata>());
+  std::shared_ptr<MetadataStore> store(std::make_shared<OMEXMLMetadata>());
 
   EXPECT_NO_THROW(r.setMetadataStore(store));
-  EXPECT_EQ(store, ome::compat::dynamic_pointer_cast<OMEXMLMetadata>(r.getMetadataStore()));
+  EXPECT_EQ(store, std::dynamic_pointer_cast<OMEXMLMetadata>(r.getMetadataStore()));
 }
 
 TEST_P(FormatReaderTest, FlatMetadataStore)
 {
   r.setId("flat");
 
-  ome::compat::shared_ptr<MetadataStore> store(ome::compat::make_shared<OMEXMLMetadata>());
+  std::shared_ptr<MetadataStore> store(std::make_shared<OMEXMLMetadata>());
 
   EXPECT_THROW(r.setMetadataStore(store), std::logic_error);
 }
@@ -1084,40 +1084,40 @@ TEST_P(FormatReaderTest, FlatPixels)
   boost::apply_visitor(v, buf.vbuffer());
 }
 
-FormatReaderTestParameters variant_params[] =
-  { //                         PixelType          EndianType
-    FormatReaderTestParameters(PT::INT8,          ome::files::ENDIAN_BIG),
-    FormatReaderTestParameters(PT::INT8,          ome::files::ENDIAN_LITTLE),
+const std::vector<FormatReaderTestParameters> variant_params
+  { // PixelType       EndianType
+    {PT::INT8,          ome::files::ENDIAN_BIG},
+    {PT::INT8,          ome::files::ENDIAN_LITTLE},
 
-    FormatReaderTestParameters(PT::INT16,         ome::files::ENDIAN_BIG),
-    FormatReaderTestParameters(PT::INT16,         ome::files::ENDIAN_LITTLE),
+    {PT::INT16,         ome::files::ENDIAN_BIG},
+    {PT::INT16,         ome::files::ENDIAN_LITTLE},
 
-    FormatReaderTestParameters(PT::INT32,         ome::files::ENDIAN_BIG),
-    FormatReaderTestParameters(PT::INT32,         ome::files::ENDIAN_LITTLE),
+    {PT::INT32,         ome::files::ENDIAN_BIG},
+    {PT::INT32,         ome::files::ENDIAN_LITTLE},
 
-    FormatReaderTestParameters(PT::UINT8,         ome::files::ENDIAN_BIG),
-    FormatReaderTestParameters(PT::UINT8,         ome::files::ENDIAN_LITTLE),
+    {PT::UINT8,         ome::files::ENDIAN_BIG},
+    {PT::UINT8,         ome::files::ENDIAN_LITTLE},
 
-    FormatReaderTestParameters(PT::UINT16,        ome::files::ENDIAN_BIG),
-    FormatReaderTestParameters(PT::UINT16,        ome::files::ENDIAN_LITTLE),
+    {PT::UINT16,        ome::files::ENDIAN_BIG},
+    {PT::UINT16,        ome::files::ENDIAN_LITTLE},
 
-    FormatReaderTestParameters(PT::UINT32,        ome::files::ENDIAN_BIG),
-    FormatReaderTestParameters(PT::UINT32,        ome::files::ENDIAN_LITTLE),
+    {PT::UINT32,        ome::files::ENDIAN_BIG},
+    {PT::UINT32,        ome::files::ENDIAN_LITTLE},
 
-    FormatReaderTestParameters(PT::FLOAT,         ome::files::ENDIAN_BIG),
-    FormatReaderTestParameters(PT::FLOAT,         ome::files::ENDIAN_LITTLE),
+    {PT::FLOAT,         ome::files::ENDIAN_BIG},
+    {PT::FLOAT,         ome::files::ENDIAN_LITTLE},
 
-    FormatReaderTestParameters(PT::DOUBLE,        ome::files::ENDIAN_BIG),
-    FormatReaderTestParameters(PT::DOUBLE,        ome::files::ENDIAN_LITTLE),
+    {PT::DOUBLE,        ome::files::ENDIAN_BIG},
+    {PT::DOUBLE,        ome::files::ENDIAN_LITTLE},
 
-    FormatReaderTestParameters(PT::BIT,           ome::files::ENDIAN_BIG),
-    FormatReaderTestParameters(PT::BIT,           ome::files::ENDIAN_LITTLE),
+    {PT::BIT,           ome::files::ENDIAN_BIG},
+    {PT::BIT,           ome::files::ENDIAN_LITTLE},
 
-    FormatReaderTestParameters(PT::COMPLEXFLOAT,  ome::files::ENDIAN_BIG),
-    FormatReaderTestParameters(PT::COMPLEXFLOAT,  ome::files::ENDIAN_LITTLE),
+    {PT::COMPLEXFLOAT,  ome::files::ENDIAN_BIG},
+    {PT::COMPLEXFLOAT,  ome::files::ENDIAN_LITTLE},
 
-    FormatReaderTestParameters(PT::COMPLEXDOUBLE, ome::files::ENDIAN_BIG),
-    FormatReaderTestParameters(PT::COMPLEXDOUBLE, ome::files::ENDIAN_LITTLE),
+    {PT::COMPLEXDOUBLE, ome::files::ENDIAN_BIG},
+    {PT::COMPLEXDOUBLE, ome::files::ENDIAN_LITTLE}
   };
 
 // Disable missing-prototypes warning for INSTANTIATE_TEST_CASE_P;

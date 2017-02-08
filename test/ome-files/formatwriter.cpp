@@ -120,7 +120,7 @@ namespace std
 }
 
 typedef ome::xml::model::enums::PixelType PT;
-typedef ome::compat::array<dimension_size_type, 3> dim;
+typedef std::array<dimension_size_type, 3> dim;
 
 class FormatWriterTestParameters
 {
@@ -226,9 +226,9 @@ public:
 
 private:
   void
-  makeMetadata(ome::compat::shared_ptr< ::ome::xml::meta::MetadataStore> store,
-               dimension_size_type                                       series,
-               ome::compat::shared_ptr<CoreMetadata>                     core)
+  makeMetadata(std::shared_ptr<::ome::xml::meta::MetadataStore> store,
+               dimension_size_type                              series,
+               std::shared_ptr<CoreMetadata>                    core)
   {
     store->setImageID(createID("Image", series), series);
     store->setImageAcquisitionDate
@@ -253,10 +253,10 @@ private:
       }
   }
 
-  ome::compat::shared_ptr<CoreMetadata>
+  std::shared_ptr<CoreMetadata>
   makeCore()
   {
-    ome::compat::shared_ptr<CoreMetadata> c(ome::compat::make_shared<CoreMetadata>());
+    std::shared_ptr<CoreMetadata> c(std::make_shared<CoreMetadata>());
 
     c->sizeX = 512;
     c->sizeY = 1024;
@@ -287,7 +287,7 @@ public:
   {
     if (!currentId)
       {
-        ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> m(ome::compat::make_shared< ::ome::xml::meta::OMEXMLMetadata>());
+        std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> m(std::make_shared<::ome::xml::meta::OMEXMLMetadata>());
 
         if (id == "output.test")
           {
@@ -298,7 +298,7 @@ public:
             makeMetadata(m, 3, makeCore());
           }
 
-        ome::compat::shared_ptr< ::ome::xml::meta::MetadataRetrieve> mr(ome::compat::static_pointer_cast< ::ome::xml::meta::MetadataRetrieve>(m));
+        std::shared_ptr<::ome::xml::meta::MetadataRetrieve> mr(std::static_pointer_cast<::ome::xml::meta::MetadataRetrieve>(m));
         setMetadataRetrieve(mr);
 
         FormatWriter::setId(id);
@@ -690,8 +690,8 @@ TEST_P(FormatWriterTest, SupportedPixelTypeByCodec)
 
 TEST_P(FormatWriterTest, DefaultMetadataRetrieve)
 {
-  ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> m(ome::compat::make_shared< ::ome::xml::meta::OMEXMLMetadata>());
-  ome::compat::shared_ptr< ::ome::xml::meta::MetadataRetrieve> mr(ome::compat::static_pointer_cast< ::ome::xml::meta::MetadataRetrieve>(m));
+  std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> m(std::make_shared<::ome::xml::meta::OMEXMLMetadata>());
+  std::shared_ptr<::ome::xml::meta::MetadataRetrieve> mr(std::static_pointer_cast<::ome::xml::meta::MetadataRetrieve>(m));
 
   EXPECT_NO_THROW(w.getMetadataRetrieve());
   EXPECT_NO_THROW(w.setMetadataRetrieve(mr));
@@ -702,9 +702,9 @@ TEST_P(FormatWriterTest, DefaultMetadataRetrieve)
 
 TEST_P(FormatWriterTest, OutputMetadataRetrieve)
 {
-  ome::compat::shared_ptr<const ::ome::xml::meta::MetadataRetrieve> mr;
-  ome::compat::shared_ptr< ::ome::xml::meta::OMEXMLMetadata> m2(ome::compat::make_shared< ::ome::xml::meta::OMEXMLMetadata>());
-  ome::compat::shared_ptr< ::ome::xml::meta::MetadataRetrieve> mr2(ome::compat::static_pointer_cast< ::ome::xml::meta::MetadataRetrieve>(m2));
+  std::shared_ptr<const ::ome::xml::meta::MetadataRetrieve> mr;
+  std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> m2(std::make_shared<::ome::xml::meta::OMEXMLMetadata>());
+  std::shared_ptr<::ome::xml::meta::MetadataRetrieve> mr2(std::static_pointer_cast<::ome::xml::meta::MetadataRetrieve>(m2));
 
   w.setId("output.test");
 
@@ -715,40 +715,40 @@ TEST_P(FormatWriterTest, OutputMetadataRetrieve)
   EXPECT_NO_THROW(cw.getMetadataRetrieve());
 }
 
-FormatWriterTestParameters variant_params[] =
-  { //                         PixelType          EndianType
-    FormatWriterTestParameters(PT::INT8,          ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::INT8,          ome::files::ENDIAN_LITTLE),
+std::vector<FormatWriterTestParameters> variant_params
+  { // PixelType        EndianType
+    {PT::INT8,          ome::files::ENDIAN_BIG},
+    {PT::INT8,          ome::files::ENDIAN_LITTLE},
 
-    FormatWriterTestParameters(PT::INT16,         ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::INT16,         ome::files::ENDIAN_LITTLE),
+    {PT::INT16,         ome::files::ENDIAN_BIG},
+    {PT::INT16,         ome::files::ENDIAN_LITTLE},
 
-    FormatWriterTestParameters(PT::INT32,         ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::INT32,         ome::files::ENDIAN_LITTLE),
+    {PT::INT32,         ome::files::ENDIAN_BIG},
+    {PT::INT32,         ome::files::ENDIAN_LITTLE},
 
-    FormatWriterTestParameters(PT::UINT8,         ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::UINT8,         ome::files::ENDIAN_LITTLE),
+    {PT::UINT8,         ome::files::ENDIAN_BIG},
+    {PT::UINT8,         ome::files::ENDIAN_LITTLE},
 
-    FormatWriterTestParameters(PT::UINT16,        ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::UINT16,        ome::files::ENDIAN_LITTLE),
+    {PT::UINT16,        ome::files::ENDIAN_BIG},
+    {PT::UINT16,        ome::files::ENDIAN_LITTLE},
 
-    FormatWriterTestParameters(PT::UINT32,        ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::UINT32,        ome::files::ENDIAN_LITTLE),
+    {PT::UINT32,        ome::files::ENDIAN_BIG},
+    {PT::UINT32,        ome::files::ENDIAN_LITTLE},
 
-    FormatWriterTestParameters(PT::FLOAT,         ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::FLOAT,         ome::files::ENDIAN_LITTLE),
+    {PT::FLOAT,         ome::files::ENDIAN_BIG},
+    {PT::FLOAT,         ome::files::ENDIAN_LITTLE},
 
-    FormatWriterTestParameters(PT::DOUBLE,        ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::DOUBLE,        ome::files::ENDIAN_LITTLE),
+    {PT::DOUBLE,        ome::files::ENDIAN_BIG},
+    {PT::DOUBLE,        ome::files::ENDIAN_LITTLE},
 
-    FormatWriterTestParameters(PT::BIT,           ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::BIT,           ome::files::ENDIAN_LITTLE),
+    {PT::BIT,           ome::files::ENDIAN_BIG},
+    {PT::BIT,           ome::files::ENDIAN_LITTLE},
 
-    FormatWriterTestParameters(PT::COMPLEXFLOAT,  ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::COMPLEXFLOAT,  ome::files::ENDIAN_LITTLE),
+    {PT::COMPLEXFLOAT,  ome::files::ENDIAN_BIG},
+    {PT::COMPLEXFLOAT,  ome::files::ENDIAN_LITTLE},
 
-    FormatWriterTestParameters(PT::COMPLEXDOUBLE, ome::files::ENDIAN_BIG),
-    FormatWriterTestParameters(PT::COMPLEXDOUBLE, ome::files::ENDIAN_LITTLE),
+    {PT::COMPLEXDOUBLE, ome::files::ENDIAN_BIG},
+    {PT::COMPLEXDOUBLE, ome::files::ENDIAN_LITTLE}
   };
 
 // Disable missing-prototypes warning for INSTANTIATE_TEST_CASE_P;

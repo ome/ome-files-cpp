@@ -38,9 +38,9 @@
 #ifndef OME_FILES_TIFF_TYPES_H
 #define OME_FILES_TIFF_TYPES_H
 
-#include <ome/files/Types.h>
+#include <cstdint>
 
-#include <ome/compat/cstdint.h>
+#include <ome/files/Types.h>
 
 #ifdef _MSC_VER
 #pragma push_macro("VOID")

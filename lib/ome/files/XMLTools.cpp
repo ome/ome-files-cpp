@@ -66,11 +66,9 @@ namespace ome
       std::string ret;
       ret.reserve(s.size());
 
-      for(std::string::const_iterator i = s.begin();
-          i != s.end();
-          ++i)
+      for (const auto& i : s)
         {
-          switch(*i)
+          switch(i)
             {
             case '<':
               ret += "&lt;";
@@ -88,7 +86,7 @@ namespace ome
               ret += "&apos;";
               break;
             default:
-              ret += *i;
+              ret += i;
               break;
             }
         }

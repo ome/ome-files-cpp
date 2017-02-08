@@ -36,13 +36,15 @@
  * #L%
  */
 
+#include <array>
 #include <cstdio>
 #include <stdexcept>
+#include <tuple>
+#include <type_traits>
 #include <vector>
 
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
-#include <boost/type_traits.hpp>
 
 #include <ome/files/PixelProperties.h>
 #include <ome/files/tiff/Codec.h>
@@ -53,7 +55,6 @@
 #include <ome/files/tiff/Exception.h>
 
 #include <ome/compat/regex.h>
-#include <ome/compat/tuple.h>
 
 #include <ome/test/config.h>
 #include <ome/test/test.h>
@@ -81,9 +82,19 @@ using namespace boost::filesystem;
 namespace
 {
 
+  /// Type trait for complex.
+  template <class T>
+  struct is_complex
+    : boost::false_type {};
+
+  /// Type trait for complex.
+  template <class T>
+  struct is_complex<std::complex<T>>
+    : boost::true_type {};
+
   struct DumpPixelBufferVisitor : public boost::static_visitor<>
   {
-    typedef ::ome::files::PixelProperties< ::ome::xml::model::enums::PixelType::BIT>::std_type bit_type;
+    typedef ::ome::files::PixelProperties<::ome::xml::model::enums::PixelType::BIT>::std_type bit_type;
 
     std::ostream& stream;
 
@@ -92,10 +103,10 @@ namespace
     {}
 
     template <typename T>
-    typename boost::enable_if_c<
-      boost::is_integral<T>::value, float
+    typename std::enable_if<
+      std::is_integral<T>::value, float
       >::type
-    dump(const ome::compat::shared_ptr< ::ome::files::PixelBuffer<T> >& buf,
+    dump(const std::shared_ptr<::ome::files::PixelBuffer<T>>& buf,
          const typename ::ome::files::PixelBuffer<T>::indices_type& idx) const
     {
       float v = static_cast<float>(buf->at(idx));
@@ -105,10 +116,10 @@ namespace
     }
 
     template <typename T>
-    typename boost::enable_if_c<
-      boost::is_floating_point<T>::value, float
+    typename std::enable_if<
+      std::is_floating_point<T>::value, float
       >::type
-    dump(const ome::compat::shared_ptr< ::ome::files::PixelBuffer<T> >& buf,
+    dump(const std::shared_ptr<::ome::files::PixelBuffer<T>>& buf,
          const typename ::ome::files::PixelBuffer<T>::indices_type& idx) const
     {
       // Assume float is already normalised.
@@ -116,10 +127,10 @@ namespace
     }
 
     template <typename T>
-    typename boost::enable_if_c<
-      boost::is_complex<T>::value, float
+    typename std::enable_if<
+      is_complex<T>::value, float
       >::type
-    dump(const ome::compat::shared_ptr< ::ome::files::PixelBuffer<T> >& buf,
+    dump(const std::shared_ptr<::ome::files::PixelBuffer<T>>& buf,
          const typename ::ome::files::PixelBuffer<T>::indices_type& idx) const
     {
       // Assume float is already normalised.
@@ -130,7 +141,7 @@ namespace
     // and the upper half being set to true for the destination boolean
     // pixel type.
     float
-    dump(const ome::compat::shared_ptr< ::ome::files::PixelBuffer<bit_type> >& buf,
+    dump(const std::shared_ptr<::ome::files::PixelBuffer<bit_type>>& buf,
          const ::ome::files::PixelBuffer<bit_type>::indices_type& idx)
     {
       return buf->at(idx) ? 1.0f : 0.0f;
@@ -153,7 +164,7 @@ namespace
         idx[ome::files::DIM_CHANNEL] = idx[ome::files::DIM_MODULO_Z] =
         idx[ome::files::DIM_MODULO_T] = idx[ome::files::DIM_MODULO_C] = 0;
 
-      const char * const shades[] = {" ", "░", "▒", "▓", "█"};
+      const std::array<const char *,5> shades{{" ", "░", "▒", "▓", "█"}};
 
       for (VariantPixelBuffer::size_type y = 0; y < h; ++y)
         {
@@ -228,13 +239,13 @@ TEST_F(TIFFTest, ConstructFailFile)
 
 TEST_F(TIFFTest, IFDsByIndex)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t =TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   for (directory_index_type i = 0; i < 10; ++i)
     {
-      ome::compat::shared_ptr<IFD> ifd;
+      std::shared_ptr<IFD> ifd;
       ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(i));
     }
 
@@ -243,14 +254,14 @@ TEST_F(TIFFTest, IFDsByIndex)
 
 TEST_F(TIFFTest, IFDsByOffset)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t =TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
   for (directory_index_type i = 0; i < 10; ++i)
     {
       uint64_t offset = t->getDirectoryByIndex(i)->getOffset();
-      ome::compat::shared_ptr<IFD> ifd;
+      std::shared_ptr<IFD> ifd;
       ASSERT_NO_THROW(ifd = t->getDirectoryByOffset(offset));
       ASSERT_EQ(ifd->getOffset(), offset);
     }
@@ -260,11 +271,11 @@ TEST_F(TIFFTest, IFDsByOffset)
 
 TEST_F(TIFFTest, IFDSimpleIter)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd = t->getDirectoryByIndex(0);
+  std::shared_ptr<IFD> ifd = t->getDirectoryByIndex(0);
 
   while(ifd)
     {
@@ -274,7 +285,7 @@ TEST_F(TIFFTest, IFDSimpleIter)
 
 TEST_F(TIFFTest, TIFFIter)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
@@ -285,7 +296,7 @@ TEST_F(TIFFTest, TIFFIter)
 
 TEST_F(TIFFTest, TIFFConstIter)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
@@ -296,7 +307,7 @@ TEST_F(TIFFTest, TIFFConstIter)
 
 TEST_F(TIFFTest, TIFFConstIter2)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
@@ -307,11 +318,11 @@ TEST_F(TIFFTest, TIFFConstIter2)
 
 TEST_F(TIFFTest, RawField)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -321,11 +332,11 @@ TEST_F(TIFFTest, RawField)
 
 TEST_F(TIFFTest, RawField0)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -335,11 +346,11 @@ TEST_F(TIFFTest, RawField0)
 
 TEST_F(TIFFTest, FieldWrapString)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -359,11 +370,11 @@ TEST_F(TIFFTest, FieldWrapString)
 
 TEST_F(TIFFTest, FieldWrapStringArray)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -376,11 +387,11 @@ TEST_F(TIFFTest, FieldWrapStringArray)
 
 TEST_F(TIFFTest, FieldWrapUInt16)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -402,11 +413,11 @@ TEST_F(TIFFTest, FieldWrapUInt16)
 
 TEST_F(TIFFTest, FieldWrapCompression)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -418,11 +429,11 @@ TEST_F(TIFFTest, FieldWrapCompression)
 
 TEST_F(TIFFTest, FieldWrapFillOrder)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -433,11 +444,11 @@ TEST_F(TIFFTest, FieldWrapFillOrder)
 
 TEST_F(TIFFTest, FieldWrapOrientation)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -448,11 +459,11 @@ TEST_F(TIFFTest, FieldWrapOrientation)
 
 TEST_F(TIFFTest, FieldWrapPlanarConfiguration)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -464,11 +475,11 @@ TEST_F(TIFFTest, FieldWrapPlanarConfiguration)
 
 TEST_F(TIFFTest, FieldWrapPhotometricInterpretation)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -480,11 +491,11 @@ TEST_F(TIFFTest, FieldWrapPhotometricInterpretation)
 
 TEST_F(TIFFTest, FieldWrapPredictor)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -495,11 +506,11 @@ TEST_F(TIFFTest, FieldWrapPredictor)
 
 TEST_F(TIFFTest, FieldWrapSampleFormat)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -510,11 +521,11 @@ TEST_F(TIFFTest, FieldWrapSampleFormat)
 
 TEST_F(TIFFTest, FieldWrapThreshholding)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -525,11 +536,11 @@ TEST_F(TIFFTest, FieldWrapThreshholding)
 
 TEST_F(TIFFTest, FieldWrapYCbCrPosition)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -540,15 +551,15 @@ TEST_F(TIFFTest, FieldWrapYCbCrPosition)
 
 TEST_F(TIFFTest, FieldWrapUInt16Pair)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
-  ome::compat::array<uint16_t, 2> value;
+  std::array<uint16_t, 2> value;
 
   ASSERT_THROW(ifd->getField(ome::files::tiff::DOTRANGE).get(value), ome::files::tiff::Exception);
   ASSERT_THROW(ifd->getField(ome::files::tiff::HALFTONEHINTS).get(value), ome::files::tiff::Exception);
@@ -558,11 +569,11 @@ TEST_F(TIFFTest, FieldWrapUInt16Pair)
 
 TEST_F(TIFFTest, FieldWrapFloat)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -578,30 +589,30 @@ TEST_F(TIFFTest, FieldWrapFloat)
 
 TEST_F(TIFFTest, FieldWrapFloat2)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
-  ome::compat::array<float, 2> value;
+  std::array<float, 2> value;
 
   ASSERT_THROW(ifd->getField(ome::files::tiff::WHITEPOINT).get(value), ome::files::tiff::Exception);
 }
 
 TEST_F(TIFFTest, FieldWrapFloat3)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
-  ome::compat::array<float, 3> value;
+  std::array<float, 3> value;
 
   ASSERT_THROW(ifd->getField(ome::files::tiff::YCBCRCOEFFICIENTS).get(value), ome::files::tiff::Exception);
 }
@@ -609,15 +620,15 @@ TEST_F(TIFFTest, FieldWrapFloat3)
 
 TEST_F(TIFFTest, FieldWrapFloat6)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
-  ome::compat::array<float, 6> value;
+  std::array<float, 6> value;
 
   ASSERT_THROW(ifd->getField(ome::files::tiff::PRIMARYCHROMATICITIES).get(value), ome::files::tiff::Exception);
   ASSERT_THROW(ifd->getField(ome::files::tiff::REFERENCEBLACKWHITE).get(value), ome::files::tiff::Exception);
@@ -625,11 +636,11 @@ TEST_F(TIFFTest, FieldWrapFloat6)
 
 TEST_F(TIFFTest, FieldWrapUInt16ExtraSamplesArray)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -639,26 +650,26 @@ TEST_F(TIFFTest, FieldWrapUInt16ExtraSamplesArray)
 
 TEST_F(TIFFTest, FieldWrapUInt16Array3)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
-  ome::compat::array<std::vector<uint16_t>, 3> value;
+  std::array<std::vector<uint16_t>, 3> value;
   ASSERT_THROW(ifd->getField(ome::files::tiff::COLORMAP).get(value), ome::files::tiff::Exception);
   ASSERT_THROW(ifd->getField(ome::files::tiff::TRANSFERFUNCTION).get(value), ome::files::tiff::Exception);
 }
 
 TEST_F(TIFFTest, FieldWrapUInt32)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -683,11 +694,11 @@ TEST_F(TIFFTest, FieldWrapUInt32)
 
 TEST_F(TIFFTest, FieldWrapUInt32Array)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -698,11 +709,11 @@ TEST_F(TIFFTest, FieldWrapUInt32Array)
 
 TEST_F(TIFFTest, FieldWrapUInt64Array)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -716,11 +727,11 @@ TEST_F(TIFFTest, FieldWrapUInt64Array)
 
 TEST_F(TIFFTest, FieldWrapByteArray)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -735,11 +746,11 @@ TEST_F(TIFFTest, FieldWrapByteArray)
 
 TEST_F(TIFFTest, ValueProxy)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -750,11 +761,11 @@ TEST_F(TIFFTest, ValueProxy)
 
 TEST_F(TIFFTest, Value)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -764,11 +775,11 @@ TEST_F(TIFFTest, Value)
 
 TEST_F(TIFFTest, FieldName)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -780,11 +791,11 @@ TEST_F(TIFFTest, FieldName)
 
 TEST_F(TIFFTest, FieldCount)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -796,11 +807,11 @@ TEST_F(TIFFTest, FieldCount)
 
 TEST_F(TIFFTest, PixelType)
 {
-  ome::compat::shared_ptr<TIFF> t;
+  std::shared_ptr<TIFF> t;
   ASSERT_NO_THROW(t = TIFF::open(tiff_path, "r"));
   ASSERT_TRUE(static_cast<bool>(t));
 
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<IFD> ifd;
   ASSERT_NO_THROW(ifd = t->getDirectoryByIndex(0));
   ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -815,15 +826,13 @@ TEST(TIFFCodec, ListCodecs)
   // present here.
 
   std::vector<Codec> codecs = ome::files::tiff::getCodecs();
-  for (std::vector<Codec>::const_iterator c = codecs.begin();
-       c != codecs.end();
-       ++c)
+  for (const auto& c: codecs)
     {
-      std::cout << c->name << " = " << c->scheme << '\n';
+      std::cout << c.name << " = " << c.scheme << '\n';
     }
 }
 
-typedef ome::compat::tuple<uint32_t,uint32_t,PT,ome::files::tiff::PlanarConfiguration> plane_configuration;
+typedef std::tuple<uint32_t,uint32_t,PT,ome::files::tiff::PlanarConfiguration> plane_configuration;
 
 struct compare_tuple
 {
@@ -831,26 +840,26 @@ struct compare_tuple
   operator() (const plane_configuration& lhs,
               const plane_configuration& rhs) const
   {
-    if (ome::compat::get<0>(lhs) < ome::compat::get<0>(rhs)) return true;
-    if (ome::compat::get<0>(lhs) > ome::compat::get<0>(rhs)) return false;
+    if (std::get<0>(lhs) < std::get<0>(rhs)) return true;
+    if (std::get<0>(lhs) > std::get<0>(rhs)) return false;
 
-    if (ome::compat::get<1>(lhs) < ome::compat::get<1>(rhs)) return true;
-    if (ome::compat::get<1>(lhs) > ome::compat::get<1>(rhs)) return false;
+    if (std::get<1>(lhs) < std::get<1>(rhs)) return true;
+    if (std::get<1>(lhs) > std::get<1>(rhs)) return false;
 
-    if (static_cast<PT::enum_value>(ome::compat::get<2>(lhs)) <
-        static_cast<PT::enum_value>(ome::compat::get<2>(rhs))) return true;
-    if (static_cast<PT::enum_value>(ome::compat::get<2>(lhs)) >
-        static_cast<PT::enum_value>(ome::compat::get<2>(rhs))) return false;
+    if (static_cast<PT::enum_value>(std::get<2>(lhs)) <
+        static_cast<PT::enum_value>(std::get<2>(rhs))) return true;
+    if (static_cast<PT::enum_value>(std::get<2>(lhs)) >
+        static_cast<PT::enum_value>(std::get<2>(rhs))) return false;
 
-    return ome::compat::get<3>(lhs) < ome::compat::get<3>(rhs);
+    return std::get<3>(lhs) < std::get<3>(rhs);
   }
 };
 
 class TIFFVariantTest : public ::testing::TestWithParam<TIFFTestParameters>
 {
 public:
-  ome::compat::shared_ptr<TIFF> tiff;
-  ome::compat::shared_ptr<IFD> ifd;
+  std::shared_ptr<TIFF> tiff;
+  std::shared_ptr<IFD> ifd;
   uint32_t iwidth;
   uint32_t iheight;
   ome::files::tiff::PlanarConfiguration planarconfig;
@@ -882,17 +891,17 @@ public:
     ASSERT_FALSE((png_sig_cmp(header, 0, 8)));
 
     png_structp pngptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-    ASSERT_TRUE(pngptr != 0);
+    ASSERT_TRUE(pngptr != nullptr);
 
     png_infop infoptr = png_create_info_struct(pngptr);
     if (!infoptr)
       png_destroy_read_struct(&pngptr, 0, 0);
-    ASSERT_TRUE(infoptr != 0);
+    ASSERT_TRUE(infoptr != nullptr);
 
     png_infop endinfoptr = png_create_info_struct(pngptr);
     if (!endinfoptr)
       png_destroy_read_struct(&pngptr, 0, 0);
-    ASSERT_TRUE(endinfoptr != 0);
+    ASSERT_TRUE(endinfoptr != nullptr);
 
     int result = setjmp(png_jmpbuf(pngptr));
     ASSERT_FALSE((result));
@@ -912,7 +921,7 @@ public:
     png_set_interlace_handling(pngptr);
     png_read_update_info(pngptr, infoptr);
 
-    ome::compat::array<VariantPixelBuffer::size_type, 9> shape;
+    std::array<VariantPixelBuffer::size_type, 9> shape;
     shape[::ome::files::DIM_SPATIAL_X] = pwidth;
     shape[::ome::files::DIM_SPATIAL_Y] = pheight;
     shape[::ome::files::DIM_SUBCHANNEL] = 3U;
@@ -925,7 +934,7 @@ public:
     VariantPixelBuffer pngdata_chunky;
     pngdata_chunky.setBuffer(shape, PT::UINT8, order_chunky);
 
-    ome::compat::shared_ptr<PixelBuffer<PixelProperties<PT::UINT8>::std_type> >& uint8_pngdata_chunky(boost::get<ome::compat::shared_ptr<PixelBuffer<PixelProperties<PT::UINT8>::std_type> > >(pngdata_chunky.vbuffer()));
+    std::shared_ptr<PixelBuffer<PixelProperties<PT::UINT8>::std_type>>& uint8_pngdata_chunky(boost::get<std::shared_ptr<PixelBuffer<PixelProperties<PT::UINT8>::std_type>>>(pngdata_chunky.vbuffer()));
     std::vector<png_bytep> row_pointers(pheight);
     for (dimension_size_type y = 0; y < pheight; ++y)
       {
@@ -1088,11 +1097,9 @@ TEST_P(TIFFVariantTest, PlaneArea1)
 
   dimension_size_type area = 0;
   std::vector<PlaneRegion> regions;
-  for (std::vector<dimension_size_type>::const_iterator i = tiles.begin();
-       i != tiles.end();
-       ++i)
+  for (const auto& t : tiles)
     {
-      PlaneRegion r = info.tileRegion(*i, full);
+      PlaneRegion r = info.tileRegion(t, full);
       regions.push_back(r);
       area += (r.w * r.h);
     }
@@ -1133,11 +1140,9 @@ TEST_P(TIFFVariantTest, PlaneArea2)
 
   dimension_size_type area = 0;
   std::vector<PlaneRegion> regions;
-  for (std::vector<dimension_size_type>::const_iterator i = tiles.begin();
-       i != tiles.end();
-       ++i)
+  for (const auto& t : tiles)
     {
-      PlaneRegion r = info.tileRegion(*i, partial);
+      PlaneRegion r = info.tileRegion(t, partial);
       regions.push_back(r);
       area += (r.w * r.h);
     }
@@ -1177,11 +1182,9 @@ TEST_P(TIFFVariantTest, PlaneArea3)
 
   dimension_size_type area = 0;
   std::vector<PlaneRegion> regions;
-  for (std::vector<dimension_size_type>::const_iterator i = tiles.begin();
-       i != tiles.end();
-       ++i)
+  for (const auto& t : tiles)
     {
-      PlaneRegion r = info.tileRegion(*i, partial);
+      PlaneRegion r = info.tileRegion(t, partial);
       regions.push_back(r);
       area += (r.w * r.h);
     }
@@ -1217,10 +1220,10 @@ namespace
             const std::string& file,
             const VariantPixelBuffer& reference)
   {
-    ome::compat::shared_ptr<TIFF> tiff;
+    std::shared_ptr<TIFF> tiff;
     ASSERT_NO_THROW(tiff = TIFF::open(file, "r"));
     ASSERT_TRUE(static_cast<bool>(tiff));
-    ome::compat::shared_ptr<IFD> ifd;
+    std::shared_ptr<IFD> ifd;
     ASSERT_NO_THROW(ifd = tiff->getDirectoryByIndex(0));
     ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -1260,11 +1263,9 @@ TEST_P(TIFFVariantTest, PlaneReadAlignedTileOrdered)
 
   VariantPixelBuffer vb;
 
-  for (std::vector<dimension_size_type>::const_iterator i = tiles.begin();
-       i != tiles.end();
-       ++i)
+  for (const auto& t : tiles)
     {
-      PlaneRegion r = info.tileRegion(*i, full);
+      PlaneRegion r = info.tileRegion(t, full);
 
       ifd->readImage(vb, r.x, r.y, r.w, r.h);
 
@@ -1283,11 +1284,9 @@ TEST_P(TIFFVariantTest, PlaneReadAlignedTileRandom)
   VariantPixelBuffer vb;
 
   std::random_shuffle(tiles.begin(), tiles.end());
-  for (std::vector<dimension_size_type>::const_iterator i = tiles.begin();
-       i != tiles.end();
-       ++i)
+  for (const auto& t : tiles)
     {
-      PlaneRegion r = info.tileRegion(*i, full);
+      PlaneRegion r = info.tileRegion(t, full);
 
       ifd->readImage(vb, r.x, r.y, r.w, r.h);
 
@@ -1312,13 +1311,9 @@ TEST_P(TIFFVariantTest, PlaneReadUnalignedTileOrdered)
 
   VariantPixelBuffer vb;
 
-  for (std::vector<PlaneRegion>::const_iterator i = tiles.begin();
-       i != tiles.end();
-       ++i)
+  for (const auto& t : tiles)
     {
-      const PlaneRegion& r = *i;
-
-      ifd->readImage(vb, r.x, r.y, r.w, r.h);
+      ifd->readImage(vb, t.x, t.y, t.w, t.h);
 
       /// @todo Verify buffer contents once pixelbuffer subsetting is
       /// available.
@@ -1342,13 +1337,9 @@ TEST_P(TIFFVariantTest, PlaneReadUnalignedTileRandom)
   VariantPixelBuffer vb;
 
   std::random_shuffle(tiles.begin(), tiles.end());
-  for (std::vector<PlaneRegion>::const_iterator i = tiles.begin();
-       i != tiles.end();
-       ++i)
+  for (const auto& t : tiles)
     {
-      const PlaneRegion& r = *i;
-
-      ifd->readImage(vb, r.x, r.y, r.w, r.h);
+      ifd->readImage(vb, t.x, t.y, t.w, t.h);
 
       /// @todo Verify buffer contents once pixelbuffer subsetting is
       /// available.
@@ -1501,10 +1492,10 @@ TEST_P(PixelTest, WriteTIFF)
 
   // Write TIFF
   {
-    ome::compat::shared_ptr<TIFF> wtiff;
+    std::shared_ptr<TIFF> wtiff;
     ASSERT_NO_THROW(wtiff = TIFF::open(params.filename, "w"));
     ASSERT_TRUE(static_cast<bool>(wtiff));
-    ome::compat::shared_ptr<IFD> wifd;
+    std::shared_ptr<IFD> wifd;
     ASSERT_NO_THROW(wifd = wtiff->getCurrentDirectory());
     ASSERT_TRUE(static_cast<bool>(wifd));
 
@@ -1560,15 +1551,11 @@ TEST_P(PixelTest, WriteTIFF)
     if (!params.ordered)
       std::random_shuffle(tiles.begin(), tiles.end());
 
-    for (std::vector<PlaneRegion>::const_iterator i = tiles.begin();
-         i != tiles.end();
-         ++i)
+    for (const auto& t : tiles)
       {
-        const PlaneRegion& r = *i;
-
-        ome::compat::array<VariantPixelBuffer::size_type, 9> shape;
-        shape[::ome::files::DIM_SPATIAL_X] = r.w;
-        shape[::ome::files::DIM_SPATIAL_Y] = r.h;
+        std::array<VariantPixelBuffer::size_type, 9> shape;
+        shape[::ome::files::DIM_SPATIAL_X] = t.w;
+        shape[::ome::files::DIM_SPATIAL_Y] = t.h;
         shape[::ome::files::DIM_SUBCHANNEL] = 3U;
         shape[::ome::files::DIM_SPATIAL_Z] = shape[::ome::files::DIM_TEMPORAL_T] = shape[::ome::files::DIM_CHANNEL] =
           shape[::ome::files::DIM_MODULO_Z] = shape[::ome::files::DIM_MODULO_T] = shape[::ome::files::DIM_MODULO_C] = 1;
@@ -1581,10 +1568,10 @@ TEST_P(PixelTest, WriteTIFF)
         vb.setBuffer(shape, params.pixeltype, order);
 
         // Temporary subrange to write into tile
-        PixelSubrangeVisitor sv(r.x, r.y);
+        PixelSubrangeVisitor sv(t.x, t.y);
         boost::apply_visitor(sv, pixels.vbuffer(), vb.vbuffer());
 
-        wifd->writeImage(vb, r.x, r.y, r.w, r.h);
+        wifd->writeImage(vb, t.x, t.y, t.w, t.h);
       }
 
     wtiff->writeCurrentDirectory();
@@ -1595,10 +1582,10 @@ TEST_P(PixelTest, WriteTIFF)
   {
     // Note "c" to disable automatic strip chopping so we can verify
     // the exact tag content of ROWSPERSTRIP.
-    ome::compat::shared_ptr<TIFF> tiff;
+    std::shared_ptr<TIFF> tiff;
     ASSERT_NO_THROW(tiff = TIFF::open(params.filename, "rc"));
     ASSERT_TRUE(static_cast<bool>(tiff));
-    ome::compat::shared_ptr<IFD> ifd;
+    std::shared_ptr<IFD> ifd;
     ASSERT_NO_THROW(ifd = tiff->getDirectoryByIndex(0));
     ASSERT_TRUE(static_cast<bool>(ifd));
 
@@ -1692,7 +1679,7 @@ namespace
     ordered.push_back(true);
     ordered.push_back(false);
 
-    std::vector<boost::optional<std::string> > compression_types;
+    std::vector<boost::optional<std::string>> compression_types;
     compression_types.push_back(boost::optional<std::string>());
     compression_types.push_back(boost::optional<std::string>("Deflate"));
     compression_types.push_back(boost::optional<std::string>("LZW"));
@@ -1702,40 +1689,40 @@ namespace
     std::vector<PT> pixeltypes;
     std::transform(pixeltypemap.begin(), pixeltypemap.end(), std::back_inserter(pixeltypes), ptkey);
 
-    for(std::vector<dimension_size_type>::const_iterator imwid = imagexsizes.begin(); imwid != imagexsizes.end(); ++imwid)
-      for(std::vector<dimension_size_type>::const_iterator imht = imageysizes.begin(); imht != imageysizes.end(); ++imht)
-        for (std::vector<PT>::const_iterator pt = pixeltypes.begin(); pt != pixeltypes.end(); ++pt)
-          for (std::vector<ome::files::tiff::PlanarConfiguration>::const_iterator pc = planarconfigs.begin(); pc != planarconfigs.end(); ++pc)
-            for (std::vector<ome::files::tiff::PhotometricInterpretation>::const_iterator pi = photometricinterps.begin(); pi != photometricinterps.end(); ++pi)
-              for (std::vector<boost::optional<std::string> >::const_iterator comp = compression_types.begin(); comp != compression_types.end(); ++comp)
+    for(auto imwid : imagexsizes)
+      for(auto imht : imageysizes)
+        for (auto pt : pixeltypes)
+          for (auto pc : planarconfigs)
+            for (auto pi : photometricinterps)
+              for (const auto& comp: compression_types)
                 {
-                  for(std::vector<dimension_size_type>::const_iterator wid = tilesizes.begin(); wid != tilesizes.end(); ++wid)
-                    for(std::vector<dimension_size_type>::const_iterator ht = tilesizes.begin(); ht != tilesizes.end(); ++ht)
+                  for(auto wid : tilesizes)
+                    for(auto ht : tilesizes)
                       {
-                        for(std::vector<bool>::const_iterator opt = optimal.begin(); opt != optimal.end(); ++opt)
-                          for(std::vector<bool>::const_iterator ord = ordered.begin(); ord != ordered.end(); ++ord)
+                        for(auto opt : optimal)
+                          for(auto ord : ordered)
                             {
                               try
                                 {
                                   // Check PNG reference exists.
-                                  TIFFVariantTest::getPNGData(*imwid, *imht, *pt, *pc);
-                                  ret.push_back(PixelTestParameters(*imwid, *imht, *pt, ome::files::tiff::TILE, *pc, *pi, *comp, *wid, *ht, *opt, *ord));
+                                  TIFFVariantTest::getPNGData(imwid, imht, pt, pc);
+                                  ret.push_back(PixelTestParameters(imwid, imht, pt, ome::files::tiff::TILE, pc, pi, comp, wid, ht, opt, ord));
                                 }
                               catch(const std::exception&)
                                 {
                                 }
                             }
                       }
-                  for(std::vector<dimension_size_type>::const_iterator rows = stripsizes.begin(); rows != stripsizes.end(); ++rows)
+                  for(auto rows : stripsizes)
                     {
-                      for(std::vector<bool>::const_iterator opt = optimal.begin(); opt != optimal.end(); ++opt)
-                        for(std::vector<bool>::const_iterator ord = ordered.begin(); ord != ordered.end(); ++ord)
+                      for(auto opt : optimal)
+                        for(auto ord : ordered)
                           {
                             try
                               {
                                 // Check PNG reference exists.
-                                TIFFVariantTest::getPNGData(*imwid, *imht, *pt, *pc);
-                                ret.push_back(PixelTestParameters(*imwid, *imht, *pt, ome::files::tiff::STRIP, *pc, *pi, *comp, *imwid, *rows, *opt, *ord));
+                                TIFFVariantTest::getPNGData(imwid, imht, pt, pc);
+                                ret.push_back(PixelTestParameters(imwid, imht, pt, ome::files::tiff::STRIP, pc, pi, comp, imwid, rows, opt, ord));
                               }
                             catch(const std::exception&)
                               {

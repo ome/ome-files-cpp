@@ -39,11 +39,11 @@
 #ifndef TEST_PIXEL_H
 #define TEST_PIXEL_H
 
+#include <cstdint>
+
 #include <ome/files/PixelBuffer.h>
 #include <ome/files/PixelProperties.h>
 #include <ome/files/VariantPixelBuffer.h>
-
-#include <ome/compat/cstdint.h>
 
 /// Helpers to create pixel values of all supported types from integers.
 
@@ -66,46 +66,46 @@ pixel_value_complex(uint32_t value)
 
 template<>
 inline
-::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXFLOAT,
-                                          ::ome::files::ENDIAN_BIG>::type
-pixel_value< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXFLOAT,
-                                                       ::ome::files::ENDIAN_BIG>::type>(uint32_t value)
+::ome::files::PixelEndianProperties<::ome::xml::model::enums::PixelType::COMPLEXFLOAT,
+                                    ::ome::files::ENDIAN_BIG>::type
+pixel_value<::ome::files::PixelEndianProperties<::ome::xml::model::enums::PixelType::COMPLEXFLOAT,
+                                                ::ome::files::ENDIAN_BIG>::type>(uint32_t value)
 {
-  return pixel_value_complex< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXFLOAT,
-                                                                        ::ome::files::ENDIAN_BIG>::type>(value);
+  return pixel_value_complex<::ome::files::PixelEndianProperties<::ome::xml::model::enums::PixelType::COMPLEXFLOAT,
+                                                                 ::ome::files::ENDIAN_BIG>::type>(value);
 }
 
 template<>
 inline
-::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXFLOAT,
-                                          ::ome::files::ENDIAN_LITTLE>::type
-pixel_value< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXFLOAT,
-                                                       ::ome::files::ENDIAN_LITTLE>::type>(uint32_t value)
+::ome::files::PixelEndianProperties<::ome::xml::model::enums::PixelType::COMPLEXFLOAT,
+                                    ::ome::files::ENDIAN_LITTLE>::type
+pixel_value<::ome::files::PixelEndianProperties<::ome::xml::model::enums::PixelType::COMPLEXFLOAT,
+                                                ::ome::files::ENDIAN_LITTLE>::type>(uint32_t value)
 {
-  return pixel_value_complex< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXFLOAT,
-                                                                        ::ome::files::ENDIAN_LITTLE>::type>(value);
+  return pixel_value_complex<::ome::files::PixelEndianProperties<::ome::xml::model::enums::PixelType::COMPLEXFLOAT,
+                                                                 ::ome::files::ENDIAN_LITTLE>::type>(value);
 }
 
 template<>
 inline
-::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXDOUBLE,
-                                          ::ome::files::ENDIAN_BIG>::type
-pixel_value< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXDOUBLE,
-                                                       ::ome::files::ENDIAN_BIG>::type>(uint32_t value)
+::ome::files::PixelEndianProperties<::ome::xml::model::enums::PixelType::COMPLEXDOUBLE,
+                                    ::ome::files::ENDIAN_BIG>::type
+pixel_value<::ome::files::PixelEndianProperties<::ome::xml::model::enums::PixelType::COMPLEXDOUBLE,
+                                                ::ome::files::ENDIAN_BIG>::type>(uint32_t value)
 {
-  return pixel_value_complex< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXDOUBLE,
-                                                                        ::ome::files::ENDIAN_BIG>::type>(value);
+  return pixel_value_complex<::ome::files::PixelEndianProperties<::ome::xml::model::enums::PixelType::COMPLEXDOUBLE,
+                                                                 ::ome::files::ENDIAN_BIG>::type>(value);
 }
 
 template<>
 inline
-::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXDOUBLE,
-                                          ::ome::files::ENDIAN_LITTLE>::type
-pixel_value< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXDOUBLE,
-                                                       ::ome::files::ENDIAN_LITTLE>::type>(uint32_t value)
+::ome::files::PixelEndianProperties<::ome::xml::model::enums::PixelType::COMPLEXDOUBLE,
+                                    ::ome::files::ENDIAN_LITTLE>::type
+pixel_value<::ome::files::PixelEndianProperties<::ome::xml::model::enums::PixelType::COMPLEXDOUBLE,
+                                                ::ome::files::ENDIAN_LITTLE>::type>(uint32_t value)
 {
-  return pixel_value_complex< ::ome::files::PixelEndianProperties< ::ome::xml::model::enums::PixelType::COMPLEXDOUBLE,
-                                                                        ::ome::files::ENDIAN_LITTLE>::type>(value);
+  return pixel_value_complex<::ome::files::PixelEndianProperties<::ome::xml::model::enums::PixelType::COMPLEXDOUBLE,
+                                                                 ::ome::files::ENDIAN_LITTLE>::type>(value);
 }
 
 /*
@@ -117,14 +117,14 @@ template<int P>
 struct PixelTypeConversionVisitor : public boost::static_visitor<>
 {
   typedef typename ::ome::files::PixelProperties<P>::std_type src_type;
-  typedef ::ome::files::PixelProperties< ::ome::xml::model::enums::PixelType::BIT>::std_type bit_type;
+  typedef ::ome::files::PixelProperties<::ome::xml::model::enums::PixelType::BIT>::std_type bit_type;
 
-  const ome::compat::shared_ptr< ::ome::files::PixelBuffer<src_type> > *src;
+  const std::shared_ptr<::ome::files::PixelBuffer<src_type>> *src;
   ::ome::files::VariantPixelBuffer& dest;
 
   PixelTypeConversionVisitor(const ::ome::files::VariantPixelBuffer& src,
                              ::ome::files::VariantPixelBuffer& dest):
-    src(boost::get<ome::compat::shared_ptr< ::ome::files::PixelBuffer<src_type> > >(&src.vbuffer())),
+    src(boost::get<std::shared_ptr<::ome::files::PixelBuffer<src_type>>>(&src.vbuffer())),
     dest(dest)
   {
 
@@ -141,7 +141,7 @@ struct PixelTypeConversionVisitor : public boost::static_visitor<>
   typename boost::enable_if_c<
     boost::is_integral<T>::value, void
     >::type
-  operator() (ome::compat::shared_ptr< ::ome::files::PixelBuffer<T> >& lhs)
+  operator() (std::shared_ptr<::ome::files::PixelBuffer<T>>& lhs)
   {
     const src_type *src_buf = (*src)->data();
     T *dest_buf = lhs->data();
@@ -167,7 +167,7 @@ struct PixelTypeConversionVisitor : public boost::static_visitor<>
   typename boost::enable_if_c<
     boost::is_floating_point<T>::value, void
     >::type
-  operator() (ome::compat::shared_ptr< ::ome::files::PixelBuffer<T> >& lhs)
+  operator() (std::shared_ptr<::ome::files::PixelBuffer<T>>& lhs)
   {
     const src_type *src_buf = (*src)->data();
     T *dest_buf = lhs->data();
@@ -192,7 +192,7 @@ struct PixelTypeConversionVisitor : public boost::static_visitor<>
   typename boost::enable_if_c<
     boost::is_complex<T>::value, void
     >::type
-  operator() (ome::compat::shared_ptr< ::ome::files::PixelBuffer<T> >& lhs)
+  operator() (std::shared_ptr<::ome::files::PixelBuffer<T>>& lhs)
   {
     const src_type *src_buf = (*src)->data();
     T *dest_buf = lhs->data();
@@ -216,7 +216,7 @@ struct PixelTypeConversionVisitor : public boost::static_visitor<>
   // and the upper part being set to true for the destination boolean
   // pixel type.
   void
-  operator() (ome::compat::shared_ptr< ::ome::files::PixelBuffer<bit_type> >& lhs)
+  operator() (std::shared_ptr<::ome::files::PixelBuffer<bit_type>>& lhs)
   {
     const src_type *src_buf = (*src)->data();
     bit_type *dest_buf = lhs->data();
@@ -288,7 +288,7 @@ namespace std
               const ::ome::files::PixelBufferBase::storage_order_type& order)
   {
     os << '(';
-    for (uint16_t i = 0; i < ::ome::files::PixelBufferBase::dimensions; ++i)
+    for (uint16_t i = 0; i <::ome::files::PixelBufferBase::dimensions; ++i)
     {
       os << order.ordering(i) << '/' << order.ascending(i);
       if (i + 1 != ::ome::files::PixelBufferBase::dimensions)

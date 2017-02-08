@@ -231,11 +231,9 @@ namespace ome
       checkSuffix(const boost::filesystem::path&              name,
                   const std::vector<boost::filesystem::path>& suffixes)
       {
-        for (std::vector<boost::filesystem::path>::const_iterator si = suffixes.begin();
-             si != suffixes.end();
-             ++si)
+        for (const auto& suffix : suffixes)
           {
-            if (checkSuffix(name, *si))
+            if (checkSuffix(name, suffix))
               return true;
           }
 
@@ -259,24 +257,15 @@ namespace ome
         if (checkSuffix(name, suffixes))
           return true;
 
-        for (std::vector<boost::filesystem::path>::const_iterator csi = compression_suffixes.begin();
-             csi != compression_suffixes.end();
-             ++csi)
+        for (const auto& suffix : suffixes)
           {
-            for (std::vector<boost::filesystem::path>::const_iterator si = suffixes.begin();
-                 si != suffixes.end();
-                 ++si)
+            for (const auto& compsuffix : compression_suffixes)
               {
-#if !defined(BOOST_VERSION) || BOOST_VERSION >= 105000 // Boost >= 1.50
-                boost::filesystem::path suffix(*si);
-                suffix += boost::filesystem::path(".");
-                suffix += *csi;
-#else // Boost < 1.50
-                boost::filesystem::path suffix(si->parent_path());
-                suffix /= boost::filesystem::path(si->filename().string() + "." + csi->string());
-#endif // Boost version
+                boost::filesystem::path fullsuffix(suffix);
+                fullsuffix += boost::filesystem::path(".");
+                fullsuffix += compsuffix;
 
-                if (checkSuffix(name, suffix))
+                if (checkSuffix(name, fullsuffix))
                   return true;
               }
           }

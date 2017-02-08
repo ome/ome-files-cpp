@@ -38,6 +38,8 @@
 #ifndef OME_FILES_FORMATWRITER_H
 #define OME_FILES_FORMATWRITER_H
 
+#include <array>
+#include <memory>
 #include <set>
 #include <string>
 #include <vector>
@@ -51,9 +53,6 @@
 #include <ome/files/MetadataConfigurable.h>
 #include <ome/files/MetadataMap.h>
 #include <ome/files/Types.h>
-
-#include <ome/compat/array.h>
-#include <ome/compat/memory.h>
 
 #include <ome/xml/meta/MetadataRetrieve.h>
 
@@ -228,7 +227,7 @@ namespace ome
        */
       virtual
       void
-      setMetadataRetrieve(ome::compat::shared_ptr< ::ome::xml::meta::MetadataRetrieve>& retrieve) = 0;
+      setMetadataRetrieve(std::shared_ptr<::ome::xml::meta::MetadataRetrieve>& retrieve) = 0;
 
       /**
        * Get the current metadata store for this writer.
@@ -236,7 +235,7 @@ namespace ome
        * @returns the metadata store, which will never be @c null.
        */
       virtual
-      const ome::compat::shared_ptr< ::ome::xml::meta::MetadataRetrieve>&
+      const std::shared_ptr<::ome::xml::meta::MetadataRetrieve>&
       getMetadataRetrieve() const = 0;
 
       /**
@@ -245,7 +244,7 @@ namespace ome
        * @returns the metadata store, which will never be @c null.
        */
       virtual
-      ome::compat::shared_ptr< ::ome::xml::meta::MetadataRetrieve>&
+      std::shared_ptr<::ome::xml::meta::MetadataRetrieve>&
       getMetadataRetrieve() = 0;
 
       /**

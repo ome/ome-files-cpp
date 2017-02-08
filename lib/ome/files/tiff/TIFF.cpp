@@ -195,7 +195,7 @@ namespace ome
       // Note boost::make_shared can't be used here.
       TIFF::TIFF(const boost::filesystem::path& filename,
                  const std::string&             mode):
-        impl(ome::compat::shared_ptr<Impl>(new Impl(filename, mode)))
+        impl(std::shared_ptr<Impl>(new Impl(filename, mode)))
       {
         registerImageJTags();
 
@@ -223,15 +223,15 @@ namespace ome
         return reinterpret_cast<wrapped_type *>(impl->tiff);
       }
 
-      ome::compat::shared_ptr<TIFF>
+      std::shared_ptr<TIFF>
       TIFF::open(const boost::filesystem::path& filename,
                  const std::string& mode)
       {
-        ome::compat::shared_ptr<TIFF> ret;
+        std::shared_ptr<TIFF> ret;
         try
           {
             // Note boost::make_shared can't be used here.
-            ret = ome::compat::shared_ptr<TIFF>(new TIFFConcrete(filename, mode));
+            ret = std::shared_ptr<TIFF>(new TIFFConcrete(filename, mode));
           }
         catch (const std::exception& e)
           {
@@ -258,7 +258,7 @@ namespace ome
         return impl->offsets.size();
       }
 
-      ome::compat::shared_ptr<IFD>
+      std::shared_ptr<IFD>
       TIFF::getDirectoryByIndex(directory_index_type index) const
       {
         offset_type offset;
@@ -274,21 +274,21 @@ namespace ome
         return getDirectoryByOffset(offset);
       }
 
-      ome::compat::shared_ptr<IFD>
+      std::shared_ptr<IFD>
       TIFF::getDirectoryByOffset(offset_type offset) const
       {
         Sentry sentry;
 
-        ome::compat::shared_ptr<TIFF> t(ome::compat::const_pointer_cast<TIFF>(shared_from_this()));
-        ome::compat::shared_ptr<IFD> ifd = IFD::openOffset(t, offset);
+        std::shared_ptr<TIFF> t(std::const_pointer_cast<TIFF>(shared_from_this()));
+        std::shared_ptr<IFD> ifd = IFD::openOffset(t, offset);
         ifd->makeCurrent(); // Validate offset.
         return ifd;
       }
 
-      ome::compat::shared_ptr<IFD>
+      std::shared_ptr<IFD>
       TIFF::getCurrentDirectory() const
       {
-        ome::compat::shared_ptr<TIFF> t(ome::compat::const_pointer_cast<TIFF>(shared_from_this()));
+        std::shared_ptr<TIFF> t(std::const_pointer_cast<TIFF>(shared_from_this()));
         return IFD::current(t);
       }
 
@@ -307,14 +307,14 @@ namespace ome
       TIFF::iterator
       TIFF::begin()
       {
-        ome::compat::shared_ptr<IFD> ifd(getDirectoryByIndex(0U));
+        std::shared_ptr<IFD> ifd(getDirectoryByIndex(0U));
         return iterator(ifd);
       }
 
       TIFF::const_iterator
       TIFF::begin() const
       {
-        ome::compat::shared_ptr<IFD> ifd(getDirectoryByIndex(0U));
+        std::shared_ptr<IFD> ifd(getDirectoryByIndex(0U));
         return const_iterator(ifd);
       }
 
@@ -345,25 +345,25 @@ namespace ome
         // registered field info.
         static std::string ijbc("ImageJMetadataByteCounts");
         static std::string ij("ImageJMetadata");
-        static const TIFFFieldInfo ImageJFieldInfo[] =
-          {
-            {
-              TIFFTAG_IMAGEJ_META_DATA_BYTE_COUNTS,
-              TIFF_VARIABLE2, TIFF_VARIABLE2, TIFF_LONG, FIELD_CUSTOM,
-              true, true, const_cast<char *>(ijbc.c_str())
-            },
-            {
-              TIFFTAG_IMAGEJ_META_DATA,
-              TIFF_VARIABLE2, TIFF_VARIABLE2, TIFF_BYTE, FIELD_CUSTOM,
-              true, true, const_cast<char *>(ij.c_str())
-            }
-          };
+        static const std::array<TIFFFieldInfo, 2> ImageJFieldInfo
+          {{
+              {
+                TIFFTAG_IMAGEJ_META_DATA_BYTE_COUNTS,
+                TIFF_VARIABLE2, TIFF_VARIABLE2, TIFF_LONG, FIELD_CUSTOM,
+                true, true, const_cast<char *>(ijbc.c_str())
+              },
+              {
+                TIFFTAG_IMAGEJ_META_DATA,
+                TIFF_VARIABLE2, TIFF_VARIABLE2, TIFF_BYTE, FIELD_CUSTOM,
+                true, true, const_cast<char *>(ij.c_str())
+              }
+          }};
 
-        ::TIFF *tiffraw = reinterpret_cast< ::TIFF *>(getWrapped());
+        ::TIFF *tiffraw = reinterpret_cast<::TIFF *>(getWrapped());
 
         Sentry sentry;
 
-        int e = TIFFMergeFieldInfo(tiffraw, ImageJFieldInfo, boost::size(ImageJFieldInfo));
+        int e = TIFFMergeFieldInfo(tiffraw, ImageJFieldInfo.data(), ImageJFieldInfo.size());
         if (e)
           sentry.error();
       }

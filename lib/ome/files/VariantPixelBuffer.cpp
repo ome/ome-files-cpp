@@ -35,7 +35,7 @@
  * #L%
  */
 
-#include <boost/type_traits.hpp>
+#include <type_traits>
 
 #include <ome/files/VariantPixelBuffer.h>
 
@@ -235,7 +235,7 @@ namespace
     void
     operator() (T& lhs, const T& rhs) const
     {
-      ome::compat::array<VariantPixelBuffer::size_type, 9> source_shape, dest_shape;
+      std::array<VariantPixelBuffer::size_type, 9> source_shape, dest_shape;
 
       const VariantPixelBuffer::size_type *source_shape_ptr(rhs->shape());
       std::copy(source_shape_ptr, source_shape_ptr + T::element_type::dimensions,
@@ -269,14 +269,14 @@ namespace
     }
 
     template <int P>
-    typename boost::enable_if<
-      typename boost::is_same<
+    typename std::enable_if<
+      std::is_same<
         typename std::iterator_traits<InputIterator>::value_type,
         typename PixelProperties<P>::std_type
         >::value,
       void
       >::type
-    operator() (ome::compat::shared_ptr<PixelBuffer<typename PixelProperties<P>::std_type> >& lhs) const
+    operator() (std::shared_ptr<PixelBuffer<typename PixelProperties<P>::std_type>>& lhs) const
     {
       if (!lhs)
         throw std::runtime_error("Null pixel type");

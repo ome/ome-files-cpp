@@ -165,7 +165,7 @@ struct RandomAssignTestVisitor : public boost::static_visitor<>
   }
 
   void
-  operator() (const ome::compat::shared_ptr<PixelBuffer<PixelProperties<PT::BIT>::std_type> >& v)
+  operator() (const std::shared_ptr<PixelBuffer<PixelProperties<PT::BIT>::std_type>>& v)
   {
     typedef PixelProperties<PT::BIT>::std_type value_type;
 
@@ -233,14 +233,14 @@ struct ConstructExtentRefTestVisitor : public boost::static_visitor<>
   {
     typedef typename T::element_type::value_type value_type;
 
-    ome::compat::array<typename PixelBuffer<value_type>::size_type, 9> extents;
+    std::array<typename PixelBuffer<value_type>::size_type, 9> extents;
     extents[0] = 5;
     extents[1] = 2;
     extents[2] = extents[3] = extents[4] = extents[5] = extents[6] = extents[7] = extents[8] = 1;
 
     // VariantPixelBuffer with unmanaged backing store.
     value_type backing[10];
-    ome::compat::shared_ptr<PixelBuffer<value_type> > buf
+    std::shared_ptr<PixelBuffer<value_type>> buf
       (new PixelBuffer<value_type>(&backing[0], extents));
     VariantPixelBuffer mbuf(buf);
 
@@ -264,7 +264,7 @@ struct ConstructRangeRefTestVisitor : public boost::static_visitor<>
 
     // VariantPixelBuffer with unmanaged backing store.
     value_type backing[100];
-    ome::compat::shared_ptr<PixelBuffer<value_type> > buf
+    std::shared_ptr<PixelBuffer<value_type>> buf
       (new PixelBuffer<value_type>(&backing[0],
                                    boost::extents[10][10][1][1][1][1][1][1][1]));
     VariantPixelBuffer mbuf(buf);
@@ -336,7 +336,7 @@ struct ManagedTestVisitor : public boost::static_visitor<>
     {
       // VariantPixelBuffer with unmanaged backing store.
       value_type backing[100];
-      ome::compat::shared_ptr<PixelBuffer<value_type> > buf
+      std::shared_ptr<PixelBuffer<value_type>> buf
         (new PixelBuffer<value_type>(&backing[0],
                                      boost::extents[10][10][1][1][1][1][1][1][1]));
       VariantPixelBuffer mbuf(buf);
@@ -579,7 +579,7 @@ TEST_P(VariantPixelBufferTest, ConstructExtent)
 {
   const VariantPixelBufferTestParameters& params = GetParam();
 
-  ome::compat::array<VariantPixelBuffer::size_type, 9> extents;
+  std::array<VariantPixelBuffer::size_type, 9> extents;
   extents[0] = 5;
   extents[1] = 2;
   extents[2] = extents[3] = extents[4] = extents[5] = extents[6] = extents[7] = extents[8] = 1;
@@ -1020,19 +1020,19 @@ TEST_P(VariantPixelBufferTest, StreamOutput)
   boost::apply_visitor(v, buf.vbuffer());
 }
 
-VariantPixelBufferTestParameters variant_params[] =
-  { //                               PixelType
-    VariantPixelBufferTestParameters(PT::INT8),
-    VariantPixelBufferTestParameters(PT::INT16),
-    VariantPixelBufferTestParameters(PT::INT32),
-    VariantPixelBufferTestParameters(PT::UINT8),
-    VariantPixelBufferTestParameters(PT::UINT16),
-    VariantPixelBufferTestParameters(PT::UINT32),
-    VariantPixelBufferTestParameters(PT::FLOAT),
-    VariantPixelBufferTestParameters(PT::DOUBLE),
-    VariantPixelBufferTestParameters(PT::BIT),
-    VariantPixelBufferTestParameters(PT::COMPLEXFLOAT),
-    VariantPixelBufferTestParameters(PT::COMPLEXDOUBLE)
+const std::vector<VariantPixelBufferTestParameters> variant_params
+  { // PixelType
+    {PT::INT8},
+    {PT::INT16},
+    {PT::INT32},
+    {PT::UINT8},
+    {PT::UINT16},
+    {PT::UINT32},
+    {PT::FLOAT},
+    {PT::DOUBLE},
+    {PT::BIT},
+    {PT::COMPLEXFLOAT},
+    {PT::COMPLEXDOUBLE}
   };
 
 // Disable missing-prototypes warning for INSTANTIATE_TEST_CASE_P;

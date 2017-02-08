@@ -40,6 +40,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <iomanip>
 #include <map>
 #include <ostream>
@@ -47,7 +48,6 @@
 #include <string>
 #include <vector>
 
-#include <ome/compat/cstdint.h>
 #include <ome/common/variant.h>
 
 namespace ome
@@ -131,13 +131,13 @@ namespace ome
       };
 
       /// Aggregate view of all storable list types.
-      typedef boost::mpl::transform_view<basic_types_view, make_vector<boost::mpl::_1> >::type list_types_view;
+      typedef boost::mpl::transform_view<basic_types_view, make_vector<boost::mpl::_1>>::type list_types_view;
 
       /// Aggregate view of all storable types.
       typedef boost::mpl::joint_view<basic_types_view, list_types_view> all_types_view;
 
       /// List of discriminated types used by boost::variant.
-      typedef boost::mpl::insert_range<boost::mpl::vector0<>, boost::mpl::end<boost::mpl::vector0<> >::type, all_types_view>::type discriminated_types;
+      typedef boost::mpl::insert_range<boost::mpl::vector0<>, boost::mpl::end<boost::mpl::vector0<>>::type, all_types_view>::type discriminated_types;
 
     public:
       /// Key type.
@@ -442,11 +442,9 @@ namespace ome
       merge(const MetadataMap& map,
             const std::string& prefix)
       {
-        for (const_iterator i = map.begin();
-             i != map.end();
-             ++i)
+        for (const auto& m : map)
           {
-            map_type::value_type v(prefix + i->first, i->second);
+            map_type::value_type v(prefix + m.first, m.second);
             insert(v);
           }
       }
@@ -933,11 +931,9 @@ namespace ome
     MetadataMap::flatten() const
     {
       MetadataMap newmap;
-      for (MetadataMap::const_iterator i = discriminating_map.begin();
-           i != discriminating_map.end();
-           ++i)
+      for (const auto& m : discriminating_map)
         {
-          boost::apply_visitor(detail::MetadataMapFlattenVisitor(newmap, i->first), i->second);
+          boost::apply_visitor(detail::MetadataMapFlattenVisitor(newmap, m.first), m.second);
         }
       return newmap;
     }
@@ -976,11 +972,9 @@ namespace std
     operator<< (basic_ostream<charT,traits>& os,
                 const ::ome::files::MetadataMap& map)
     {
-      for (::ome::files::MetadataMap::const_iterator i = map.begin();
-           i != map.end();
-           ++i)
+      for (const auto& m : map)
         {
-          boost::apply_visitor(::ome::files::detail::MetadataMapOStreamVisitor(os, i->first), i->second);
+          boost::apply_visitor(::ome::files::detail::MetadataMapOStreamVisitor(os, m.first), m.second);
         }
       return os;
     }
