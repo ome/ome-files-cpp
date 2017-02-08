@@ -814,3 +814,66 @@ complex type, etc.), even when the logic would be identical for
 e.g. the different integer types.  This approach therefore removes the
 need for unnecessary code duplication, and the type traits checks make
 each type category explicit to the reader.
+
+Behavior differences
+--------------------
+
+Pixel data buffering
+^^^^^^^^^^^^^^^^^^^^
+
+Pixel data is handled differently between the Java and C++
+implementations.  The primary reason for the difference is that the
+Java code uses raw ``byte[]`` arrays to contain pixel data.  This
+could not be implemented in C++ due to the limitations of C++ arrays
+discussed above, as well as having a number of additional limitations:
+
+- they aren't using the native pixel type, requiring conversion to the
+  required type, potentially also including endian conversion
+- they are unstructured, having no dimension ordering or dimension
+  size information
+
+The solution was to create a dedicated :cpp:class:`PixelBuffer`
+template class which could represent pixels of any type.  This is
+contained by a :cpp:class:`VariantPixelBuffer` class which can contain
+any of the supported pixel types.  This is therefore both flexible and
+strongly-typed.  The C++ code is slightly more complex as a result,
+but is safer and more flexible, and the buffer can be passed around
+without the need for any additional metadata to describe its type,
+size and ordering.  This can make passing pixel data between different
+libraries much more transparent.
+
+Pixel sample interleaving
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Additional differences include the semantics of how the
+:cpp:func:`FormatReader::openBytes()` and
+:cpp:func:`FormatWriter::saveBytes()` methods are implemented.  The
+API is the same, but the default behavior is a little different.  All
+well-written code should cope with the differences, but code making
+assumptions may require some attention.
+
+The Java TIFF reader classes'
+:cpp:func:`FormatReader::isInterleaved()` method will always return
+``false``, irrespective of the TIFF ``PlanarConfiguration`` tag.  As a
+result, :cpp:func:`FormatReader::openBytes()` will always return pixel
+data with samples on separate contiguous planes.  In contrast, the C++
+TIFF reader classes' :cpp:func:`FormatReader::isInterleaved()` method
+will return ``true`` if the TIFF ``PlanarConfiguration`` is ``CONTIG``
+and ``false`` if ``SEPARATE``, and the
+:cpp:func:`FormatReader::openBytes()` method will return pixel data
+with the appropriate interleaving, matching the same format in the
+TIFF file.  The Java behavior is due to the implementation details of
+its TIFF reading code; the C++ code uses libtiff and simply passes
+back the pixel data without any rearrangement.  Java code which
+assumes it will never receive interleaved data will need to be updated
+to cope with it when porting to C++.
+
+The Java TIFF writer will always set interleaving if the number of
+samples per pixel is one (which is the recommended behaviour),
+overriding :cpp:func:`FormatWriter::setInterleaved()`.  The C++ TIFF
+writer will always set interleaving based upon
+:cpp:func:`FormatWriter::setInterleaved()`, and will not override the
+request of the caller.  This discrepancy will be rectified in a future
+release to match the behaviour of the Java reader; in practice there
+is no difference in the pixel ordering since interleaving is
+irrelevant when there is only one sample per pixel.
