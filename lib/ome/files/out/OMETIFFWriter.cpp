@@ -658,7 +658,10 @@ namespace ome
             // readers which don't support tiles.
             ifd->setTileType(tiff::STRIP);
             ifd->setTileWidth(getSizeX());
-            ifd->setTileHeight(65536U / getSizeX());
+            uint32_t height = 65536U / getSizeX();
+            if (height == 0)
+              height = 1;
+            ifd->setTileHeight(height);
           }
 
         ome::compat::array<dimension_size_type, 3> coords = getZCTCoords(getPlane());
