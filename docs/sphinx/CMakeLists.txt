@@ -71,8 +71,8 @@ if (BUILD_SPHINX AND SPHINX_BUILD)
                      COMMAND ${CMAKE_COMMAND} -E make_directory "${sphinx_builddir}/cache"
                      COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/man"
                      COMMAND ${SPHINX_BUILD}
-                             -D "release=${OME_VERSION_SHORT}"
-                             -D "version=${OME_VERSION_MAJOR}.${OME_VERSION_MINOR}"
+                             -D "release=${ome-files_VERSION}${OME_VCS_DEV}"
+                             -D "version=${ome-files_VERSION_MAJOR}.${ome-files_VERSION_MINOR}"
                              -c "${sphinx_builddir}"
                              -d "${sphinx_builddir}/cache"
                              -b man
@@ -96,8 +96,8 @@ if (BUILD_SPHINX AND SPHINX_BUILD)
                      COMMAND ${CMAKE_COMMAND} -E make_directory "${sphinx_builddir}/cache"
                      COMMAND ${CMAKE_COMMAND} -E make_directory "${sphinx_builddir}/html"
                      COMMAND ${SPHINX_BUILD}
-                             -D "release=${OME_VERSION_SHORT}"
-                             -D "version=${OME_VERSION_MAJOR}.${OME_VERSION_MINOR}"
+                             -D "release=${ome-files_VERSION}${OME_VCS_DEV}"
+                             -D "version=${ome-files_VERSION_MAJOR}.${ome-files_VERSION_MINOR}"
                              -c "${sphinx_builddir}"
                              -d "${sphinx_builddir}/cache"
                              -b html
@@ -119,8 +119,8 @@ if (BUILD_SPHINX AND SPHINX_BUILD)
                     COMMAND ${CMAKE_COMMAND} -E make_directory "${sphinx_builddir}/cache"
                     COMMAND ${CMAKE_COMMAND} -E make_directory "${sphinx_builddir}/linkcheck"
                     COMMAND ${SPHINX_BUILD}
-                            -D "release=${OME_VERSION_SHORT}"
-                            -D "version=${OME_VERSION_MAJOR}.${OME_VERSION_MINOR}"
+                            -D "release=${ome-files_VERSION}${OME_VCS_DEV}"
+                            -D "version=${ome-files_VERSION_MAJOR}.${ome-files_VERSION_MINOR}"
                             -c "${sphinx_builddir}"
                             -d "${sphinx_builddir}/cache"
                             -b linkcheck

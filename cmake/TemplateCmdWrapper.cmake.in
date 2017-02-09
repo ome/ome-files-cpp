@@ -62,11 +62,10 @@ set "OME_FILES_INSTALL_PKGLIBEXECDIR=@WIN_OME_FILES_INSTALL_PKGLIBEXECDIR@"
 
 REM Release version
 
-set "VERSION_MAJOR=@OME_VERSION_MAJOR@"
-set "VERSION_MINOR=@OME_VERSION_MINOR@"
-set "VERSION_PATCH=@OME_VERSION_PATCH@"
-set "VERSION_EXTRA=@OME_VERSION_EXTRA@"
-set "RELEASE_DATE=@OME_VCS_DATE_S@"
+set "VERSION_MAJOR=@ome-files_VERSION_MAJOR@"
+set "VERSION_MINOR=@ome-files_VERSION_MINOR@"
+set "VERSION_PATCH=@ome-files_VERSION_PATCH@"
+set "VERSION_EXTRA=@ome-files_VERSION_EXTRA@"
 
 REM Program invoked as and command requested (if any)
 
@@ -115,7 +114,7 @@ exit /b
 :version
 
 call :heredoc versiontext && goto versionexit:
-ome-files (OME Files) !VERSION_MAJOR!.!VERSION_MINOR!.!VERSION_PATCH!!VERSION_EXTRA! (!RELEASE_DATE!)
+ome-files (OME Files) !VERSION_MAJOR!.!VERSION_MINOR!.!VERSION_PATCH!!VERSION_EXTRA!
 Copyright (c) 2006-2016 Open Microscopy Environment
 
 This is free software; see the source for copying conditions.  There is NO

@@ -60,19 +60,3 @@ TEST(Version, VersionStreamOutput)
 
   ASSERT_EQ(os.str(), expected);
 }
-
-TEST(Version, CorrectDate)
-{
-  ASSERT_EQ(static_cast<boost::posix_time::ptime>(ome::files::release_date), boost::posix_time::from_time_t(OME_FILES_VCS_DATE));
-}
-
-TEST(Version, DateStreamOutput)
-{
-  std::ostringstream os;
-  os << ome::files::release_date;
-
-  std::ostringstream expected;
-  expected << ome::xml::model::primitives::Timestamp(boost::posix_time::from_time_t(OME_FILES_VCS_DATE));
-
-  ASSERT_EQ(os.str(), expected.str());
-}
