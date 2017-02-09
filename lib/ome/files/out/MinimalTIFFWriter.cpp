@@ -237,9 +237,24 @@ namespace ome
         ifd->setImageWidth(getSizeX());
         ifd->setImageHeight(getSizeY());
 
-        ifd->setTileType(tiff::STRIP);
-        ifd->setTileWidth(getSizeX());
-        ifd->setTileHeight(1U);
+        // Default strip size.  We base this upon a default
+        // chunk size of 64KiB for greyscale images, which will
+        // increase to 192KiB for 3 sample RGB images.
+        if(getSizeX() == 0)
+          {
+            throw FormatException("Can't set strip or tile size: SizeX is 0");
+          }
+        else
+          {
+            // Default to strips, mainly for compatibility with
+            // readers which don't support tiles.
+            ifd->setTileType(tiff::STRIP);
+            ifd->setTileWidth(getSizeX());
+            uint32_t height = 65536U / getSizeX();
+            if (height == 0)
+              height = 1;
+            ifd->setTileHeight(height);
+          }
 
         std::array<dimension_size_type, 3> coords = getZCTCoords(getPlane());
 
