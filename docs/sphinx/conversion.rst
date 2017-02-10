@@ -877,3 +877,12 @@ request of the caller.  This discrepancy will be rectified in a future
 release to match the behavior of the Java reader; in practice there is
 no difference in the pixel ordering since interleaving is irrelevant
 when there is only one sample per pixel.
+
+To obtain the Java TIFF reader behavior in C++, i.e. to obtain
+non-interleaved pixel data, create a :cpp:class:`VariantPixelBuffer`
+with the desired pixel type and interleaving (use the
+:cpp:func:`PixelBufferBase::make_storage_order` helper method to
+create the dimension order without interleaving), and then assign the
+buffer filled by :cpp:func:`FormatRead::openBytes` to this buffer; the
+data will be transparently converted to the desired ordering on
+assignment.
