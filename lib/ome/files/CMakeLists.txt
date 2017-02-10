@@ -181,7 +181,7 @@ target_link_libraries(ome-files
                       Boost::filesystem
                       TIFF::TIFF)
 
-set_target_properties(ome-files PROPERTIES VERSION ${OME_VERSION_SHORT})
+set_target_properties(ome-files PROPERTIES VERSION ${ome-files_VERSION})
 
 add_library(OME::Files ALIAS ome-files)
 

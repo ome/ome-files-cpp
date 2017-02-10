@@ -65,11 +65,10 @@ OME_FILES_INSTALL_PKGLIBEXECDIR="@OME_FILES_INSTALL_PKGLIBEXECDIR@"
 
 # Release version
 
-VERSION_MAJOR="@OME_VERSION_MAJOR@"
-VERSION_MINOR="@OME_VERSION_MINOR@"
-VERSION_PATCH="@OME_VERSION_PATCH@"
-VERSION_EXTRA="@OME_VERSION_EXTRA@"
-RELEASE_DATE="@OME_VCS_DATE_S@"
+VERSION_MAJOR="@ome-files_VERSION_MAJOR@"
+VERSION_MINOR="@ome-files_VERSION_MINOR@"
+VERSION_PATCH="@ome-files_VERSION_PATCH@"
+VERSION_EXTRA="@ome-files_VERSION_EXTRA@"
 
 # Program invoked as and command requested (if any)
 
@@ -135,7 +134,7 @@ EOF
 
 version() {
   cat <<EOF
-ome-files (OME Files) $VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH$VERSION_EXTRA ($RELEASE_DATE)
+ome-files (OME Files) $VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH$VERSION_EXTRA
 Copyright © 2006–2016 Open Microscopy Environment
 
 This is free software; see the source for copying conditions.  There is NO

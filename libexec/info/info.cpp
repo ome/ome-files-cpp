@@ -68,13 +68,12 @@ namespace
   void
   print_version(std::ostream& stream)
   {
-    format fmtr("%1% (%2%) %3% (%4%)");
+    format fmtr("%1% (%2%) %3%");
     fmtr % "ome-files info" % "OME Files"
-      % OME_FILES_VERSION_MAJOR_S "." OME_FILES_VERSION_MINOR_S "." OME_FILES_VERSION_PATCH_S OME_FILES_VERSION_EXTRA_S
-      % OME_FILES_VCS_DATE_S;
+      % OME_FILES_VERSION_MAJOR_S "." OME_FILES_VERSION_MINOR_S "." OME_FILES_VERSION_PATCH_S OME_FILES_VERSION_EXTRA_S;
 
     format fmtc("Copyright © %1%–%2% Open Microscopy Environment");
-    fmtc % "2006" % "2014";
+    fmtc % "2006" % "2017";
 
     stream << fmtr << '\n'
            << fmtc << '\n' << '\n'

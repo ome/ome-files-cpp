@@ -8,7 +8,7 @@ build/CMakeCache.txt: CMakeLists.txt conf.py.in
 	rm -rf build && \
 	mkdir build && \
 	cd build && \
-	cmake -G "Unix Makefiles" -DOME_VERSION_MAJOR=X -DOME_VERSION_MINOR=Y -DOME_VERSION_SHORT=X.Y.Z -Dsphinx:BOOL=ON -Dsphinx-pdf:BOOL=ON ..
+	cmake -G "Unix Makefiles" -Dome-files_VERSION_MAJOR=X -Dome-files_VERSION_MINOR=Y -Dome-files_VERSION=X.Y.Z -Dsphinx:BOOL=ON -Dsphinx-pdf:BOOL=ON ..
 
 man: configure
 	cd build && \

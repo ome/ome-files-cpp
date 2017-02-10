@@ -50,15 +50,6 @@ namespace ome
   namespace files
   {
 
-    namespace
-    {
-      boost::posix_time::ptime
-      posix_release_date()
-      {
-        return boost::posix_time::from_time_t(OME_FILES_VCS_DATE);
-      }
-    }
-
     Version::Version(uint32_t           major,
                      uint32_t           minor,
                      uint32_t           patch,
@@ -71,8 +62,6 @@ namespace ome
     }
 
     const Version release_version(OME_FILES_VERSION_MAJOR, OME_FILES_VERSION_MINOR, OME_FILES_VERSION_PATCH, OME_FILES_VERSION_EXTRA_S);
-
-    const ::ome::xml::model::primitives::Timestamp release_date(posix_release_date());
 
   }
 }
