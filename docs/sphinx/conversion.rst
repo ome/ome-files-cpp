@@ -837,9 +837,9 @@ template class which could represent pixels of any type.  This is
 contained by a :cpp:class:`VariantPixelBuffer` class which can contain
 any of the supported pixel types.  This is therefore both flexible and
 strongly-typed.  The C++ code is slightly more complex as a result,
-but is safer, and the buffer can be passed around without the need for
-any additional metadata to describe its type, size and ordering.  This
-can make passing pixel data between different libraries much more
+but it is safer, and the buffer can be passed around without the need
+for any additional metadata to describe its type, size and ordering.
+This can make passing pixel data between different libraries much more
 transparent.
 
 Pixel sample interleaving
