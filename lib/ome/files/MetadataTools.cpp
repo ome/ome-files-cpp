@@ -263,6 +263,7 @@ namespace ome
       ome::xml::model::detail::OMEModel model;
       std::shared_ptr<ome::xml::meta::OMEXMLMetadataRoot> root(std::dynamic_pointer_cast<ome::xml::meta::OMEXMLMetadataRoot>(meta->getRoot()));
       root->update(docroot, model);
+      model.resolveReferences();
 
       return meta;
     }
