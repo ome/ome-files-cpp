@@ -115,7 +115,7 @@ exit /b
 
 call :heredoc versiontext && goto versionexit:
 ome-files (OME Files) !VERSION_MAJOR!.!VERSION_MINOR!.!VERSION_PATCH!!VERSION_EXTRA!
-Copyright (c) 2006-2016 Open Microscopy Environment
+Copyright (c) 2006-2017 Open Microscopy Environment
 
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
