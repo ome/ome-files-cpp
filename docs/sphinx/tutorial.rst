@@ -531,6 +531,21 @@ defined storage order using the helper function:
 
 Note that the logical order of the dimension extents is unchanged.
 
+Sometimes it may be necessary to change the storage order of data, for
+example to give it the appropriate structure to pass to another
+library with specific ordering requirements.  This can be done by a
+simple assignment between two buffers having a different storage
+order; the dimension extents must be of the same size for the buffers
+to be compatible.  The following example demonstrates conversion of
+planar data to contiguous:
+
+.. literalinclude:: examples/pixeldata.cpp
+   :language: cpp
+   :start-after: reorder-example-start
+   :end-before: reorder-example-end
+
+In place conversion is not yet supported.
+
 In practice, it is unlikely that you will need to create any
 :cpp:class:`PixelBuffer` objects directly.  The
 :cpp:class:`FormatReader` and :cpp:class:`FormatWriter` interfaces use
