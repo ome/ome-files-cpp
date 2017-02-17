@@ -65,7 +65,7 @@ list(APPEND CMAKE_MODULE_PATH
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/BioFormatsCommon.cmake")
 
 set(release-name "ome-files-cpp")
-set(release-version "0.3.0")
+set(release-version "0.3.1")
 project(ome-files
         VERSION "${release-version}"
         LANGUAGES CXX)
@@ -102,7 +102,7 @@ include(HeaderTest)
 
 find_package(OMECompat 5.4.0 REQUIRED)
 find_package(OMECommon 5.4.0 REQUIRED)
-find_package(OMEXML 5.5.0 REQUIRED)
+find_package(OMEXML 5.5.1 REQUIRED)
 
 if(MSVC)
   # Debug library suffix.
