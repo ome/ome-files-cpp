@@ -65,7 +65,7 @@ REM Release version
 set "VERSION_MAJOR=@ome-files_VERSION_MAJOR@"
 set "VERSION_MINOR=@ome-files_VERSION_MINOR@"
 set "VERSION_PATCH=@ome-files_VERSION_PATCH@"
-set "VERSION_EXTRA=@ome-files_VERSION_EXTRA@"
+set "VERSION_EXTRA=@OME_VCS_DEV@"
 
 REM Program invoked as and command requested (if any)
 
