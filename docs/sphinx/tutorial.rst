@@ -544,7 +544,7 @@ planar data to contiguous:
    :start-after: reorder-example-start
    :end-before: reorder-example-end
 
-In place conversion is not yet supported.
+In-place conversion is not yet supported.
 
 In practice, it is unlikely that you will need to create any
 :cpp:class:`PixelBuffer` objects directly.  The
