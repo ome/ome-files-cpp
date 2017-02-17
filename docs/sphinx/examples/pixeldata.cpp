@@ -99,7 +99,7 @@ namespace
     /* create-ordered-example-start */
     // Language type for UINT16 pixel data
     typedef PixelProperties<PixelType::UINT16>::std_type uint16_pixel_type;
-    // Storage order is XYSCTZztc; subchannels are not interleaved
+    // Storage order is XYSCTZctz; subchannels are not interleaved
     // ("planar") after XY; lowercase letters are unused Modulo
     // dimensions
     PixelBufferBase::storage_order_type order1
@@ -115,7 +115,7 @@ namespace
 
     // Language type for INT8 pixel data
     typedef PixelProperties<PixelType::INT8>::std_type int8_pixel_type;
-    // Storage order is SXYZCTztc; subchannels are interleaved
+    // Storage order is SXYZCTzct; subchannels are interleaved
     // ("chunky") before XY; lowercase letters are unused Modulo
     // dimensions
     PixelBufferBase::storage_order_type order2
@@ -129,6 +129,46 @@ namespace
        ome::files::ENDIAN_NATIVE,
        order2);
     /* create-ordered-example-end */
+  }
+
+  void
+  reorderPixelBuffer()
+  {
+    /* reorder-example-start */
+    // Language type for FLOAT pixel data
+    typedef PixelProperties<PixelType::FLOAT>::std_type float_pixel_type;
+    // Storage order is XYSZCTzct; subchannels are not interleaved
+    // ("planar") after XY; lowercase letters are unused Modulo
+    // dimensions
+    PixelBufferBase::storage_order_type planar_order
+      (PixelBufferBase::make_storage_order(DimensionOrder::XYZCT, false));
+    // Storage order is SXYZCTzct; subchannels are interleaved
+    // ("chunky" or "contiguous") before XY; lowercase letters are
+    // unused Modulo dimensions
+    PixelBufferBase::storage_order_type contiguous_order
+      (PixelBufferBase::make_storage_order(DimensionOrder::XYZCT, true));
+
+    // Create PixelBuffer for float data with planar order
+    // X=512 Y=512 Z=16 T=1 C=3 S/z/t/c=1
+    PixelBuffer<float_pixel_type> planar_buffer
+      (boost::extents[512][512][16][1][3][1][1][1][1],
+       PixelType::FLOAT,
+       ome::files::ENDIAN_NATIVE,
+       planar_order);
+
+    // Create PixelBuffer for float data with contiguous order
+    // X=512 Y=512 Z=16 T=1 C=3 S/z/t/c=1
+    PixelBuffer<float_pixel_type> contiguous_buffer
+      (boost::extents[512][512][16][1][3][1][1][1][1],
+       PixelType::FLOAT,
+       ome::files::ENDIAN_NATIVE,
+       contiguous_order);
+
+    // Transfer the pixel data from the planar buffer to the
+    // contiguous buffer; the pixel data will be reordered
+    // appropriately during the transfer.
+    contiguous_buffer = planar_buffer;
+    /* reorder-example-end */
   }
 
   /* visitor-example-start */
@@ -239,6 +279,7 @@ main()
     {
       createPixelBuffer();
       createPixelBufferOrdered();
+      reorderPixelBuffer();
       applyVariant();
     }
   catch (const std::exception& e)
