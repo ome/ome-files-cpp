@@ -3,6 +3,14 @@
 OME-Files is a standalone C++ library for reading and writing life sciences
 image file formats.
 
+Links
+-----
+
+- [Overview of all components](http://www.openmicroscopy.org/site/support/ome-files-cpp/)
+- [Documentation](http://www.openmicroscopy.org/site/support/ome-files-cpp/ome-files/manual/html/index.html)
+- [Tutorial](http://www.openmicroscopy.org/site/support/ome-files-cpp/ome-files/manual/html/tutorial.html)
+- [API reference](http://www.openmicroscopy.org/site/support/ome-files-cpp/ome-files/api/html/namespaces.html)
+- [Performance testing](https://github.com/openmicroscopy/ome-files-performance)
 
 Purpose
 -------
@@ -35,8 +43,8 @@ You can use OME-Files C++ to easily support OME-TIFF in your software.
 More information
 ----------------
 
-For more information, see the [OME-Files web
-site](http://www.openmicroscopy.org/site/products/bio-formats).
+For more information, see the [documentation]
+(http://www.openmicroscopy.org/site/support/ome-files-cpp/).
 
 
 Pull request testing
