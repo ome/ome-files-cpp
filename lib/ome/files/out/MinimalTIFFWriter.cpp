@@ -265,7 +265,7 @@ namespace ome
         ifd->setSamplesPerPixel(getRGBChannelCount(channel));
 
         const boost::optional<bool> interleaved(getInterleaved());
-        if (isRGB(channel) && interleaved && *interleaved)
+        if (interleaved && *interleaved)
           ifd->setPlanarConfiguration(tiff::CONTIG);
         else
           ifd->setPlanarConfiguration(tiff::SEPARATE);
