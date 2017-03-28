@@ -649,7 +649,10 @@ TEST_P(FormatReaderTest, FlatSeries)
   EXPECT_EQ(1U, r.getResolutionCount());
   EXPECT_EQ(0U, r.getResolution());
   EXPECT_NO_THROW(r.setResolution(0));
-  EXPECT_THROW(r.getZCTCoords(r.getImageCount()), std::logic_error);
+  EXPECT_THROW(r.getZCTCoords(r.getImageCount()), std::out_of_range);
+  EXPECT_THROW(r.getIndex(r.getSizeZ(), 0, 0), std::out_of_range);
+  EXPECT_THROW(r.getIndex(0, r.getEffectiveSizeC(), 0), std::out_of_range);
+  EXPECT_THROW(r.getIndex(0, 0, r.getSizeT()), std::out_of_range);
 
   static const std::vector<dims> coords
     {
