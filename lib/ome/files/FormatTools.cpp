@@ -58,7 +58,7 @@ namespace ome
       {
         boost::format fmt("Invalid %1% %2%: %3%");
         fmt % dim % what % value;
-        throw std::logic_error(fmt.str());
+        throw std::out_of_range(fmt.str());
       }
 
       void
@@ -69,7 +69,7 @@ namespace ome
       {
         boost::format fmt("Invalid %1% %2%: %3%/%4%");
         fmt % dim % what % value1 % value2;
-        throw std::logic_error(fmt.str());
+        throw std::out_of_range(fmt.str());
       }
 
       void
@@ -426,6 +426,13 @@ namespace ome
                  dimension_size_type num,
                  dimension_size_type index)
     {
+      if (index >= num)
+	{
+	  boost::format fmt("Invalid index: %1%");
+	  fmt % index;
+	  throw std::out_of_range(fmt.str());
+	}
+
       dimension_size_type iz = 0, it = 0, ic = 0;
       validate_dimensions(order, zSize, cSize, tSize, num, iz, ic, it);
 
