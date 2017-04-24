@@ -54,6 +54,7 @@ find_tiff_tests()
         {
           static ome::compat::regex tile_match(".*/data-layout-([[:digit:]]+)x([[:digit:]]+)-([[:alpha:]]+)-tiles-([[:digit:]]+)x([[:digit:]]+)\\.tiff");
           static ome::compat::regex strip_match(".*/data-layout-([[:digit:]]+)x([[:digit:]]+)-([[:alpha:]]+)-strips-([[:digit:]]+)\\.tiff");
+          static ome::compat::regex plain_match(".*/data-layout-([[:digit:]]+)x([[:digit:]]+)-([[:alpha:]]+)\\.tiff");
 
           ome::compat::smatch found;
           std::string file(i->path().string());
@@ -63,7 +64,7 @@ find_tiff_tests()
           if (ome::compat::regex_match(file, found, tile_match))
             {
               TIFFTestParameters p;
-              p.tile = true;
+              p.tile = ome::files::tiff::TILE;
               p.file = file;
               p.wfile = wfile;
               p.compression = ome::files::tiff::COMPRESSION_NONE;
@@ -80,12 +81,14 @@ find_tiff_tests()
               if (found[3] == "planar")
                 p.imageplanar = true;
 
+              p.tilewidth = 0;
               std::istringstream twid(found[4]);
-              if (!(twid >> p.tilewidth))
+              if (!(twid >> *p.tilewidth))
                 continue;
 
+              p.tilelength = 0;
               std::istringstream tht(found[5]);
-              if (!(tht >> p.tilelength))
+              if (!(tht >> *p.tilelength))
                 continue;
 
               params.push_back(p);
@@ -93,7 +96,7 @@ find_tiff_tests()
           else if (ome::compat::regex_match(file, found, strip_match))
             {
               TIFFTestParameters p;
-              p.tile = false;
+              p.tile = ome::files::tiff::STRIP;
               p.file = file;
               p.wfile = wfile;
               p.compression = ome::files::tiff::COMPRESSION_NONE;
@@ -110,11 +113,37 @@ find_tiff_tests()
               if (found[3] == "planar")
                 p.imageplanar = true;
 
-              p.tilewidth = p.imagewidth;
+              p.tilewidth = boost::none;
 
+              p.tilelength = 0;
               std::istringstream srow(found[4]);
-              if (!(srow >> p.tilelength))
+              if (!(srow >> *p.tilelength))
                 continue;
+
+              params.push_back(p);
+            }
+          else if (ome::compat::regex_match(file, found, plain_match))
+            {
+              TIFFTestParameters p;
+              p.tile = boost::none;
+              p.file = file;
+              p.wfile = wfile;
+              p.compression = ome::files::tiff::COMPRESSION_NONE;
+
+              std::istringstream iwid(found[1]);
+              if (!(iwid >> p.imagewidth))
+                continue;
+
+              std::istringstream iht(found[2]);
+              if (!(iht >> p.imagelength))
+                continue;
+
+              p.imageplanar = false;
+              if (found[3] == "planar")
+                p.imageplanar = true;
+
+              p.tilewidth = boost::none;
+              p.tilelength = boost::none;
 
               params.push_back(p);
             }

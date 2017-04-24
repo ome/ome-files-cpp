@@ -86,6 +86,8 @@ namespace ome
         interleaved(boost::none),
         sequential(false),
         framesPerSecond(0),
+        tile_size_x(boost::none),
+        tile_size_y(boost::none),
         metadataRetrieve(std::make_shared<DummyMetadata>())
       {
         assertId(currentId, false);
@@ -542,6 +544,51 @@ namespace ome
       FormatWriter::canDoStacks() const
       {
         return writerProperties.stacks;
+      }
+
+      void
+      FormatWriter::setTileSizeX(boost::optional<dimension_size_type> size)
+      {
+        tile_size_x = size;
+      }
+
+      boost::optional<dimension_size_type>
+      FormatWriter::getTileSizeX() const
+      {
+        return tile_size_x;
+      }
+
+      void
+      FormatWriter::setTileSizeY(boost::optional<dimension_size_type> size)
+      {
+        tile_size_y = size;
+      }
+
+
+      boost::optional<dimension_size_type>
+      FormatWriter::getTileSizeY() const
+      {
+        return tile_size_y;
+      }
+
+      dimension_size_type
+      FormatWriter::getEffectiveTileSizeX() const
+      {
+        if (!tile_size_x)
+          {
+            return metadataRetrieve->getPixelsSizeX(getSeries());
+          }
+        return *tile_size_x;
+      }
+
+      dimension_size_type
+      FormatWriter::getEffectiveTileSizeY() const
+      {
+        if (!tile_size_y)
+          {
+            return metadataRetrieve->getPixelsSizeY(getSeries());
+          }
+        return *tile_size_y;
       }
 
     }

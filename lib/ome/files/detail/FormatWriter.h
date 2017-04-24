@@ -136,6 +136,12 @@ namespace ome
         /// The frames per second to use when writing.
         frame_rate_type framesPerSecond;
 
+        /// Tile size X.
+        boost::optional<dimension_size_type> tile_size_x;
+
+        /// Tile size Y.
+        boost::optional<dimension_size_type> tile_size_y;
+
         /**
          * Current metadata store. Should never be accessed directly as the
          * semantics of getMetadataRetrieve() prevent "null" access.
@@ -446,6 +452,30 @@ namespace ome
         // Documented in superclass.
         const std::vector<boost::filesystem::path>&
         getCompressionSuffixes() const;
+
+        // Documented in superclass.
+        void
+        setTileSizeX(boost::optional<dimension_size_type> size);
+
+        // Documented in superclass.
+        boost::optional<dimension_size_type>
+        getTileSizeX() const;
+
+        // Documented in superclass.
+        void
+        setTileSizeY(boost::optional<dimension_size_type> size);
+
+        // Documented in superclass.
+        boost::optional<dimension_size_type>
+        getTileSizeY() const;
+
+        // Documented in superclass.
+        dimension_size_type
+        getEffectiveTileSizeX() const;
+
+        // Documented in superclass.
+        dimension_size_type
+        getEffectiveTileSizeY() const;
       };
 
     }

@@ -40,6 +40,7 @@
 #define TEST_TIFFSAMPLES_H
 
 #include <boost/filesystem.hpp>
+#include <boost/optional.hpp>
 
 #include <ome/files/Types.h>
 #include <ome/files/tiff/Types.h>
@@ -53,14 +54,14 @@
 
 struct TIFFTestParameters
 {
-  bool tile;
+  boost::optional<ome::files::tiff::TileType> tile;
   std::string file;
   std::string wfile;
   bool imageplanar;
   ome::files::dimension_size_type imagewidth;
   ome::files::dimension_size_type imagelength;
-  ome::files::dimension_size_type tilewidth;
-  ome::files::dimension_size_type tilelength;
+  boost::optional<ome::files::dimension_size_type> tilewidth;
+  boost::optional<ome::files::dimension_size_type> tilelength;
   ome::files::tiff::Compression compression;
 };
 
@@ -69,13 +70,23 @@ inline std::basic_ostream<charT,traits>&
 operator<< (std::basic_ostream<charT,traits>& os,
             const TIFFTestParameters& p)
 {
-  return os << p.file << " [" << p.wfile << "] ("
-            << p.imagewidth << "x" << p.imagelength
-            << (p.imageplanar ? " planar" : " chunky")
-            << (p.tile ? " tiled " : " strips ")
-            << p.tilewidth << "x" << p.tilelength
-            << " compression " << p.compression
-            << ")";
+  os << p.file << " [" << p.wfile << "] ("
+     << p.imagewidth << "x" << p.imagelength
+     << (p.imageplanar ? " planar" : " chunky")
+     << (p.tile ? (*p.tile ? " tiled " : " strips ") : "none");
+  if(p.tilewidth)
+    os << *p.tilewidth;
+  else
+    os << "unknown";
+  os << "x";
+  if(p.tilelength)
+    os << *p.tilelength;
+  else
+    os << "unknown";
+  os << " compression " << p.compression
+     << ")";
+
+  return os;
 }
 
 extern std::vector<TIFFTestParameters>

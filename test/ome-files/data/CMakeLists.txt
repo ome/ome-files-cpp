@@ -91,6 +91,16 @@ if(GRAPHICSMAGICK_EXECUTABLE)
                                      "${genpng}")
           list(APPEND images "${genpng}")
 
+          # Generate TIFF without explicit tiling information
+          set(gentiff "${CMAKE_CURRENT_BINARY_DIR}/${image}-${imagewidth}x${imageheight}-${planarconfig}.tiff")
+          add_custom_command(OUTPUT "${gentiff}"
+                             DEPENDS "${genpng}"
+                             COMMAND "${GRAPHICSMAGICK_EXECUTABLE}" convert
+                             "${genpng}"
+                             -interlace "${interlace}"
+                             "${gentiff}")
+          list(APPEND images "${gentiff}")
+
           # Generate TIFF tile variants for each image size
           foreach(tilewidth 16 32 48 64)
             foreach(tileheight 16 32 48 64)

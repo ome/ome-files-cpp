@@ -222,6 +222,20 @@ namespace ome
           }
       }
 
+      dimension_size_type
+      MinimalTIFFWriter::getEffectiveTileSizeX() const
+      {
+        // Get current IFD.
+        return ifd->getTileWidth();
+      }
+
+      dimension_size_type
+      MinimalTIFFWriter::getEffectiveTileSizeY() const
+      {
+        // Get current IFD.
+        return ifd->getTileHeight();
+      }
+
       void
       MinimalTIFFWriter::nextIFD() const
       {
@@ -233,9 +247,11 @@ namespace ome
       void
       MinimalTIFFWriter::setupIFD() const
       {
-        // Default to single strips for now.
         ifd->setImageWidth(getSizeX());
         ifd->setImageHeight(getSizeY());
+
+        auto tile_x = getTileSizeX();
+        auto tile_y = getTileSizeY();
 
         // Default strip or tile size.  We base this upon a default
         // chunk size of 64KiB for greyscale images, which will
@@ -244,6 +260,20 @@ namespace ome
         if(getSizeX() == 0)
           {
             throw FormatException("Can't set strip or tile size: SizeX is 0");
+          }
+        else if(!tile_x && tile_y)
+          {
+            // Manually set strip size.
+            ifd->setTileType(tiff::STRIP);
+            ifd->setTileWidth(getSizeX());
+            ifd->setTileHeight(*tile_y);
+          }
+        else if(tile_x && tile_y)
+          {
+            // Manually set tile size.
+            ifd->setTileType(tiff::TILE);
+            ifd->setTileWidth(*tile_x);
+            ifd->setTileHeight(*tile_y);
           }
         else if(getSizeX() < 2048)
           {

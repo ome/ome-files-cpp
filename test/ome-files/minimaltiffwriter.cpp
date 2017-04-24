@@ -147,6 +147,8 @@ TEST(TIFFWriter, SupportedCompressionTypes)
 
 TEST_P(TIFFWriterTest, setId)
 {
+  const TIFFTestParameters& params = GetParam();
+
   std::vector<std::shared_ptr<CoreMetadata>> seriesList;
   for (const auto& i : *tiff)
     {
@@ -163,6 +165,11 @@ TEST_P(TIFFWriterTest, setId)
   bool interleaved = true;
 
   tiffwriter.setInterleaved(interleaved);
+  if(params.tile)
+    {
+      tiffwriter.setTileSizeX(params.tilewidth);
+      tiffwriter.setTileSizeY(params.tilelength);
+    }
 
   ASSERT_NO_THROW(tiffwriter.setId(testfile));
 

@@ -116,6 +116,14 @@ namespace ome
         void
         setPlane(dimension_size_type plane) const;
 
+        // Documented in superclass.
+        dimension_size_type
+        getEffectiveTileSizeX() const;
+
+        // Documented in superclass.
+        dimension_size_type
+        getEffectiveTileSizeY() const;
+
       protected:
         /// Flush current IFD and create new IFD.
         void

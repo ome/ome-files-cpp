@@ -108,6 +108,8 @@ public:
 
 TEST_P(TIFFWriterTest, setId)
 {
+  const TIFFTestParameters& params = GetParam();
+
   std::vector<std::shared_ptr<CoreMetadata>> seriesList;
   for (const auto& i : *tiff)
     {
@@ -125,6 +127,8 @@ TEST_P(TIFFWriterTest, setId)
 
   tiffwriter.setInterleaved(interleaved);
   tiffwriter.setCompression("Deflate");
+  tiffwriter.setTileSizeX(params.tilewidth);
+  tiffwriter.setTileSizeY(params.tilelength);
 
   ASSERT_NO_THROW(tiffwriter.setId(testfile));
 
