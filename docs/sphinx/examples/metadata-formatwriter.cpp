@@ -192,6 +192,8 @@ main(int argc, char *argv[])
           // Set writer options before opening a file
           writer->setMetadataRetrieve(meta);
           writer->setInterleaved(false);
+          writer->setTileSizeX(256);
+          writer->setTileSizeY(256);
 
           // Open the file
           writer->setId(filename);
