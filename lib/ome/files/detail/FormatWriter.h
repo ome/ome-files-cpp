@@ -454,28 +454,20 @@ namespace ome
         getCompressionSuffixes() const;
 
         // Documented in superclass.
-        void
+        dimension_size_type
         setTileSizeX(boost::optional<dimension_size_type> size);
 
         // Documented in superclass.
-        boost::optional<dimension_size_type>
+        dimension_size_type
         getTileSizeX() const;
 
         // Documented in superclass.
-        void
+        dimension_size_type
         setTileSizeY(boost::optional<dimension_size_type> size);
 
         // Documented in superclass.
-        boost::optional<dimension_size_type>
+        dimension_size_type
         getTileSizeY() const;
-
-        // Documented in superclass.
-        dimension_size_type
-        getEffectiveTileSizeX() const;
-
-        // Documented in superclass.
-        dimension_size_type
-        getEffectiveTileSizeY() const;
       };
 
     }

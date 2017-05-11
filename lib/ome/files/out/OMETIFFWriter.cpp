@@ -617,7 +617,7 @@ namespace ome
       }
 
       dimension_size_type
-      OMETIFFWriter::getEffectiveTileSizeX() const
+      OMETIFFWriter::getTileSizeX() const
       {
         // Get current IFD.
         std::shared_ptr<tiff::IFD> ifd (currentTIFF->second.tiff->getCurrentDirectory());
@@ -625,7 +625,7 @@ namespace ome
       }
 
       dimension_size_type
-      OMETIFFWriter::getEffectiveTileSizeY() const
+      OMETIFFWriter::getTileSizeY() const
       {
         // Get current IFD.
         std::shared_ptr<tiff::IFD> ifd (currentTIFF->second.tiff->getCurrentDirectory());
@@ -648,9 +648,6 @@ namespace ome
         ifd->setImageWidth(getSizeX());
         ifd->setImageHeight(getSizeY());
 
-        auto tile_x = getTileSizeX();
-        auto tile_y = getTileSizeY();
-
         // Default strip or tile size.  We base this upon a default
         // chunk size of 64KiB for greyscale images, which will
         // increase to 192KiB for 3 sample RGB images.  We use strips
@@ -659,19 +656,19 @@ namespace ome
           {
             throw FormatException("Can't set strip or tile size: SizeX is 0");
           }
-        else if(!tile_x && tile_y)
+        else if(!this->tile_size_x && this->tile_size_y)
           {
             // Manually set strip size.
             ifd->setTileType(tiff::STRIP);
             ifd->setTileWidth(getSizeX());
-            ifd->setTileHeight(*tile_y);
+            ifd->setTileHeight(*this->tile_size_y);
           }
-        else if(tile_x && tile_y)
+        else if(this->tile_size_x && this->tile_size_y)
           {
             // Manually set tile size.
             ifd->setTileType(tiff::TILE);
-            ifd->setTileWidth(*tile_x);
-            ifd->setTileHeight(*tile_y);
+            ifd->setTileWidth(*this->tile_size_x);
+            ifd->setTileHeight(*this->tile_size_y);
           }
         else if(getSizeX() < 2048)
           {

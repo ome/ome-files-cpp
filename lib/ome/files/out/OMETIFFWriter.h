@@ -175,11 +175,11 @@ namespace ome
 
         // Documented in superclass.
         dimension_size_type
-        getEffectiveTileSizeX() const;
+        getTileSizeX() const;
 
         // Documented in superclass.
         dimension_size_type
-        getEffectiveTileSizeY() const;
+        getTileSizeY() const;
 
       protected:
         /// Flush current IFD and create new IFD.

@@ -546,33 +546,15 @@ namespace ome
         return writerProperties.stacks;
       }
 
-      void
+      dimension_size_type
       FormatWriter::setTileSizeX(boost::optional<dimension_size_type> size)
       {
         tile_size_x = size;
-      }
-
-      boost::optional<dimension_size_type>
-      FormatWriter::getTileSizeX() const
-      {
-        return tile_size_x;
-      }
-
-      void
-      FormatWriter::setTileSizeY(boost::optional<dimension_size_type> size)
-      {
-        tile_size_y = size;
-      }
-
-
-      boost::optional<dimension_size_type>
-      FormatWriter::getTileSizeY() const
-      {
-        return tile_size_y;
+        return getTileSizeX();
       }
 
       dimension_size_type
-      FormatWriter::getEffectiveTileSizeX() const
+      FormatWriter::getTileSizeX() const
       {
         if (!tile_size_x)
           {
@@ -582,7 +564,15 @@ namespace ome
       }
 
       dimension_size_type
-      FormatWriter::getEffectiveTileSizeY() const
+      FormatWriter::setTileSizeY(boost::optional<dimension_size_type> size)
+      {
+        tile_size_y = size;
+        return getTileSizeY();
+      }
+
+
+      dimension_size_type
+      FormatWriter::getTileSizeY() const
       {
         if (!tile_size_y)
           {

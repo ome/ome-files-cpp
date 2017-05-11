@@ -397,51 +397,14 @@ namespace ome
        * Set the requested tile width.
        *
        * The requested tile width may not be supported by the
-       * underlying file format.  Call getEffectiveTileSizeX() to get
-       * the size in use by the writer.
+       * underlying file format.  Call getTileSizeX() to get the
+       * effective size in use by the writer, or use the return value.
        *
-       * @param size the requested tile width.
+       * @param size the effective tile width.
        **/
       virtual
-      void
+      dimension_size_type
       setTileSizeX(boost::optional<dimension_size_type> size) = 0;
-
-      /**
-       * Get the requested tile width.
-       *
-       * @note Call getEffectiveTileSizeX() to get the size in use by
-       * the writer.
-       *
-       * @returns the requested tile width.
-       **/
-      virtual
-      boost::optional<dimension_size_type>
-      getTileSizeX() const = 0;
-
-      /**
-       * Set the requested tile height.
-       *
-       * The requested tile height may not be supported by the
-       * underlying file format.  Call getEffectiveTileSizeY() to get
-       * the size in use by the writer.
-       *
-       * @param size the requested tile height.
-       **/
-      virtual
-      void
-      setTileSizeY(boost::optional<dimension_size_type> size) = 0;
-
-      /**
-       * Get the requested tile height.
-       *
-       * @note Call getEffectiveTileSizeY() to get the size in use by
-       * the writer.
-       *
-       * @returns the requested tile height.
-       **/
-      virtual
-      boost::optional<dimension_size_type>
-      getTileSizeY() const = 0;
 
       /**
        * Get the effective tile width.
@@ -457,8 +420,20 @@ namespace ome
        **/
       virtual
       dimension_size_type
-      getEffectiveTileSizeX() const = 0;
+      getTileSizeX() const = 0;
 
+      /**
+       * Set the requested tile height.
+       *
+       * The requested tile height may not be supported by the
+       * underlying file format.  Call getTileSizeY() to get the
+       * effective size in use by the writer, or use the return value.
+       *
+       * @param size the effective tile height.
+       **/
+      virtual
+      dimension_size_type
+      setTileSizeY(boost::optional<dimension_size_type> size) = 0;
 
       /**
        * Get the effective tile height.
@@ -474,7 +449,7 @@ namespace ome
        **/
       virtual
       dimension_size_type
-      getEffectiveTileSizeY() const = 0;
+      getTileSizeY() const = 0;
     };
 
   }
