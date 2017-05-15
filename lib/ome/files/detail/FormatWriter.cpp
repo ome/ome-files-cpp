@@ -558,7 +558,15 @@ namespace ome
       {
         if (!tile_size_x)
           {
-            return metadataRetrieve->getPixelsSizeX(getSeries());
+            if (!metadataRetrieve)
+              // fallback before setId and setMetadataRetrieve
+              throw std::logic_error("MetadataStore can not be null");
+            if (currentId)
+              // after setId
+              return metadataRetrieve->getPixelsSizeX(getSeries());
+            else
+              // fallback before setId
+              return metadataRetrieve->getPixelsSizeX(0);
           }
         return *tile_size_x;
       }
@@ -576,7 +584,15 @@ namespace ome
       {
         if (!tile_size_y)
           {
-            return metadataRetrieve->getPixelsSizeY(getSeries());
+            if (!metadataRetrieve)
+              // fallback before setId and setMetadataRetrieve
+              throw std::logic_error("MetadataStore can not be null");
+            if (currentId)
+              // after setId
+              return metadataRetrieve->getPixelsSizeY(getSeries());
+            else
+              // fallback before setId
+              return metadataRetrieve->getPixelsSizeX(0);
           }
         return *tile_size_y;
       }

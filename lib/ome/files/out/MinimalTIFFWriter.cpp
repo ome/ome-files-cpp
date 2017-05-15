@@ -225,15 +225,25 @@ namespace ome
       dimension_size_type
       MinimalTIFFWriter::getTileSizeX() const
       {
-        // Get current IFD.
-        return ifd->getTileWidth();
+        // Get current IFD.  Also requires unset size (fallback) or
+        // nonzero set size.
+        if (currentId && ifd && (!this->tile_size_x ||
+                    (this->tile_size_x && *this->tile_size_x)))
+          return ifd->getTileWidth();
+        else // setId not called yet; fall back.
+          return detail::FormatWriter::getTileSizeX();
       }
 
       dimension_size_type
       MinimalTIFFWriter::getTileSizeY() const
       {
-        // Get current IFD.
-        return ifd->getTileHeight();
+        // Get current IFD.  Also requires unset size (fallback) or
+        // nonzero set size.
+        if (currentId && ifd && (!this->tile_size_y ||
+                    (this->tile_size_y && *this->tile_size_y)))
+          return ifd->getTileHeight();
+        else // setId not called yet; fall back.
+          return detail::FormatWriter::getTileSizeY();
       }
 
       void
@@ -260,17 +270,39 @@ namespace ome
           }
         else if(!this->tile_size_x && this->tile_size_y)
           {
-            // Manually set strip size.
-            ifd->setTileType(tiff::STRIP);
-            ifd->setTileWidth(getSizeX());
-            ifd->setTileHeight(*this->tile_size_y);
+            // Manually set strip size if the size is positive.  Or
+            // else set strips of size 1 as a fallback for
+            // compatibility with Bio-Formats.
+            if(*this->tile_size_y)
+              {
+                ifd->setTileType(tiff::STRIP);
+                ifd->setTileWidth(getSizeX());
+                ifd->setTileHeight(*this->tile_size_y);
+              }
+            else
+              {
+                ifd->setTileType(tiff::STRIP);
+                ifd->setTileWidth(getSizeX());
+                ifd->setTileHeight(1U);
+              }
           }
         else if(this->tile_size_x && this->tile_size_y)
           {
-            // Manually set tile size.
-            ifd->setTileType(tiff::TILE);
-            ifd->setTileWidth(*this->tile_size_x);
-            ifd->setTileHeight(*this->tile_size_y);
+            // Manually set tile size if both sizes are positive.  Or
+            // else set strips of size 1 as a fallback for
+            // compatibility with Bio-Formats.
+            if(*this->tile_size_x && *this->tile_size_y)
+              {
+                ifd->setTileType(tiff::TILE);
+                ifd->setTileWidth(*this->tile_size_x);
+                ifd->setTileHeight(*this->tile_size_y);
+              }
+            else
+              {
+                ifd->setTileType(tiff::STRIP);
+                ifd->setTileWidth(getSizeX());
+                ifd->setTileHeight(1U);
+              }
           }
         else if(getSizeX() < 2048)
           {
