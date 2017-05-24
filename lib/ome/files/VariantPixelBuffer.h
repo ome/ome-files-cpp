@@ -649,7 +649,7 @@ namespace ome
 
       /// Find a PixelBuffer data array of a specific pixel type.
       template<typename T>
-      struct VariantPixelBufferVisitor : public boost::static_visitor<PixelBuffer<T>&>
+      struct VariantPixelBufferVisitor : public boost::static_visitor<PixelBuffer<T> *>
       {
         /**
          * PixelBuffer of correct type.
@@ -658,12 +658,12 @@ namespace ome
          * @returns a pointer to the data array.
          * @throws if the PixelBuffer is null.
          */
-        PixelBuffer<T>&
+        PixelBuffer<T> *
         operator() (std::shared_ptr<PixelBuffer<T>>& v) const
         {
           if (!v)
             throw std::runtime_error("Null pixel type");
-          return *v;
+          return v.get();
         }
 
         /**
@@ -673,7 +673,7 @@ namespace ome
          * @returns a pointer to the data array.
          */
         template <typename U>
-        PixelBuffer<T>&
+        PixelBuffer<T> *
         operator() (U& /* v */) const
         {
           throw std::runtime_error("Unsupported pixel type conversion for buffer");
@@ -682,7 +682,7 @@ namespace ome
 
       /// Find a PixelBuffer data array of a specific pixel type.
       template<typename T>
-      struct VariantPixelBufferConstVisitor : public boost::static_visitor<const PixelBuffer<T>&>
+      struct VariantPixelBufferConstVisitor : public boost::static_visitor<const PixelBuffer<T> *>
       {
         /**
          * PixelBuffer of correct type.
@@ -691,12 +691,12 @@ namespace ome
          * @returns a pointer to the data array.
          * @throws if the PixelBuffer is null.
          */
-        const PixelBuffer<T>&
+        const PixelBuffer<T> *
         operator() (const std::shared_ptr<PixelBuffer<T>>& v) const
         {
           if (!v)
             throw std::runtime_error("Null pixel type");
-          return *v;
+          return v.get();
         }
 
         /**
@@ -706,7 +706,7 @@ namespace ome
          * @returns a pointer to the data array.
          */
         template <typename U>
-        const PixelBuffer<T>&
+        const PixelBuffer<T> *
         operator() (U& /* v */) const
         {
           throw std::runtime_error("Unsupported pixel type conversion for buffer");
@@ -919,7 +919,7 @@ namespace ome
     VariantPixelBuffer::array()
     {
       detail::VariantPixelBufferVisitor<T> v;
-      return boost::apply_visitor(v, buffer).array();
+      return boost::apply_visitor(v, buffer)->array();
     }
 
     /// @copydoc VariantPixelBuffer::array() const
@@ -928,7 +928,7 @@ namespace ome
     VariantPixelBuffer::array() const
     {
       detail::VariantPixelBufferConstVisitor<T> v;
-      return boost::apply_visitor(v, buffer).array();
+      return boost::apply_visitor(v, buffer)->array();
     }
 
     template<typename T>
@@ -936,7 +936,7 @@ namespace ome
     VariantPixelBuffer::data()
     {
       detail::VariantPixelBufferVisitor<T> v;
-      return boost::apply_visitor(v, buffer).data();
+      return boost::apply_visitor(v, buffer)->data();
     }
 
     template<typename T>
@@ -944,7 +944,7 @@ namespace ome
     VariantPixelBuffer::data() const
     {
       detail::VariantPixelBufferConstVisitor<T> v;
-      return boost::apply_visitor(v, buffer).data();
+      return boost::apply_visitor(v, buffer)->data();
     }
 
     template<typename T>
@@ -952,7 +952,7 @@ namespace ome
     VariantPixelBuffer::origin() const
     {
       detail::VariantPixelBufferConstVisitor<T> v;
-      return boost::apply_visitor(v, buffer).origin();
+      return boost::apply_visitor(v, buffer)->origin();
     }
 
     /**
