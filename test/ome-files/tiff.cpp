@@ -1033,15 +1033,19 @@ TEST_P(TIFFVariantTest, TileInfo)
   const TIFFTestParameters& params = GetParam();
   TileInfo info = ifd->getTileInfo();
 
-  EXPECT_EQ(params.tilewidth, info.tileWidth());
-  EXPECT_EQ(params.tilelength, info.tileHeight());
+  if (params.tilewidth)
+    EXPECT_EQ(*params.tilewidth, info.tileWidth());
+  if (params.tilelength)
+    EXPECT_EQ(*params.tilelength, info.tileHeight());
   EXPECT_NE(0U, info.bufferSize());
 
-  dimension_size_type ecol = iwidth / params.tilewidth;
-  if (iwidth % params.tilewidth)
+  dimension_size_type ecol = iwidth /
+    (params.tilewidth ? *params.tilewidth : params.imagewidth);
+  if (iwidth % (params.tilewidth ? *params.tilewidth : params.imagewidth))
     ++ecol;
-  dimension_size_type erow = iheight / params.tilelength;
-  if (iheight % params.tilelength)
+  dimension_size_type erow = iheight /
+    (params.tilelength ? *params.tilelength : params.imagelength);
+  if (iheight % (params.tilelength ? *params.tilelength : params.imagelength))
     ++erow;
   EXPECT_EQ(erow, info.tileRowCount());
   EXPECT_EQ(ecol, info.tileColumnCount());
@@ -1052,7 +1056,9 @@ TEST_P(TIFFVariantTest, TileInfo)
     ASSERT_EQ(ome::files::tiff::CONTIG, planarconfig);
 
   if (params.tile)
-    ASSERT_EQ(ome::files::tiff::TILE, info.tileType());
+    ASSERT_EQ(*params.tile, info.tileType());
+  else
+    ASSERT_EQ(ome::files::tiff::STRIP, info.tileType());
 }
 
 // Check that the first tile matches the expected tile size
@@ -1066,21 +1072,23 @@ TEST_P(TIFFVariantTest, TilePlaneRegion0)
   PlaneRegion region0 = info.tileRegion(0, full);
   EXPECT_EQ(0U, region0.x);
   EXPECT_EQ(0U, region0.y);
-  if (params.imagewidth < params.tilewidth)
+  if (!params.tilewidth ||
+      params.imagewidth < *params.tilewidth)
     {
       EXPECT_EQ(params.imagewidth, region0.w);
     }
   else
     {
-      EXPECT_EQ(params.tilewidth, region0.w);
+      EXPECT_EQ(*params.tilewidth, region0.w);
     }
-  if (params.imagelength < params.tilelength)
+  if (!params.tilelength ||
+      params.imagelength < *params.tilelength)
     {
       EXPECT_EQ(params.imagelength, region0.h);
     }
   else
     {
-      EXPECT_EQ(params.tilelength, region0.h);
+      EXPECT_EQ(*params.tilelength, region0.h);
     }
 }
 

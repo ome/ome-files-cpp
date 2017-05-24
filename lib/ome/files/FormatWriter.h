@@ -392,6 +392,64 @@ namespace ome
       virtual
       bool
       getWriteSequentially() const = 0;
+
+      /**
+       * Set the requested tile width.
+       *
+       * The requested tile width may not be supported by the
+       * underlying file format.  Call getTileSizeX() to get the
+       * effective size in use by the writer, or use the return value.
+       *
+       * @param size the effective tile width.
+       **/
+      virtual
+      dimension_size_type
+      setTileSizeX(boost::optional<dimension_size_type> size) = 0;
+
+      /**
+       * Get the effective tile width.
+       *
+       * This is intended for use with saveBytes().  Unlike
+       * getTileSizeX(), which returns the size set by the caller (if
+       * any), this method returns the size in use by the reader.  If
+       * the width requested is unsupported, the writer may set the
+       * nearest supported size, or the full image width or greater if
+       * no smaller tile sizes are supported.
+       *
+       * @returns the effective tile width.
+       **/
+      virtual
+      dimension_size_type
+      getTileSizeX() const = 0;
+
+      /**
+       * Set the requested tile height.
+       *
+       * The requested tile height may not be supported by the
+       * underlying file format.  Call getTileSizeY() to get the
+       * effective size in use by the writer, or use the return value.
+       *
+       * @param size the effective tile height.
+       **/
+      virtual
+      dimension_size_type
+      setTileSizeY(boost::optional<dimension_size_type> size) = 0;
+
+      /**
+       * Get the effective tile height.
+       *
+       * This is intended for use with saveBytes().  Unlike
+       * getTileSizeY(), which returns the size set by the caller (if
+       * any), this method returns the size in use by the reader.  If
+       * the height requested is unsupported, the writer may set the
+       * nearest supported size, or the full image height or greater if
+       * no smaller tile sizes are supported.
+       *
+       * @returns the effective tile height.
+       **/
+      virtual
+      dimension_size_type
+      getTileSizeY() const = 0;
     };
 
   }

@@ -222,6 +222,30 @@ namespace ome
           }
       }
 
+      dimension_size_type
+      MinimalTIFFWriter::getTileSizeX() const
+      {
+        // Get current IFD.  Also requires unset size (fallback) or
+        // nonzero set size.
+        if (currentId && ifd && (!this->tile_size_x ||
+                    (this->tile_size_x && *this->tile_size_x)))
+          return ifd->getTileWidth();
+        else // setId not called yet; fall back.
+          return detail::FormatWriter::getTileSizeX();
+      }
+
+      dimension_size_type
+      MinimalTIFFWriter::getTileSizeY() const
+      {
+        // Get current IFD.  Also requires unset size (fallback) or
+        // nonzero set size.
+        if (currentId && ifd && (!this->tile_size_y ||
+                    (this->tile_size_y && *this->tile_size_y)))
+          return ifd->getTileHeight();
+        else // setId not called yet; fall back.
+          return detail::FormatWriter::getTileSizeY();
+      }
+
       void
       MinimalTIFFWriter::nextIFD() const
       {
@@ -233,18 +257,54 @@ namespace ome
       void
       MinimalTIFFWriter::setupIFD() const
       {
-        // Default to single strips for now.
         ifd->setImageWidth(getSizeX());
         ifd->setImageHeight(getSizeY());
 
-        // Default strip size.  We base this upon a default
+        // Default strip or tile size.  We base this upon a default
         // chunk size of 64KiB for greyscale images, which will
-        // increase to 192KiB for 3 sample RGB images.
+        // increase to 192KiB for 3 sample RGB images.  We use strips
+        // up to a width of 2048 after which tiles are used.
         if(getSizeX() == 0)
           {
             throw FormatException("Can't set strip or tile size: SizeX is 0");
           }
-        else
+        else if(!this->tile_size_x && this->tile_size_y)
+          {
+            // Manually set strip size if the size is positive.  Or
+            // else set strips of size 1 as a fallback for
+            // compatibility with Bio-Formats.
+            if(*this->tile_size_y)
+              {
+                ifd->setTileType(tiff::STRIP);
+                ifd->setTileWidth(getSizeX());
+                ifd->setTileHeight(*this->tile_size_y);
+              }
+            else
+              {
+                ifd->setTileType(tiff::STRIP);
+                ifd->setTileWidth(getSizeX());
+                ifd->setTileHeight(1U);
+              }
+          }
+        else if(this->tile_size_x && this->tile_size_y)
+          {
+            // Manually set tile size if both sizes are positive.  Or
+            // else set strips of size 1 as a fallback for
+            // compatibility with Bio-Formats.
+            if(*this->tile_size_x && *this->tile_size_y)
+              {
+                ifd->setTileType(tiff::TILE);
+                ifd->setTileWidth(*this->tile_size_x);
+                ifd->setTileHeight(*this->tile_size_y);
+              }
+            else
+              {
+                ifd->setTileType(tiff::STRIP);
+                ifd->setTileWidth(getSizeX());
+                ifd->setTileHeight(1U);
+              }
+          }
+        else if(getSizeX() < 2048)
           {
             // Default to strips, mainly for compatibility with
             // readers which don't support tiles.
@@ -254,6 +314,13 @@ namespace ome
             if (height == 0)
               height = 1;
             ifd->setTileHeight(height);
+          }
+        else
+          {
+            // Default to tiles.
+            ifd->setTileType(tiff::TILE);
+            ifd->setTileWidth(256U);
+            ifd->setTileHeight(256U);
           }
 
         std::array<dimension_size_type, 3> coords = getZCTCoords(getPlane());

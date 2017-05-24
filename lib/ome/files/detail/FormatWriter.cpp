@@ -86,6 +86,8 @@ namespace ome
         interleaved(boost::none),
         sequential(false),
         framesPerSecond(0),
+        tile_size_x(boost::none),
+        tile_size_y(boost::none),
         metadataRetrieve(std::make_shared<DummyMetadata>())
       {
         assertId(currentId, false);
@@ -542,6 +544,57 @@ namespace ome
       FormatWriter::canDoStacks() const
       {
         return writerProperties.stacks;
+      }
+
+      dimension_size_type
+      FormatWriter::setTileSizeX(boost::optional<dimension_size_type> size)
+      {
+        tile_size_x = size;
+        return getTileSizeX();
+      }
+
+      dimension_size_type
+      FormatWriter::getTileSizeX() const
+      {
+        if (!tile_size_x)
+          {
+            if (!metadataRetrieve)
+              // fallback before setId and setMetadataRetrieve
+              throw std::logic_error("MetadataStore can not be null");
+            if (currentId)
+              // after setId
+              return metadataRetrieve->getPixelsSizeX(getSeries());
+            else
+              // fallback before setId
+              return metadataRetrieve->getPixelsSizeX(0);
+          }
+        return *tile_size_x;
+      }
+
+      dimension_size_type
+      FormatWriter::setTileSizeY(boost::optional<dimension_size_type> size)
+      {
+        tile_size_y = size;
+        return getTileSizeY();
+      }
+
+
+      dimension_size_type
+      FormatWriter::getTileSizeY() const
+      {
+        if (!tile_size_y)
+          {
+            if (!metadataRetrieve)
+              // fallback before setId and setMetadataRetrieve
+              throw std::logic_error("MetadataStore can not be null");
+            if (currentId)
+              // after setId
+              return metadataRetrieve->getPixelsSizeY(getSeries());
+            else
+              // fallback before setId
+              return metadataRetrieve->getPixelsSizeX(0);
+          }
+        return *tile_size_y;
       }
 
     }

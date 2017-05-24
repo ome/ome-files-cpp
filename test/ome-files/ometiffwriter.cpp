@@ -42,6 +42,7 @@
 #include <ome/files/CoreMetadata.h>
 #include <ome/files/MetadataTools.h>
 #include <ome/files/VariantPixelBuffer.h>
+#include <ome/files/in/OMETIFFReader.h>
 #include <ome/files/out/OMETIFFWriter.h>
 #include <ome/files/tiff/Field.h>
 #include <ome/files/tiff/IFD.h>
@@ -58,6 +59,7 @@
 using ome::files::dimension_size_type;
 using ome::files::CoreMetadata;
 using ome::files::VariantPixelBuffer;
+using ome::files::in::OMETIFFReader;
 using ome::files::out::OMETIFFWriter;
 using ome::files::tiff::IFD;
 using ome::files::tiff::TIFF;
@@ -108,6 +110,8 @@ public:
 
 TEST_P(TIFFWriterTest, setId)
 {
+  const TIFFTestParameters& params = GetParam();
+
   std::vector<std::shared_ptr<CoreMetadata>> seriesList;
   for (const auto& i : *tiff)
     {
@@ -121,10 +125,10 @@ TEST_P(TIFFWriterTest, setId)
 
   tiffwriter.setMetadataRetrieve(retrieve);
 
-  bool interleaved = true;
-
-  tiffwriter.setInterleaved(interleaved);
+  tiffwriter.setInterleaved(!params.imageplanar);
   tiffwriter.setCompression("Deflate");
+  tiffwriter.setTileSizeX(params.tilewidth);
+  tiffwriter.setTileSizeY(params.tilelength);
 
   ASSERT_NO_THROW(tiffwriter.setId(testfile));
 
@@ -144,7 +148,7 @@ TEST_P(TIFFWriterTest, setId)
       shape[ome::files::DIM_SPATIAL_Z] = shape[ome::files::DIM_TEMPORAL_T] = shape[ome::files::DIM_CHANNEL] =
         shape[ome::files::DIM_MODULO_Z] = shape[ome::files::DIM_MODULO_T] = shape[ome::files::DIM_MODULO_C] = 1;
 
-      ome::files::PixelBufferBase::storage_order_type order(ome::files::PixelBufferBase::make_storage_order(ome::xml::model::enums::DimensionOrder::XYZTC, interleaved));
+      ome::files::PixelBufferBase::storage_order_type order(ome::files::PixelBufferBase::make_storage_order(ome::xml::model::enums::DimensionOrder::XYZTC, !params.imageplanar));
 
       VariantPixelBuffer src(shape, ifd->getPixelType(), order);
       src = buf;
@@ -154,6 +158,47 @@ TEST_P(TIFFWriterTest, setId)
       ++currentSeries;
     }
   tiffwriter.close();
+
+  // Read and validate OME-TIFF
+  {
+    OMETIFFReader tiffreader;
+    std::shared_ptr<ome::xml::meta::MetadataStore> store(std::make_shared<ome::xml::meta::OMEXMLMetadata>());
+    ASSERT_NO_THROW(tiffreader.setMetadataStore(store));
+
+    ASSERT_NO_THROW(tiffreader.setId(testfile));
+
+    ASSERT_EQ(seriesList.size(), tiffreader.getSeriesCount());
+    for(dimension_size_type i = 0; i < tiffreader.getSeriesCount(); ++i)
+      {
+        tiffreader.setSeries(i);
+        const std::shared_ptr<CoreMetadata> ref = seriesList.at(i);
+        
+        EXPECT_EQ(ref->sizeX, tiffreader.getSizeX());
+        EXPECT_EQ(ref->sizeY, tiffreader.getSizeY());
+        EXPECT_EQ(ref->sizeZ, tiffreader.getSizeZ());
+        EXPECT_EQ(ref->sizeT, tiffreader.getSizeT());
+        EXPECT_EQ(ref->sizeC.size(), tiffreader.getEffectiveSizeC());
+        if (params.tilewidth)
+          EXPECT_EQ(*params.tilewidth, tiffreader.getOptimalTileWidth(0));
+        if (params.tilelength)
+          EXPECT_EQ(*params.tilelength, tiffreader.getOptimalTileHeight(0));
+        EXPECT_EQ(ome::xml::model::enums::PixelType::UINT8, tiffreader.getPixelType());
+        EXPECT_EQ(8, tiffreader.getBitsPerPixel());
+        EXPECT_EQ(3, tiffreader.getRGBChannelCount(0));
+        EXPECT_EQ(!params.imageplanar, tiffreader.isInterleaved());
+
+        VariantPixelBuffer buf;
+        std::shared_ptr<IFD> ifd = tiff->getDirectoryByIndex(i);
+        ASSERT_TRUE(static_cast<bool>(ifd));
+        ifd->readImage(buf);
+
+        VariantPixelBuffer vb;
+        tiffreader.openBytes(0, vb);
+
+        EXPECT_TRUE(buf == vb);
+      }
+  }
+
 }
 
 std::vector<TIFFTestParameters> params(find_tiff_tests());
