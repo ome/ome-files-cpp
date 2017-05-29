@@ -829,7 +829,7 @@ namespace ome
 
       /// Find a PixelBuffer data array of a specific pixel type.
       template<typename T>
-      struct PixelBufferArrayVisitor : public boost::static_visitor<typename PixelBuffer<T>::array_ref_type&>
+      struct PixelBufferArrayVisitor : public boost::static_visitor<typename PixelBuffer<T>::array_ref_type *>
       {
         /**
          * PixelBuffer of any type.
@@ -838,18 +838,18 @@ namespace ome
          * @returns a reference to the data array.
          */
         template <typename U>
-        typename PixelBuffer<T>::array_ref_type&
+        typename PixelBuffer<T>::array_ref_type *
         operator() (U& v) const
         {
           if (!v)
             throw std::runtime_error("Null array type");
-          return *v;
+          return v.get();
         }
       };
 
       /// Find a PixelBuffer data array of a specific pixel type.
       template<typename T>
-      struct PixelBufferConstArrayVisitor : public boost::static_visitor<const typename PixelBuffer<T>::array_ref_type&>
+      struct PixelBufferConstArrayVisitor : public boost::static_visitor<const typename PixelBuffer<T>::array_ref_type *>
       {
         /**
          * PixelBuffer of any type.
@@ -858,12 +858,12 @@ namespace ome
          * @returns a const reference to the data array.
          */
         template <typename U>
-        const typename PixelBuffer<T>::array_ref_type&
+        const typename PixelBuffer<T>::array_ref_type *
         operator() (U& v) const
         {
           if (!v)
             throw std::runtime_error("Null array type");
-          return *v;
+          return v.get();
         }
       };
 
@@ -874,7 +874,7 @@ namespace ome
     PixelBuffer<T>::array()
     {
       detail::PixelBufferArrayVisitor<T> v;
-      return boost::apply_visitor(v, multiarray);
+      return *(boost::apply_visitor(v, multiarray));
     }
 
     template<typename T>
@@ -882,7 +882,7 @@ namespace ome
     PixelBuffer<T>::array() const
     {
       detail::PixelBufferConstArrayVisitor<T> v;
-      return boost::apply_visitor(v, multiarray);
+      return *(boost::apply_visitor(v, multiarray));
     }
 
   }

@@ -150,15 +150,15 @@ namespace
     }
   };
 
-  struct PBStorageOrderVisitor : public boost::static_visitor<const VariantPixelBuffer::storage_order_type&>
+  struct PBStorageOrderVisitor : public boost::static_visitor<const VariantPixelBuffer::storage_order_type *>
   {
     template <typename T>
-    const VariantPixelBuffer::storage_order_type&
+    const VariantPixelBuffer::storage_order_type *
     operator() (const T& v)
     {
       if (!v)
         throw std::runtime_error("Null pixel type");
-      return v->storage_order();
+      return &(v->storage_order());
     }
   };
 
@@ -375,7 +375,7 @@ namespace ome
     VariantPixelBuffer::storage_order() const
     {
       PBStorageOrderVisitor v;
-      return boost::apply_visitor(v, buffer);
+      return *(boost::apply_visitor(v, buffer));
     }
 
     PixelType
