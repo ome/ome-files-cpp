@@ -235,8 +235,8 @@ used in this situation to create a suitable metadata store:
 
 .. literalinclude:: examples/metadata-formatwriter.cpp
    :language: cpp
-   :start-after: write-example-start
-   :end-before: write-example-end
+   :start-after: core-metadata-start
+   :end-before: core-metadata-end
 
 Full example source: :download:`metadata-formatreader.cpp
 <examples/metadata-formatreader.cpp>`,
@@ -383,7 +383,36 @@ objects.
    :start-after: add-example-start
    :end-before: add-example-end
 
-Full example source: :download:`metadata-io.cpp <examples/metadata-io.cpp>`
+In addition to this basic metadata, it is possible to create and
+modify extended metadata elements.  In the following example, we
+describe the setup of the microscope during acquisition, including its
+objective and detector parameters.  Only a few parameters are set
+here; it is possible to completely describe the instrument
+configuration, including the settings on a per-image and per-channel
+basis if they vary during the course of acquisition.
+
+.. literalinclude:: examples/metadata-formatwriter.cpp
+   :language: cpp
+   :start-after: extended-metadata-start
+   :end-before: extended-metadata-end
+
+If the existing data model elements and attributes are insufficient
+for describing the complexity of your hardware or experimental setup,
+it's possible to extend it with custom annotations.  These annotations
+exist globally, but may be referenced where needed, and may be
+referenced by multiple model elements if required.  In the follow
+example, we create and attach an annotation to the ``Detector``
+element, and then create and attach two annotations to the first
+``Image`` element.
+
+.. literalinclude:: examples/metadata-formatwriter.cpp
+   :language: cpp
+   :start-after: annotations-start
+   :end-before: annotations-end
+
+Full example source: :download:`metadata-io.cpp
+<examples/metadata-io.cpp>` and :download:`metadata-formatwriter.cpp
+<examples/metadata-formatwriter.cpp>`
 
 .. seealso::
 
