@@ -92,7 +92,11 @@ namespace ome
         /// Constructor.
         MinimalTIFFWriter();
 
-        /// Constructor with writer properties (for derived writers).
+        /**
+         * Constructor with writer properties (for derived writers).
+         *
+         * @param writerProperties the derived writer properties.
+         */
         MinimalTIFFWriter(const ome::files::detail::WriterProperties& writerProperties);
 
         /// Destructor.

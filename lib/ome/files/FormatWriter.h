@@ -90,13 +90,12 @@ namespace ome
       FormatWriter()
       {}
 
-    private:
-      /// Copy constructor (deleted).
-      FormatWriter (const FormatWriter&);
+      /// @cond SKIP
+      FormatWriter (const FormatWriter&) = delete;
 
-      /// Assignment operator (deleted).
       FormatWriter&
-      operator= (const FormatWriter&);
+      operator= (const FormatWriter&) = delete;
+      /// @endcond SKIP
 
     public:
       /// Destructor.
@@ -400,7 +399,8 @@ namespace ome
        * underlying file format.  Call getTileSizeX() to get the
        * effective size in use by the writer, or use the return value.
        *
-       * @param size the effective tile width.
+       * @param size the requested tile width.
+       * @returns the effective tile width.
        **/
       virtual
       dimension_size_type
@@ -429,7 +429,8 @@ namespace ome
        * underlying file format.  Call getTileSizeY() to get the
        * effective size in use by the writer, or use the return value.
        *
-       * @param size the effective tile height.
+       * @param size the requested tile height.
+       * @returns the effective tile height.
        **/
       virtual
       dimension_size_type

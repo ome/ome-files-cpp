@@ -210,18 +210,17 @@ namespace ome
         /// Constructor.
         FormatReader(const ReaderProperties&);
 
+        /// @cond SKIP
+        FormatReader (const FormatReader&) = delete;
+
+        FormatReader&
+        operator= (const FormatReader&) = delete;
+        /// @endcond SKIP
+
       public:
         /// Destructor.
         virtual
         ~FormatReader();
-
-      private:
-        /// Copy constructor (deleted).
-        FormatReader (const FormatReader&);
-
-        /// Assignment operator (deleted).
-        FormatReader&
-        operator= (const FormatReader&);
 
       protected:
         /**

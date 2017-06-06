@@ -459,6 +459,8 @@ namespace ome
 
       /**
        * Get the number of pixel elements in the multi-dimensional array.
+       *
+       * @returns the number of elements.
        */
       size_type
       num_elements() const
@@ -468,6 +470,8 @@ namespace ome
 
       /**
        * Get the number of dimensions in the multi-dimensional array.
+       *
+       * @returns the number of dimensions.
        */
       size_type
       num_dimensions() const

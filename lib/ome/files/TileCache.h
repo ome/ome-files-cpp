@@ -69,18 +69,16 @@ namespace ome
       /// Destructor.
       virtual ~TileCache();
 
-    private:
       // To avoid unintentional and expensive copies, copying and
       // assignment of caches is prevented.
 
-      /// Copy constructor (deleted).
-      TileCache (const TileCache&);
+      /// @cond SKIP
+      TileCache (const TileCache&) = delete;
 
-      /// Assignment operator (deleted).
       TileCache&
-      operator= (const TileCache&);
+      operator= (const TileCache&) = delete;
+      /// @endcond SKIP
 
-    public:
       /**
        * Insert a tile into the tile cache.
        *

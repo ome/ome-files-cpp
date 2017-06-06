@@ -61,6 +61,7 @@ namespace ome
       class TileInfo
       {
       protected:
+        /// IFD uses protected TileInfo methods.
         friend class IFD;
 
         /**

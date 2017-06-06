@@ -79,7 +79,11 @@ namespace ome
         /// Constructor.
         MinimalTIFFReader();
 
-        /// Constructor with reader properties (for derived readers).
+        /**
+         * Constructor with reader properties (for derived readers).
+         *
+         * @param readerProperties the derived reader properties.
+         */
         MinimalTIFFReader(const ome::files::detail::ReaderProperties& readerProperties);
 
         /// Destructor.

@@ -66,18 +66,16 @@ namespace ome
       /// Destructor.
       virtual ~TileBuffer();
 
-    private:
       // To avoid unintentional and expensive copies, copying and
       // assignment of buffers is prevented.
 
-      /// Copy constructor (deleted).
-      TileBuffer (const TileBuffer&);
+      /// @cond SKIP
+      TileBuffer (const TileBuffer&) = delete;
 
-      /// Assignment operator (deleted).
       TileBuffer&
-      operator= (const TileBuffer&);
+      operator= (const TileBuffer&) = delete;
+      /// @endcond SKIP
 
-    public:
       /**
        * Get the buffer size.
        *

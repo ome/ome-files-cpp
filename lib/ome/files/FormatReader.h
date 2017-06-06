@@ -143,13 +143,12 @@ namespace ome
       FormatReader()
       {}
 
-    private:
-      /// Copy constructor (deleted).
-      FormatReader (const FormatReader&);
+      /// @cond SKIP
+      FormatReader (const FormatReader&) = delete;
 
-      /// Assignment operator (deleted).
       FormatReader&
-      operator= (const FormatReader&);
+      operator= (const FormatReader&) = delete;
+      /// @endcond SKIP
 
     public:
       /// Destructor.
@@ -678,6 +677,8 @@ namespace ome
       /**
        * Specifies whether or not to save proprietary metadata
        * in the MetadataStore.
+       *
+       * @param populate @c true to save or @c false to discard.
        */
       virtual
       void

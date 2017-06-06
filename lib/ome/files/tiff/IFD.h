@@ -75,20 +75,28 @@ namespace ome
         std::shared_ptr<Impl> impl;
 
       protected:
-        /// Constructor (not public).
+        /**
+         * Constructor (not public).
+         *
+         * @param tiff the TIFF this IFD belongs to.
+         * @param offset the IFD offset in the TIFF.
+         */
         IFD(std::shared_ptr<TIFF>& tiff,
             offset_type            offset);
 
-        /// Constructor (not public).
+        /**
+         * Constructor (not public).
+         *
+         * @param tiff the TIFF this IFD belongs to.
+         */
         IFD(std::shared_ptr<TIFF>& tiff);
 
-      private:
-        /// Copy constructor (deleted).
-        IFD (const IFD&);
+        /// @cond SKIP
+        IFD (const IFD&) = delete;
 
-        /// Assignment operator (deleted).
         IFD&
-        operator= (const IFD&);
+        operator= (const IFD&) = delete;
+        /// @endcond SKIP
 
       public:
         /// Destructor.
