@@ -634,13 +634,12 @@ namespace ome
         {
         }
 
-      private:
-        /// Copy constructor (deleted).
-        Impl (const Impl&);
+        /// @cond SKIP
+        Impl (const Impl&) = delete;
 
-        /// Assignment operator (deleted).
         Impl&
-        operator= (const Impl&);
+        operator= (const Impl&) = delete;
+        /// @endcond SKIP
       };
 
       IFD::IFD(std::shared_ptr<TIFF>& tiff,

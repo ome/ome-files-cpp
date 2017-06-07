@@ -67,13 +67,12 @@ namespace ome
       FormatHandler()
       {}
 
-    private:
-      /// Copy constructor (deleted).
-      FormatHandler (const FormatHandler&);
+      /// @cond SKIP
+      FormatHandler (const FormatHandler&) = delete;
 
-      /// Assignment operator (deleted).
       FormatHandler&
-      operator= (const FormatHandler&);
+      operator= (const FormatHandler&) = delete;
+      /// @endcond SKIP
 
     public:
       /// Destructor.

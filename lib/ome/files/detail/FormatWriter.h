@@ -148,17 +148,15 @@ namespace ome
          */
         std::shared_ptr<::ome::xml::meta::MetadataRetrieve> metadataRetrieve;
 
-      protected:
         /// Constructor.
         FormatWriter(const WriterProperties&);
 
-      private:
-        /// Copy constructor (deleted).
-        FormatWriter (const FormatWriter&);
+        /// @cond SKIP
+        FormatWriter (const FormatWriter&) = delete;
 
-        /// Assignment operator (deleted).
         FormatWriter&
-        operator= (const FormatWriter&);
+        operator= (const FormatWriter&) = delete;
+        /// @endcond SKIP
 
       public:
         /// Destructor.

@@ -161,6 +161,7 @@ namespace ome
         /// The tag value type (C++ type).
         typedef typename ::ome::files::detail::tiff::TagProperties<tag_category>::value_type value_type;
 
+        /// Field uses internal IFD state.
         friend class IFD;
 
       protected:

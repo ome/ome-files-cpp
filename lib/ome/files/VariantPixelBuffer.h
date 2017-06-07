@@ -417,12 +417,16 @@ namespace ome
 
       /**
        * Get the number of pixel elements in the multi-dimensional array.
+       *
+       * @returns the number of elements.
        */
       size_type
       num_elements() const;
 
       /**
        * Get the number of dimensions in the multi-dimensional array.
+       *
+       * @returns the number of dimensions.
        */
       size_type
       num_dimensions() const;
@@ -482,12 +486,16 @@ namespace ome
 
       /**
        * Get the type of pixels stored in the buffer.
+       *
+       * @returns the pixel type.
        */
       ::ome::xml::model::enums::PixelType
       pixelType() const;
 
       /**
        * Get the endianness of the pixel type stored in the buffer.
+       *
+       * @returns the endian type.
        */
       EndianType
       endianType() const;
@@ -913,7 +921,7 @@ namespace ome
 
     }
 
-    /// @copydoc VariantPixelBuffer::array()
+    /// @copydoc PixelBuffer::array()
     template<typename T>
     inline typename PixelBuffer<T>::array_ref_type&
     VariantPixelBuffer::array()
@@ -922,7 +930,7 @@ namespace ome
       return boost::apply_visitor(v, buffer)->array();
     }
 
-    /// @copydoc VariantPixelBuffer::array() const
+    /// @copydoc PixelBuffer::array() const
     template<typename T>
     inline const typename PixelBuffer<T>::array_ref_type&
     VariantPixelBuffer::array() const

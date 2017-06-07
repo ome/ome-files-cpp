@@ -106,7 +106,9 @@ namespace ome
          */
         mutable std::shared_ptr<Value> pos;
 
+        /// IFD iterator internals uses internal TIFF state.
         friend class boost::iterator_core_access;
+        /// IFD iterator uses internal TIFF state.
         template <class> friend class IFDIterator;
 
         /**
@@ -160,17 +162,23 @@ namespace ome
         std::shared_ptr<Impl> impl;
 
       protected:
-        /// Constructor (non-public).
+        /**
+         * Constructor (non-public).
+         *
+         * @param filename the file to open.
+         * @param mode the file open mode (@c r to read, @c w to write
+         * or @c a to append).
+         * @throws an Exception on failure.
+         */
         TIFF(const boost::filesystem::path& filename,
              const std::string&             mode);
 
-      private:
-        /// Copy constructor (deleted).
-        TIFF (const TIFF&);
+        /// @cond SKIP
+        TIFF (const TIFF&) = delete;
 
-        /// Assignment operator (deleted).
         TIFF&
-        operator= (const TIFF&);
+        operator= (const TIFF&) = delete;
+        /// @endcond SKIP
 
       public:
         /// Destructor.
@@ -282,6 +290,7 @@ namespace ome
         wrapped_type *
         getWrapped() const;
 
+        /// IFD uses internal TIFF state.
         friend class IFD;
 
         /// IFD iterator.
