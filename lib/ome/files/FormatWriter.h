@@ -396,8 +396,11 @@ namespace ome
        * Set the requested tile width.
        *
        * The requested tile width may not be supported by the
-       * underlying file format.  Call getTileSizeX() to get the
-       * effective size in use by the writer, or use the return value.
+       * underlying file format.  If the width requested is
+       * unsupported, the writer may set the nearest supported size,
+       * or the full image width or greater if no smaller tile sizes
+       * are supported.  Call getTileSizeX() to get the effective size
+       * in use by the writer, or use the return value.
        *
        * @param size the requested tile width.
        * @returns the effective tile width.
@@ -409,12 +412,7 @@ namespace ome
       /**
        * Get the effective tile width.
        *
-       * This is intended for use with saveBytes().  Unlike
-       * getTileSizeX(), which returns the size set by the caller (if
-       * any), this method returns the size in use by the reader.  If
-       * the width requested is unsupported, the writer may set the
-       * nearest supported size, or the full image width or greater if
-       * no smaller tile sizes are supported.
+       * This is intended for use with saveBytes().
        *
        * @returns the effective tile width.
        **/
@@ -426,8 +424,11 @@ namespace ome
        * Set the requested tile height.
        *
        * The requested tile height may not be supported by the
-       * underlying file format.  Call getTileSizeY() to get the
-       * effective size in use by the writer, or use the return value.
+       * underlying file format.  If the height requested is
+       * unsupported, the writer may set the nearest supported size,
+       * or the full image height or greater if no smaller tile sizes
+       * are supported.  Call getTileSizeY() to get the effective size
+       * in use by the writer, or use the return value.
        *
        * @param size the requested tile height.
        * @returns the effective tile height.
@@ -439,12 +440,7 @@ namespace ome
       /**
        * Get the effective tile height.
        *
-       * This is intended for use with saveBytes().  Unlike
-       * getTileSizeY(), which returns the size set by the caller (if
-       * any), this method returns the size in use by the reader.  If
-       * the height requested is unsupported, the writer may set the
-       * nearest supported size, or the full image height or greater if
-       * no smaller tile sizes are supported.
+       * This is intended for use with saveBytes().
        *
        * @returns the effective tile height.
        **/
