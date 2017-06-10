@@ -1,7 +1,7 @@
 /*
  * #%L
  * OME-FILES C++ library for image IO.
- * Copyright © 2015 Open Microscopy Environment:
+ * Copyright © 2015–2017 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
  *   - National Institutes of Health
  *   - University of Dundee
@@ -124,7 +124,8 @@ namespace
 
     // Create an Objective for this Instrument.
     MetadataStore::index_type objective_idx = 0;
-    std::string objective_id = createID("Objective", instrument_idx, objective_idx);
+    std::string objective_id = createID("Objective",
+                                        instrument_idx, objective_idx);
     store->setObjectiveID(objective_id, instrument_idx, objective_idx);
     store->setObjectiveManufacturer("InterFocal", instrument_idx, objective_idx);
     store->setObjectiveNominalMagnification(40, instrument_idx, objective_idx);
@@ -151,13 +152,15 @@ namespace
     MetadataStore::index_type map_annotation_idx = 0;
     std::string annotation_id = createID("Annotation", annotation_idx);
     store->setMapAnnotationID(annotation_id, map_annotation_idx);
-    store->setMapAnnotationNamespace("https://microscopy.example.com/colour-balance", map_annotation_idx);
+    store->setMapAnnotationNamespace
+      ("https://microscopy.example.com/colour-balance", map_annotation_idx);
     store->setMapAnnotationValue({{"white-balance", "5,15,8"},
           {"black-balance", "112,140,126"}}, map_annotation_idx);
 
     // Link MapAnnotation to Detector.
     MetadataStore::index_type detector_ref_idx = 0;
-    store->setDetectorAnnotationRef(annotation_id, instrument_idx, detector_idx, detector_ref_idx);
+    store->setDetectorAnnotationRef(annotation_id, instrument_idx, detector_idx,
+                                    detector_ref_idx);
 
     // Create a LongAnnotation.
     ++annotation_idx;
@@ -165,7 +168,8 @@ namespace
     annotation_id = createID("Annotation", annotation_idx);
     store->setLongAnnotationID(annotation_id, long_annotation_idx);
     store->setLongAnnotationValue(239423, long_annotation_idx);
-    store->setLongAnnotationNamespace("https://microscopy.example.com/trigger-delay", long_annotation_idx);
+    store->setLongAnnotationNamespace
+      ("https://microscopy.example.com/trigger-delay", long_annotation_idx);
 
     // Link LongAnnotation to Image.
     MetadataStore::index_type image_ref_idx = 0;
@@ -177,7 +181,8 @@ namespace
     annotation_id = createID("Annotation", annotation_idx);
     store->setLongAnnotationID(annotation_id, long_annotation_idx);
     store->setLongAnnotationValue(934223, long_annotation_idx);
-    store->setLongAnnotationNamespace("https://microscopy.example.com/sample-number", long_annotation_idx);
+    store->setLongAnnotationNamespace
+      ("https://microscopy.example.com/sample-number", long_annotation_idx);
 
     // Link second LongAnnotation to Image.
     ++image_ref_idx = 0;

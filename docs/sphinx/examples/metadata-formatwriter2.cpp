@@ -1,7 +1,7 @@
 /*
 * #%L
 * OME-FILES C++ library for image IO.
-* Copyright © 2015 Open Microscopy Environment:
+* Copyright © 2015–2017 Open Microscopy Environment:
 *   - Massachusetts Institute of Technology
 *   - National Institutes of Health
 *   - University of Dundee
@@ -126,7 +126,9 @@ namespace
   {
     /* extended-metadata-start */
     // Get root OME object
-    std::shared_ptr<ome::xml::meta::OMEXMLMetadataRoot> root(std::dynamic_pointer_cast<ome::xml::meta::OMEXMLMetadataRoot>(store->getRoot()));
+    std::shared_ptr<ome::xml::meta::OMEXMLMetadataRoot>
+      root(std::dynamic_pointer_cast<ome::xml::meta::OMEXMLMetadataRoot>
+           (store->getRoot()));
     if (!root)
       return;
 
@@ -148,7 +150,8 @@ namespace
     objective->setLensNA(objective_na);
     auto objective_immersion = std::make_shared<Immersion>(Immersion::OIL);
     objective->setImmersion(objective_immersion);
-    auto objective_wd = std::make_shared<Quantity<UnitsLength>>(0.34, UnitsLength::MILLIMETER);
+    auto objective_wd = std::make_shared<Quantity<UnitsLength>>
+      (0.34, UnitsLength::MILLIMETER);
     objective->setWorkingDistance(objective_wd);
     instrument->addObjective(objective);
 
@@ -212,7 +215,8 @@ namespace
     auto map_ann0 = std::make_shared<ome::xml::model::MapAnnotation>();
     std::string annotation_id = createID("Annotation", annotation_idx);
     map_ann0->setID(annotation_id);
-    auto map_ann0_ns = std::make_shared<std::string>("https://microscopy.example.com/colour-balance");
+    auto map_ann0_ns = std::make_shared<std::string>
+      ("https://microscopy.example.com/colour-balance");
     map_ann0->setNamespace(map_ann0_ns);
     map_ann0->setValue({{"white-balance", "5,15,8"},
           {"black-balance", "112,140,126"}});
@@ -226,7 +230,8 @@ namespace
     ++annotation_idx;
     annotation_id = createID("Annotation", annotation_idx);
     long_ann0->setID(annotation_id);
-    auto long_ann0_ns = std::make_shared<std::string>("https://microscopy.example.com/trigger-delay");
+    auto long_ann0_ns = std::make_shared<std::string>
+      ("https://microscopy.example.com/trigger-delay");
     long_ann0->setNamespace(long_ann0_ns);
     long_ann0->setValue(239423);
     sa->addLongAnnotation(long_ann0);
@@ -239,7 +244,8 @@ namespace
     ++annotation_idx;
     annotation_id = createID("Annotation", annotation_idx);
     long_ann1->setID(annotation_id);
-    auto long_ann1_ns = std::make_shared<std::string>("https://microscopy.example.com/sample-number");
+    auto long_ann1_ns = std::make_shared<std::string>
+      ("https://microscopy.example.com/sample-number");
     long_ann1->setNamespace(long_ann1_ns);
     long_ann1->setValue(934223);
 
