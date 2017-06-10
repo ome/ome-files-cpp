@@ -130,7 +130,8 @@ namespace
     store->setObjectiveNominalMagnification(40, instrument_idx, objective_idx);
     store->setObjectiveLensNA(0.4, instrument_idx, objective_idx);
     store->setObjectiveImmersion(Immersion::OIL, instrument_idx, objective_idx);
-    store->setObjectiveWorkingDistance({0.34, UnitsLength::MILLIMETER}, instrument_idx, objective_idx);
+    store->setObjectiveWorkingDistance({0.34, UnitsLength::MILLIMETER},
+                                       instrument_idx, objective_idx);
 
     // Create a Detector for this Instrument.
     MetadataStore::index_type detector_idx = 0;
@@ -250,7 +251,8 @@ namespace
             // Write the the entire pixel buffer to the plane.
             writer.saveBytes(p, vbuffer);
 
-            stream << "Wrote " << buffer->num_elements() << ' ' << buffer->pixelType() << " pixels\n";
+            stream << "Wrote " << buffer->num_elements() << ' '
+                   << buffer->pixelType() << " pixels\n";
           }
       }
     /* pixel-example-end */

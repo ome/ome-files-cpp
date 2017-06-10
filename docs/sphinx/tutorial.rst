@@ -459,6 +459,26 @@ method is used to copy the data from the OME root object and its
 children into an XML DOM tree.  The DOM tree is then converted to text
 for output.
 
+As shown previously for the :cpp:class:`MetadataStore`, it is also
+possible to create and modify extended metadata elements using the
+model objects directly.  The following example, demonstrates the setup
+of the microscope during acquisition, including its objective and
+detector parameters to achieve the same effect as in the example
+above.
+
+.. literalinclude:: examples/metadata-formatwriter2.cpp
+   :language: cpp
+   :start-after: extended-metadata-start
+   :end-before: extended-metadata-end
+
+Creating annotations and linking them to model objects is also
+possible using model objects directly:
+
+.. literalinclude:: examples/metadata-formatwriter2.cpp
+   :language: cpp
+   :start-after: annotations-start
+   :end-before: annotations-end
+
 Full example source: :download:`model-io.cpp <examples/model-io.cpp>`
 
 .. seealso::
