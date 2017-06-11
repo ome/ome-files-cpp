@@ -41,7 +41,7 @@ extensions = ['sphinx.ext.extlinks', 'edit_on_github']
 
 ## Configuration for the edit_on_github extension
 edit_on_github_project = 'ome/ome-files-cpp'
-edit_on_github_branch = 'develop'
+edit_on_github_branch = 'master'
 edit_on_github_prefix = 'docs/sphinx'
 
 # Add any paths that contain templates here, relative to this directory.
@@ -106,7 +106,7 @@ pygments_style = 'sphinx'
 #modindex_common_prefix = []
 
 # Variables used to define Github extlinks
-source_branch = 'develop'
+source_branch = 'master'
 if (ext_source_branch is not None and len(ext_source_branch) > 0 and
     ext_source_branch != "@%s@" % ('sphinx_source_branch')):
     source_branch = ext_source_branch
