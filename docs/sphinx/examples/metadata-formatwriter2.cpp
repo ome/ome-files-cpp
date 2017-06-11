@@ -248,6 +248,7 @@ namespace
       ("https://microscopy.example.com/sample-number");
     long_ann1->setNamespace(long_ann1_ns);
     long_ann1->setValue(934223);
+    sa->addLongAnnotation(long_ann1);
 
     // Link second LongAnnotation to Image.
     image->linkAnnotation(long_ann1);

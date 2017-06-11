@@ -398,12 +398,12 @@ basis if they vary during the course of acquisition.
 
 If the existing data model elements and attributes are insufficient
 for describing the complexity of your hardware or experimental setup,
-it's possible to extend it with custom annotations.  These annotations
-exist globally, but may be referenced where needed, and may be
-referenced by multiple model elements if required.  In the follow
-example, we create and attach an annotation to the ``Detector``
-element, and then create and attach two annotations to the first
-``Image`` element.
+it is possible to extend it with custom annotations.  These
+annotations exist globally, but may be referenced by a model element
+where needed, and may be referenced by multiple model elements if
+required.  In the following example, we create and attach an
+annotation to the ``Detector`` element, and then create and attach two
+annotations to the first ``Image`` element.
 
 .. literalinclude:: examples/metadata-formatwriter.cpp
    :language: cpp
@@ -459,11 +459,11 @@ method is used to copy the data from the OME root object and its
 children into an XML DOM tree.  The DOM tree is then converted to text
 for output.
 
-As shown previously for the :cpp:class:`MetadataStore`, it is also
+As shown previously for the :cpp:class:`MetadataStore` API, it is also
 possible to create and modify extended metadata elements using the
-model objects directly.  The following example, demonstrates the setup
+model objects directly.  The following example demonstrates the setup
 of the microscope during acquisition, including its objective and
-detector parameters to achieve the same effect as in the example
+detector parameters, to achieve the same effect as in the example
 above.
 
 .. literalinclude:: examples/metadata-formatwriter2.cpp
