@@ -92,7 +92,7 @@ namespace
   shared_ptr<OMEXMLMetadata>
   createMetadata()
   {
-    /* core-metadata-start */
+    /* create-metadata-start */
     // OME-XML metadata store.
     auto meta = make_shared<OMEXMLMetadata>();
 
@@ -116,7 +116,7 @@ namespace
     seriesList.push_back(core); // add two identical series
 
     fillMetadata(*meta, seriesList);
-    /* core-metadata-end */
+    /* create-metadata-end */
 
     return meta;
   }

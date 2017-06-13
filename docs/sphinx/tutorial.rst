@@ -235,8 +235,8 @@ used in this situation to create a suitable metadata store:
 
 .. literalinclude:: examples/metadata-formatwriter.cpp
    :language: cpp
-   :start-after: core-metadata-start
-   :end-before: core-metadata-end
+   :start-after: create-metadata-start
+   :end-before: create-metadata-end
 
 Full example source: :download:`metadata-formatreader.cpp
 <examples/metadata-formatreader.cpp>`,
@@ -480,6 +480,8 @@ possible using model objects directly:
    :end-before: annotations-end
 
 Full example source: :download:`model-io.cpp <examples/model-io.cpp>`
+and :download:`metadata-formatwriter2.cpp
+<examples/metadata-formatwriter2.cpp>`
 
 .. seealso::
 
