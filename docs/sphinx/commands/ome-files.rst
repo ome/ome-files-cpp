@@ -39,7 +39,8 @@ Commonly-used commands are:
 info (or showinf)
   Display and validate image metadata
 view (or glview)
-  View image pixel data
+  View image pixel data [optional component; only present if built with
+  Qt5 and OpenGL support]
 
 See also
 --------

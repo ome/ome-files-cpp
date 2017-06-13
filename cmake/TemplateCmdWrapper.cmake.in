@@ -154,7 +154,7 @@ for %%e in (%PATHEXT%) do (
     )
 )
 if [%foundcmd%]==[] (
-  echo ome-files: '%realcmd%' is not a ome-files-test command.  See 'ome-files --help'" >&2
+  echo ome-files: '%realcmd%' is not a ome-files command.  See 'ome-files --help'" >&2
   exit /b 1
 )
 
