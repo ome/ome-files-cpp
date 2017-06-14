@@ -1,7 +1,7 @@
 /*
  * #%L
  * OME-FILES C++ library for image IO.
- * Copyright © 2015 Open Microscopy Environment:
+ * Copyright © 2015–2017 Open Microscopy Environment:
  *   - Massachusetts Institute of Technology
  *   - National Institutes of Health
  *   - University of Dundee
@@ -49,7 +49,9 @@
 using boost::filesystem::path;
 using std::make_shared;
 using std::shared_ptr;
+using std::static_pointer_cast;
 using ome::files::dimension_size_type;
+using ome::files::createID;
 using ome::files::fillMetadata;
 using ome::files::CoreMetadata;
 using ome::files::DIM_SPATIAL_X;
@@ -62,18 +64,26 @@ using ome::files::PixelBuffer;
 using ome::files::PixelBufferBase;
 using ome::files::PixelProperties;
 using ome::files::VariantPixelBuffer;
+using ome::xml::model::enums::Binning;
+using ome::xml::model::enums::Immersion;
 using ome::xml::model::enums::PixelType;
+using ome::xml::model::enums::DetectorType;
 using ome::xml::model::enums::DimensionOrder;
+using ome::xml::model::enums::UnitsLength;
+using ome::xml::meta::MetadataRetrieve;
+using ome::xml::meta::MetadataStore;
+using ome::xml::meta::Metadata;
+using ome::xml::meta::OMEXMLMetadata;
 
 namespace
 {
 
-  /* write-example-start */
-  shared_ptr<::ome::xml::meta::OMEXMLMetadata>
+  shared_ptr<OMEXMLMetadata>
   createMetadata()
   {
+    /* create-metadata-start */
     // OME-XML metadata store.
-    shared_ptr<::ome::xml::meta::OMEXMLMetadata> meta(make_shared<::ome::xml::meta::OMEXMLMetadata>());
+    auto meta = make_shared<OMEXMLMetadata>();
 
     // Create simple CoreMetadata and use this to set up the OME-XML
     // metadata.  This is purely for convenience in this example; a
@@ -93,16 +103,101 @@ namespace
     seriesList.push_back(core); // add two identical series
 
     fillMetadata(*meta, seriesList);
+    /* create-metadata-end */
 
     return meta;
   }
-  /* write-example-end */
 
-  /* pixel-example-start */
+  void
+  addExtendedMetadata(shared_ptr<OMEXMLMetadata> store)
+  {
+    /* extended-metadata-start */
+    // There is one image with one channel in this image.
+    MetadataStore::index_type image_idx = 0;
+    MetadataStore::index_type channel_idx = 0;
+    MetadataStore::index_type annotation_idx = 0;
+
+    // Create an Instrument.
+    MetadataStore::index_type instrument_idx = 0;
+    std::string instrument_id = createID("Instrument", instrument_idx);
+    store->setInstrumentID(instrument_id, instrument_idx);
+
+    // Create an Objective for this Instrument.
+    MetadataStore::index_type objective_idx = 0;
+    std::string objective_id = createID("Objective",
+                                        instrument_idx, objective_idx);
+    store->setObjectiveID(objective_id, instrument_idx, objective_idx);
+    store->setObjectiveManufacturer("InterFocal", instrument_idx, objective_idx);
+    store->setObjectiveNominalMagnification(40, instrument_idx, objective_idx);
+    store->setObjectiveLensNA(0.4, instrument_idx, objective_idx);
+    store->setObjectiveImmersion(Immersion::OIL, instrument_idx, objective_idx);
+    store->setObjectiveWorkingDistance({0.34, UnitsLength::MILLIMETER},
+                                       instrument_idx, objective_idx);
+
+    // Create a Detector for this Instrument.
+    MetadataStore::index_type detector_idx = 0;
+    std::string detector_id = createID("Detector", instrument_idx, detector_idx);
+    store->setDetectorID(detector_id, instrument_idx, detector_idx);
+    store->setObjectiveManufacturer("MegaCapture", instrument_idx, detector_idx);
+    store->setDetectorType(DetectorType::CCD, instrument_idx, detector_idx);
+
+    // Create Settings for this Detector for the Channel on the Image.
+    store->setDetectorSettingsID(detector_id, image_idx, channel_idx);
+    store->setDetectorSettingsBinning(Binning::TWOBYTWO, image_idx, channel_idx);
+    store->setDetectorSettingsGain(56.89, image_idx, channel_idx);
+    /* extended-metadata-end */
+
+    /* annotations-start */
+    // Create a MapAnnotation.
+    MetadataStore::index_type map_annotation_idx = 0;
+    std::string annotation_id = createID("Annotation", annotation_idx);
+    store->setMapAnnotationID(annotation_id, map_annotation_idx);
+    store->setMapAnnotationNamespace
+      ("https://microscopy.example.com/colour-balance", map_annotation_idx);
+    store->setMapAnnotationValue({{"white-balance", "5,15,8"},
+          {"black-balance", "112,140,126"}}, map_annotation_idx);
+
+    // Link MapAnnotation to Detector.
+    MetadataStore::index_type detector_ref_idx = 0;
+    store->setDetectorAnnotationRef(annotation_id, instrument_idx, detector_idx,
+                                    detector_ref_idx);
+
+    // Create a LongAnnotation.
+    ++annotation_idx;
+    MetadataStore::index_type long_annotation_idx = 0;
+    annotation_id = createID("Annotation", annotation_idx);
+    store->setLongAnnotationID(annotation_id, long_annotation_idx);
+    store->setLongAnnotationValue(239423, long_annotation_idx);
+    store->setLongAnnotationNamespace
+      ("https://microscopy.example.com/trigger-delay", long_annotation_idx);
+
+    // Link LongAnnotation to Image.
+    MetadataStore::index_type image_ref_idx = 0;
+    store->setImageAnnotationRef(annotation_id, image_idx, image_ref_idx);
+
+    // Create a second LongAnnotation.
+    ++annotation_idx;
+    ++long_annotation_idx;
+    annotation_id = createID("Annotation", annotation_idx);
+    store->setLongAnnotationID(annotation_id, long_annotation_idx);
+    store->setLongAnnotationValue(934223, long_annotation_idx);
+    store->setLongAnnotationNamespace
+      ("https://microscopy.example.com/sample-number", long_annotation_idx);
+
+    // Link second LongAnnotation to Image.
+    ++image_ref_idx = 0;
+    store->setImageAnnotationRef(annotation_id, image_idx, image_ref_idx);
+
+    // Update all the annotation cross-references.
+    store->resolveReferences();
+    /* annotations-end */
+  }
+
   void
   writePixelData(FormatWriter& writer,
                  std::ostream& stream)
   {
+    /* pixel-example-start */
     // Total number of images (series)
     dimension_size_type ic = writer.getMetadataRetrieve()->getImageCount();
     stream << "Image count: " << ic << '\n';
@@ -144,7 +239,7 @@ namespace
                   std::fill(idx.begin(), idx.end(), 0);
                   idx[DIM_SPATIAL_X] = x;
                   idx[DIM_SPATIAL_Y] = y;
-                  
+
                   idx[DIM_SUBCHANNEL] = 0;
                   buffer->at(idx) = (static_cast<float>(x) / 512.0f) * 4096.0f;
                   idx[DIM_SUBCHANNEL] = 1;
@@ -161,11 +256,12 @@ namespace
             // Write the the entire pixel buffer to the plane.
             writer.saveBytes(p, vbuffer);
 
-            stream << "Wrote " << buffer->num_elements() << ' ' << buffer->pixelType() << " pixels\n";
+            stream << "Wrote " << buffer->num_elements() << ' '
+                   << buffer->pixelType() << " pixels\n";
           }
       }
+    /* pixel-example-end */
   }
-  /* pixel-example-end */
 
 }
 
@@ -183,14 +279,17 @@ main(int argc, char *argv[])
           path filename(argv[1]);
 
           /* writer-example-start */
-          // Create metadata for the file to be written.
-          shared_ptr<::ome::xml::meta::MetadataRetrieve> meta(createMetadata());
+          // Create minimal metadata for the file to be written.
+          auto meta = createMetadata();
+          // Add extended metadata.
+          addExtendedMetadata(meta);
 
           // Create TIFF writer
-          shared_ptr<FormatWriter> writer(make_shared<OMETIFFWriter>());
+          auto writer = make_shared<OMETIFFWriter>();
 
           // Set writer options before opening a file
-          writer->setMetadataRetrieve(meta);
+          auto retrieve = static_pointer_cast<MetadataRetrieve>(meta);
+          writer->setMetadataRetrieve(retrieve);
           writer->setInterleaved(false);
           writer->setTileSizeX(256);
           writer->setTileSizeY(256);
