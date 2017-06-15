@@ -161,7 +161,7 @@ run() {
   realcmd="$LIBEXECDIR/$realcmd"
 
   if [ ! -x "$realcmd" ]; then
-    echo "ome-files: '$runcmd' is not a ome-files-test command.  See 'ome-files-test --help'" >&2
+    echo "ome-files: '$runcmd' is not a ome-files command.  See 'ome-files --help'" >&2
     exit 1
   fi
 
