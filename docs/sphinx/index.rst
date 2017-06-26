@@ -12,6 +12,7 @@ OME-Files C++ Documentation
     tutorial
     ome-files-env
     schema
+    tiling
     commands/ome-files
     commands/ome-files-info
     commands/ome-files-view
