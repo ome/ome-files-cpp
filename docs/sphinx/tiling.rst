@@ -8,16 +8,16 @@ stored as either tiles or strips.
 
 When chosing a tile size for TIFF data, consider these factors:
 
-- The tile size must be a multiple of 16
+- The tile size must be a multiple of 16.
 - The tile size should be a multiple of the image size or else storage
   space will be wasted due to tiles overlapping the right and/or bottom
-  borders of the image
+  borders of the image.
 - A smaller tile size results in more tiles; there is a small storage
   overhead and a larger processing overhead which makes larger tile
-  sizes more efficient
+  sizes more efficient.
 - Larger tile sizes do not affect write performance, but may affect
   read performance if it results in data being read and discarded;
-  consider the read access patterns of the stored data
+  consider the read access patterns of the stored data.
 
 For images with a width less than 2048 pixels, the OME Files TIFF
 writers currently default to writing strips of approximately 2\
