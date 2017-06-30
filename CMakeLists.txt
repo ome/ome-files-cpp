@@ -59,7 +59,7 @@ list(APPEND CMAKE_MODULE_PATH
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/BioFormatsCommon.cmake")
 
 set(release-name "ome-files-cpp")
-set(release-version "0.3.2")
+set(release-version "0.4.0")
 project(ome-files
         VERSION "${release-version}"
         LANGUAGES CXX)
