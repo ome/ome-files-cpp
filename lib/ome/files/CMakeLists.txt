@@ -173,6 +173,7 @@ target_include_directories(ome-files PUBLIC
                            $<BUILD_INTERFACE:${TIFF_INCLUDE_DIR}>)
 
 target_link_libraries(ome-files
+                      Threads::Threads
                       OME::Compat
                       OME::Common
                       OME::XML

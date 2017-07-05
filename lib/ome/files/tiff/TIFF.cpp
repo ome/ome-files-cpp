@@ -46,7 +46,6 @@
 #include <ome/common/config.h>
 
 #include <boost/range/size.hpp>
-#include <boost/thread.hpp>
 
 #include <ome/files/Version.h>
 #include <ome/files/tiff/Field.h>
@@ -60,9 +59,6 @@
 #include <ome/common/string.h>
 
 #include <tiffio.h>
-
-using boost::mutex;
-using boost::lock_guard;
 
 namespace ome
 {
