@@ -35,6 +35,7 @@
  * #L%
  */
 
+#include <iostream>
 #include <limits>
 
 #include <ome/files/tiff/Field.h>
@@ -139,6 +140,14 @@ namespace ome
 
               if (!fieldinfo)
                 {
+                  /**
+                   * @todo Log an error or throw an exception.  Having
+                   * a logger as a Field class member is likely to
+                   * heavyweight.  However, we do need to be sure that
+                   * non-standard unregistered fields can be read.
+                   * Maybe by using the libtiff custom type
+                   * registration as done for ImageJ metadata?
+                   */
                   std::cerr << "getFieldInfo: tag " << tag << " unknown\n";
                 }
               else
