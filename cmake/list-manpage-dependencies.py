@@ -3,6 +3,8 @@
 # Find manual page dependencies
 # argv1 = doc dir containing conf.py
 
+from __future__ import print_function
+
 import imp
 import os.path
 import sys
@@ -16,6 +18,6 @@ if __name__ == "__main__":
     conf = imp.load_source('conf', os.path.join(dir, 'conf.py'))
 
     for man in conf.man_pages:
-        print os.path.join(sys.argv[2], "%s%s" %
-                           (man[0], conf.source_suffix))
-    print os.path.join(dir, 'conf.py')
+        print(os.path.join(sys.argv[2], "%s%s" %
+                           (man[0], conf.source_suffix)))
+    print(os.path.join(dir, 'conf.py'))
