@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # #%L
-# OME Files C++ libraries (shell wrapper)
+# OME C++ libraries (shell wrapper)
 # %%
 # Copyright © 2015-2017 Open Microscopy Environment:
 #   - Massachusetts Institute of Technology
@@ -134,7 +134,7 @@ EOF
 
 version() {
   cat <<EOF
-ome-files (OME Files) $VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH$VERSION_EXTRA
+ome-files (OME) $VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH$VERSION_EXTRA
 Copyright © 2006–2017 Open Microscopy Environment
 
 This is free software; see the source for copying conditions.  There is NO
