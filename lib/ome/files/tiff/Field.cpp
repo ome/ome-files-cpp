@@ -35,6 +35,7 @@
  * #L%
  */
 
+#include <iostream>
 #include <limits>
 
 #include <ome/files/tiff/Field.h>
