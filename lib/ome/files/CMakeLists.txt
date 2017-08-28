@@ -1,5 +1,5 @@
 # #%L
-# OME Files C++ libraries (cmake build infrastructure)
+# OME C++ libraries (cmake build infrastructure)
 # %%
 # Copyright © 2006 - 2015 Open Microscopy Environment:
 #   - Massachusetts Institute of Technology
@@ -173,6 +173,7 @@ target_include_directories(ome-files PUBLIC
                            $<BUILD_INTERFACE:${TIFF_INCLUDE_DIR}>)
 
 target_link_libraries(ome-files
+                      Threads::Threads
                       OME::Compat
                       OME::Common
                       OME::XML

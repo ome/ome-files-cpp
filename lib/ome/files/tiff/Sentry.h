@@ -41,9 +41,9 @@
 #include <cstdarg>
 #include <cstdint>
 #include <memory>
+#include <mutex>
 #include <string>
 
-#include <boost/thread.hpp>
 
 namespace ome
 {
@@ -126,10 +126,10 @@ namespace ome
 
       private:
         /// Mutex to lock libtiff access.
-        static boost::recursive_mutex tiff_mutex;
+        static std::recursive_mutex tiff_mutex;
 
         /// Acquired lock on tiff_lock.
-        boost::lock_guard<boost::recursive_mutex> lock;
+        std::lock_guard<std::recursive_mutex> lock;
 
         /// Last error message.
         std::string message;

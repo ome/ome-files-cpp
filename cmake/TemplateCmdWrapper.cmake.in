@@ -1,6 +1,6 @@
 @echo off
 REM #%L
-REM OME Files C++ libraries (shell wrapper)
+REM OME C++ libraries (shell wrapper)
 REM %%
 REM Copyright © 2015-2017 Open Microscopy Environment:
 REM   - Massachusetts Institute of Technology
@@ -114,7 +114,7 @@ exit /b
 :version
 
 call :heredoc versiontext && goto versionexit:
-ome-files (OME Files) !VERSION_MAJOR!.!VERSION_MINOR!.!VERSION_PATCH!!VERSION_EXTRA!
+ome-files (OME) !VERSION_MAJOR!.!VERSION_MINOR!.!VERSION_PATCH!!VERSION_EXTRA!
 Copyright (c) 2006-2017 Open Microscopy Environment
 
 This is free software; see the source for copying conditions.  There is NO

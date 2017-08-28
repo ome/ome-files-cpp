@@ -1,5 +1,5 @@
 # #%L
-# OME Files C++ libraries (cmake build infrastructure)
+# OME C++ libraries (cmake build infrastructure)
 # %%
 # Copyright © 2006 - 2015 Open Microscopy Environment:
 #   - Massachusetts Institute of Technology
@@ -61,7 +61,7 @@ project(ome-files
         LANGUAGES CXX)
 
 include(cmake/Version.cmake)
-git_version_info("OME Files C++" "${CMAKE_CURRENT_SOURCE_DIR}")
+git_version_info("OME C++" "${CMAKE_CURRENT_SOURCE_DIR}")
 
 if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
   message(FATAL_ERROR "In-tree builds are not supported; please run cmake from a separate build directory.")
@@ -108,19 +108,19 @@ endif()
 
 if(NOT DEFINED OME_FILES_INSTALL_PKGDATADIR)
   set(OME_FILES_INSTALL_PKGDATADIR "${CMAKE_INSTALL_DATADIR}/ome/files"
-      CACHE PATH "OME Files-specific datadir")
+      CACHE PATH "OME-specific datadir")
 endif()
 
 # Use standard path if using a prefix.
 if(CMAKE_INSTALL_PREFIX)
   if (NOT DEFINED OME_FILES_INSTALL_PKGLIBEXECDIR)
     set(OME_FILES_INSTALL_PKGLIBEXECDIR "${CMAKE_INSTALL_LIBEXECDIR}/ome/files"
-        CACHE PATH "OME Files-specific libexecdir")
+        CACHE PATH "OME-specific libexecdir")
   endif()
 else()
   if (NOT DEFINED OME_FILES_INSTALL_PKGLIBEXECDIR)
     set(OME_FILES_INSTALL_PKGLIBEXECDIR "${CMAKE_INSTALL_LIBEXECDIR}"
-        CACHE PATH "OME Files-specific libexecdir")
+        CACHE PATH "OME-specific libexecdir")
   endif()
 endif()
 

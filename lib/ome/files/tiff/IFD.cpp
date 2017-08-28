@@ -41,7 +41,6 @@
 #include <cassert>
 
 #include <boost/format.hpp>
-#include <boost/thread.hpp>
 
 #include <ome/files/PlaneRegion.h>
 #include <ome/files/TileBuffer.h>

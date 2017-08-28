@@ -42,6 +42,7 @@
 #else
 # include "stdarg.h"
 #endif
+#include <cstdlib>
 
 #include <ome/files/tiff/Sentry.h>
 #include <ome/files/tiff/Exception.h>
@@ -85,7 +86,7 @@ namespace ome
 
       }
 
-      boost::recursive_mutex Sentry::tiff_mutex;
+      std::recursive_mutex Sentry::tiff_mutex;
 
       // Visual Studio 12 and earlier don't have va_copy.
 #if _MSC_VER &&_MSC_VER < 1800
