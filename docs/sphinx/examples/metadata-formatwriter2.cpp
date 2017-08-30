@@ -218,8 +218,10 @@ namespace
     auto map_ann0_ns = std::make_shared<std::string>
       ("https://microscopy.example.com/colour-balance");
     map_ann0->setNamespace(map_ann0_ns);
-    map_ann0->setValue({{"white-balance", "5,15,8"},
-          {"black-balance", "112,140,126"}});
+    ome::xml::model::primitives::OrderedMultimap map;
+    map.push_back({"white-balance", "5,15,8"});
+    map.push_back({"black-balance", "112,140,126"});
+    map_ann0->setValue(map);
     sa->addMapAnnotation(map_ann0);
 
     // Link MapAnnotation to Detector.

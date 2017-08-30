@@ -39,8 +39,6 @@
 
 #include <boost/filesystem/path.hpp>
 
-#include <ome/compat/memory.h>
-
 #include <ome/files/FormatReader.h>
 #include <ome/files/MetadataMap.h>
 #include <ome/files/Types.h>

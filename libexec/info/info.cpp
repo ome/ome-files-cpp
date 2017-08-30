@@ -47,6 +47,7 @@
 #include <ome/files/module.h>
 #include <ome/files/Version.h>
 
+#include <ome/common/filesystem.h>
 #include <ome/common/log.h>
 #include <ome/common/module.h>
 
@@ -101,7 +102,7 @@ namespace
     std::string htmlpage = name;
     htmlpage += ".html";
     docpath /= htmlpage;
-    docpath = boost::filesystem::canonical(docpath);
+    docpath = ome::common::canonical(docpath);
     std::cout << "Opening documentation in web browser";
     CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
     ShellExecute(NULL, "open", docpath.string().c_str(),

@@ -154,8 +154,10 @@ namespace
     store->setMapAnnotationID(annotation_id, map_annotation_idx);
     store->setMapAnnotationNamespace
       ("https://microscopy.example.com/colour-balance", map_annotation_idx);
-    store->setMapAnnotationValue({{"white-balance", "5,15,8"},
-          {"black-balance", "112,140,126"}}, map_annotation_idx);
+    ome::xml::model::primitives::OrderedMultimap map;
+    map.push_back({"white-balance", "5,15,8"});
+    map.push_back({"black-balance", "112,140,126"});
+    store->setMapAnnotationValue(map, map_annotation_idx);
 
     // Link MapAnnotation to Detector.
     MetadataStore::index_type detector_ref_idx = 0;
