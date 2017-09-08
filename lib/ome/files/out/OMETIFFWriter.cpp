@@ -446,7 +446,7 @@ namespace ome
         path canonicalpath = id;
         try
           {
-            canonicalpath = boost::filesystem::canonical(id);
+            canonicalpath = ome::common::canonical(id);
           }
         catch (const std::exception&)
           {

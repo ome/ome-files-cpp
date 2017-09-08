@@ -45,6 +45,9 @@
 
 #include <ome/common/variant.h>
 
+// Required with Boost 1.53 after variant include.
+#include <boost/preprocessor.hpp>
+
 namespace ome
 {
   namespace files
@@ -322,7 +325,7 @@ namespace ome
 
         switch(pixeltype)
           {
-            BOOST_PP_SEQ_FOR_EACH(OME_FILES_VARIANTPIXELBUFFER_CREATEEXTENTS_CASE, size, OME_XML_MODEL_ENUMS_PIXELTYPE_VALUES);
+            BOOST_PP_SEQ_FOR_EACH(OME_FILES_VARIANTPIXELBUFFER_CREATEEXTENTS_CASE, _, OME_XML_MODEL_ENUMS_PIXELTYPE_VALUES);
           }
 
         return buf;
@@ -355,7 +358,7 @@ namespace ome
 
         switch(pixeltype)
           {
-            BOOST_PP_SEQ_FOR_EACH(OME_FILES_VARIANTPIXELBUFFER_CREATERANGE_CASE, size, OME_XML_MODEL_ENUMS_PIXELTYPE_VALUES);
+            BOOST_PP_SEQ_FOR_EACH(OME_FILES_VARIANTPIXELBUFFER_CREATERANGE_CASE, _, OME_XML_MODEL_ENUMS_PIXELTYPE_VALUES);
           }
 
         return buf;

@@ -44,6 +44,8 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/range/size.hpp>
 
+#include <ome/common/filesystem.h>
+
 #include <ome/files/FormatException.h>
 #include <ome/files/FormatTools.h>
 #include <ome/files/MetadataTools.h>
@@ -60,7 +62,7 @@
 
 namespace fs = boost::filesystem;
 using boost::filesystem::path;
-using boost::filesystem::canonical;
+using ome::common::canonical;
 
 using ome::files::detail::ReaderProperties;
 using ome::files::tiff::TIFF;

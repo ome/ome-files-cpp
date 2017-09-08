@@ -38,9 +38,9 @@
 #ifndef OME_FILES_DETAIL_OMETIFF_H
 #define OME_FILES_DETAIL_OMETIFF_H
 
-#include <ome/files/Types.h>
-
 #include <boost/filesystem/path.hpp>
+
+#include <ome/files/Types.h>
 
 namespace ome
 {

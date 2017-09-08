@@ -40,7 +40,9 @@
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/geometries/box.hpp>
+#ifdef OME_HAVE_BOOST_GEOMETRY_INDEX_RTREE_HPP
 #include <boost/geometry/index/rtree.hpp>
+#endif
 
 #include <algorithm>
 #include <list>
@@ -50,7 +52,9 @@
 
 using ome::files::dimension_size_type;
 namespace geom = boost::geometry;
+#ifdef OME_HAVE_BOOST_GEOMETRY_INDEX_RTREE_HPP
 namespace geomi = boost::geometry::index;
+#endif // OME_HAVE_BOOST_GEOMETRY_INDEX_RTREE_HPP
 
 typedef geom::model::point<dimension_size_type, 2, geom::cs::cartesian> point;
 typedef geom::model::box<point> box;
@@ -75,6 +79,32 @@ namespace
        bmax.get<0>() - bmin.get<0>(), bmax.get<1>() - bmin.get<1>());
   }
 
+#ifndef OME_HAVE_BOOST_GEOMETRY_INDEX_RTREE_HPP
+  // Compare box
+  struct BoxCompare
+  {
+    const box& cmp;
+
+    BoxCompare(const box& cmp):
+      cmp(cmp)
+    {}
+
+    bool
+    operator()(const box& v) const
+    {
+      const point& amin = cmp.min_corner();
+      const point& amax = cmp.max_corner();
+      const point& bmin = v.min_corner();
+      const point& bmax = v.max_corner();
+
+      return (amin.get<0>() == bmin.get<0>() &&
+              amin.get<1>() == bmin.get<1>() &&
+              amax.get<0>() == bmax.get<0>() &&
+              amax.get<1>() == bmax.get<1>());
+    }
+  };
+#endif // ! OME_HAVE_BOOST_GEOMETRY_INDEX_RTREE_HPP
+
 }
 
 namespace ome
@@ -89,7 +119,11 @@ namespace ome
     {
     public:
       /// Region coverage stored as box ranges.
-      geomi::rtree<box, geomi::quadratic<16>> rtree;
+#ifdef OME_HAVE_BOOST_GEOMETRY_INDEX_RTREE_HPP
+      geomi::rtree<box, geomi::quadratic<16> > rtree;
+#else // ! OME_HAVE_BOOST_GEOMETRY_INDEX_RTREE_HPP
+      std::list<box> rtree;
+#endif // OME_HAVE_BOOST_GEOMETRY_INDEX_RTREE_HPP
 
       /**
        * Constructor.
@@ -115,8 +149,45 @@ namespace ome
       {
         std::vector<box> results;
 
+#ifdef OME_HAVE_BOOST_GEOMETRY_INDEX_RTREE_HPP
         rtree.query(geomi::intersects(b),
                     std::back_inserter(results));
+#else // ! OME_HAVE_BOOST_GEOMETRY_INDEX_RTREE_HPP
+        // Slower linear search in the absence of rtree.
+        PlaneRegion region(region_from_box(b));
+
+        for (std::list<box>::const_iterator i = rtree.begin();
+             i != rtree.end();
+             ++i)
+          {
+            PlaneRegion test(region_from_box(*i));
+            PlaneRegion intersection = region & test;
+
+            if (intersection.w && intersection.h)
+              results.push_back(*i);
+            else
+              {
+                // Also include non-intersecting but touching
+                // regions for coalescing, both edges and corners.
+                // These are included by the R*Tree box intersection
+                // search and needed for the region coalescing logic.
+                if ((region.x + region.w == test.x ||
+                     test.x + test.w == region.x) &&
+                    ((region.y >= test.y &&
+                      region.y <= test.y + test.h) ||
+                     (region.y + region.h >= test.y &&
+                      region.y +region.h <= test.y + test.h)))
+                  results.push_back(*i);
+                else if ((region.y + region.h == test.y ||
+                          test.y + test.h == region.y) &&
+                         ((region.x >= test.x &&
+                           region.x <= test.x + test.w) ||
+                          (region.x + region.w >= test.x &&
+                           region.x +region.w <= test.x + test.w)))
+                  results.push_back(*i);
+              }
+          }
+#endif // OME_HAVE_BOOST_GEOMETRY_INDEX_RTREE_HPP
 
         return results;
       }
@@ -143,7 +214,11 @@ namespace ome
 
           if (!coalesce)
             {
+#ifdef OME_HAVE_BOOST_GEOMETRY_INDEX_RTREE_HPP
               impl->rtree.insert(b);
+#else // ! OME_HAVE_BOOST_GEOMETRY_INDEX_RTREE_HPP
+              impl->rtree.push_back(b);
+#endif // OME_HAVE_BOOST_GEOMETRY_INDEX_RTREE_HPP
               inserted = true;
             }
           else // Merge adjacent regions
@@ -180,13 +255,25 @@ namespace ome
               if (!remove.empty())
                 {
                   for (const auto& r : remove)
-                    impl->rtree.remove(r);
+                    {
+#ifdef OME_HAVE_BOOST_GEOMETRY_INDEX_RTREE_HPP
+                      impl->rtree.remove(r);
+#else // ! OME_HAVE_BOOST_GEOMETRY_INDEX_RTREE_HPP
+                      auto ib = std::find_if(impl->rtree.begin(), impl->rtree.end(), BoxCompare(r));
+                      if (ib != impl->rtree.end())
+                        impl->rtree.erase(ib);
+#endif // OME_HAVE_BOOST_GEOMETRY_INDEX_RTREE_HPP
+                    }
                 }
 
               // Insert merged region
               box mb(box_from_region(merged_region));
 
+#ifdef OME_HAVE_BOOST_GEOMETRY_INDEX_RTREE_HPP
               impl->rtree.insert(mb);
+#else // ! OME_HAVE_BOOST_GEOMETRY_INDEX_RTREE_HPP
+              impl->rtree.push_back(mb);
+#endif // OME_HAVE_BOOST_GEOMETRY_INDEX_RTREE_HPP
               inserted = true;
             }
         }
@@ -199,7 +286,18 @@ namespace ome
     {
       box b(box_from_region(region));
 
+#ifdef OME_HAVE_BOOST_GEOMETRY_INDEX_RTREE_HPP
       return (impl->rtree.remove(b));
+#else // ! OME_HAVE_BOOST_GEOMETRY_INDEX_RTREE_HPP
+      bool found = false;
+      std::list<box>::iterator i = std::find_if(impl->rtree.begin(), impl->rtree.end(), BoxCompare(b));
+      if (i != impl->rtree.end())
+        {
+          impl->rtree.erase(i);
+          found = true;
+        }
+      return found;
+#endif // OME_HAVE_BOOST_GEOMETRY_INDEX_RTREE_HPP
     }
 
     dimension_size_type
