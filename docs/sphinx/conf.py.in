@@ -373,13 +373,3 @@ linkcheck_timeout = 30
 
 # Regular expressions that match URIs that should not be checked when doing a linkcheck build
 linkcheck_ignore = []
-try:
-    if sys.version_info[0] >= 3:
-        from urllib.request import urlopen
-    else:
-        from urllib import urlopen
-    brokenfiles_url = 'https://raw.github.com/openmicroscopy/sphinx-ignore-links/master/broken_links.txt'
-    brokenlinks = urlopen(brokenfiles_url)
-    linkcheck_ignore.extend(brokenlinks.read().splitlines())
-except IOError:
-    print("Could not open list of broken links.")
