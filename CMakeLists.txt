@@ -80,7 +80,6 @@ set(BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS_DEFAULT} CACHE BOOL "Use shared librar
 include(Options)
 include(GNUInstallDirs)
 include(CompilerChecks)
-include(PlatformChecks)
 include(BoostChecks)
 include(RegexChecks)
 include(ThreadChecks)
