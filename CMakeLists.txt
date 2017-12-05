@@ -55,7 +55,7 @@ list(APPEND CMAKE_MODULE_PATH
      "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 set(release-name "ome-files-cpp")
-set(release-version "0.5.0")
+set(release-version "0.5.1")
 project(ome-files
         VERSION "${release-version}"
         LANGUAGES CXX)
