@@ -182,6 +182,11 @@ target_link_libraries(ome-files
                       Boost::filesystem
                       TIFF::TIFF)
 
+if(WIN32)
+  # Boost UUID (≥ 1.67) requires bcrypt on Windows
+  target_link_libraries(ome-files bcrypt)
+endif()
+
 set_target_properties(ome-files PROPERTIES VERSION ${ome-files_VERSION})
 
 add_library(OME::Files ALIAS ome-files)

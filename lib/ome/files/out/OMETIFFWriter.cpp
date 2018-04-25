@@ -37,6 +37,10 @@
 
 #include <cassert>
 
+// Include first due to side effect of MPL vector limit setting which can change the default
+// and break multi_index with Boost 1.67
+#include <ome/xml/meta/Convert.h>
+
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/format.hpp>
@@ -60,8 +64,6 @@
 
 #include <ome/common/endian.h>
 #include <ome/common/filesystem.h>
-
-#include <ome/xml/meta/Convert.h>
 
 #include <tiffio.h>
 
