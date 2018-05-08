@@ -210,7 +210,7 @@ namespace ome
       namespace
       {
 
-        struct PlaneVisitor : public boost::static_visitor<>
+        struct PlaneVisitor
         {
           std::istream&       source;
           FormatReader&       reader;
@@ -379,7 +379,7 @@ namespace ome
         // Fill the buffer according to its type.
         PlaneVisitor v(source, *this,
                        x, y, w, h, samples, scanlinePad);
-        boost::apply_visitor(v, dest.vbuffer());
+        ome::compat::visit(v, dest.vbuffer());
       }
 
       std::shared_ptr<::ome::xml::meta::MetadataStore>

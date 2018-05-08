@@ -48,7 +48,7 @@
 #include <string>
 #include <vector>
 
-#include <ome/common/variant.h>
+#include <ome/compat/variant.h>
 
 namespace ome
 {
@@ -78,73 +78,38 @@ namespace ome
      */
     class MetadataMap
     {
-    private:
-      /*
-       * The following series of typedefs may appear a little
-       * complicated, and perhaps unnecessary, but they do have a
-       * purpose.  They exist to work around pre-C++11 compiler
-       * limitations (lack of variadic templates), primarily a limit
-       * to the maximum number of types which may be used with
-       * boost::variant.  To exceed this limit (minimum guaranteed is
-       * 10), boost::mpl sequences are used to define the variant
-       * types.  These also have length limits, so the type list is
-       * built up by defining separate type sequences, then
-       * concatenating them, and transforming them to provide list
-       * variants.  Note that none of this is code per se; it's all
-       * compile-time template expansion which evaluates to a list of
-       * permitted types.
-       */
-
-      /// Storable non-numeric types.
-      typedef boost::mpl::vector<std::string,
-                                 bool> non_numeric_types;
-
-      /// Storable integer types.
-      typedef boost::mpl::vector<uint8_t,
-                                 uint16_t,
-                                 uint32_t,
-                                 uint64_t,
-                                 int8_t,
-                                 int16_t,
-                                 int32_t,
-                                 int64_t> integer_types;
-
-      /// Storable floating-point types.
-      typedef boost::mpl::vector<float,
-                                 double,
-                                 long double> float_types;
-
-      /// Aggregate view of all numeric types.
-      typedef boost::mpl::joint_view<integer_types,
-                                     float_types>::type numeric_types_view;
-
-      /// Aggregate view of all storable simple types.
-      typedef boost::mpl::joint_view<non_numeric_types,
-                                     numeric_types_view>::type basic_types_view;
-
-      /// Convert T into a std::vector<T>.
-      template<typename T>
-      struct make_vector
-      {
-        /// The result type.
-        typedef std::vector<T> type;
-      };
-
-      /// Aggregate view of all storable list types.
-      typedef boost::mpl::transform_view<basic_types_view, make_vector<boost::mpl::_1>>::type list_types_view;
-
-      /// Aggregate view of all storable types.
-      typedef boost::mpl::joint_view<basic_types_view, list_types_view> all_types_view;
-
-      /// List of discriminated types used by boost::variant.
-      typedef boost::mpl::insert_range<boost::mpl::vector0<>, boost::mpl::end<boost::mpl::vector0<>>::type, all_types_view>::type discriminated_types;
-
     public:
       /// Key type.
       typedef std::string key_type;
 
-      /// Value type, allowing assignment of all storable types.
-      typedef boost::make_variant_over<discriminated_types>::type value_type;
+      /// Value type (all storable types),
+      using value_type =
+        ome::compat::variant<std::string,
+                             bool,
+                             uint8_t,
+                             uint16_t,
+                             uint32_t,
+                             uint64_t,
+                             int8_t,
+                             int16_t,
+                             int32_t,
+                             int64_t,
+                             float,
+                             double,
+                             long double,
+                             std::vector<std::string>,
+                             std::vector<bool>,
+                             std::vector<uint8_t>,
+                             std::vector<uint16_t>,
+                             std::vector<uint32_t>,
+                             std::vector<uint64_t>,
+                             std::vector<int8_t>,
+                             std::vector<int16_t>,
+                             std::vector<int32_t>,
+                             std::vector<int64_t>,
+                             std::vector<float>,
+                             std::vector<double>,
+                             std::vector<long double>>;
 
       /// std::string to discriminated type mapping.
       typedef std::map<key_type, value_type> map_type;
@@ -237,7 +202,7 @@ namespace ome
             list_type& list(get<list_type>(key));
             list.push_back(value);
           }
-        catch (const boost::bad_get&)
+        catch (const ome::compat::bad_variant_access&)
           {
             list_type new_list;
             new_list.push_back(value);
@@ -287,7 +252,7 @@ namespace ome
             value = get<T>(key);
             return true;
           }
-        catch (const boost::bad_get&)
+        catch (const ome::compat::bad_variant_access&)
           {
             return false;
           }
@@ -301,14 +266,15 @@ namespace ome
        *
        * @param key the key to find.
        * @returns a reference to the stored value.
-       * @throws boost::bad_get on failure if the key was not found or
-       * if the type did not match the stored value type.
+       * @throws ome::compat::bad_variant_access on failure if the key
+       * was not found or if the type did not match the stored value
+       * type.
        */
       template <typename T>
       T&
       get(const key_type& key)
       {
-        return boost::get<T>(get<value_type>(key));
+        return ome::compat::get<T>(get<value_type>(key));
       }
 
       /**
@@ -319,14 +285,15 @@ namespace ome
        *
        * @param key the key to find.
        * @returns a reference to the stored value.
-       * @throws boost::bad_get on failure if the key was not found or
-       * if the type did not match the stored value type.
+       * @throws ome::compat::bad_variant_access on failure if the key
+       * was not found or if the type did not match the stored value
+       * type.
        */
       template <typename T>
       const T&
       get(const key_type& key) const
       {
-        return boost::get<T>(get<value_type>(key));
+        return ome::compat::get<T>(get<value_type>(key));
       }
 
       /**
@@ -704,7 +671,7 @@ namespace ome
       /**
        * Visitor template for output of MetadataMap values to an ostream.
        */
-      struct MetadataMapValueTypeOStreamVisitor : public boost::static_visitor<>
+      struct MetadataMapValueTypeOStreamVisitor
       {
         /// The stream to output to.
         std::ostream& os;
@@ -755,7 +722,7 @@ namespace ome
       /**
        * Visitor template for output of MetadataMap values to an ostream.
        */
-      struct MetadataMapOStreamVisitor : public boost::static_visitor<>
+      struct MetadataMapOStreamVisitor
       {
         /// The stream to output to.
         std::ostream& os;
@@ -818,7 +785,7 @@ namespace ome
       /**
        * Visitor template for flattening of MetadataMap vector values.
        */
-      struct MetadataMapFlattenVisitor : public boost::static_visitor<>
+      struct MetadataMapFlattenVisitor
       {
         /// The map in which to set the flattened elements.
         MetadataMap& map;
@@ -890,8 +857,9 @@ namespace ome
      *
      * @param key the key to find.
      * @returns a reference to the stored value.
-     * @throws boost::bad_get on failure if the key was not found or
-     * if the type did not match the stored value type.
+     * @throws ome::compat::bad_variant_access on failure if the key
+     * was not found or if the type did not match the stored value
+     * type.
      */
     template<>
     inline MetadataMap::value_type&
@@ -899,7 +867,7 @@ namespace ome
     {
       map_type::iterator i = discriminating_map.find(key);
       if (i == discriminating_map.end())
-        throw boost::bad_get();
+        throw ome::compat::bad_variant_access();
 
       return i->second;
     }
@@ -912,8 +880,9 @@ namespace ome
      *
      * @param key the key to find.
      * @returns a reference to the stored value.
-     * @throws boost::bad_get on failure if the key was not found or
-     * if the type did not match the stored value type.
+     * @throws ome::compat::bad_variant_access on failure if the key
+     * was not found or if the type did not match the stored value
+     * type.
      */
     template<>
     inline const MetadataMap::value_type&
@@ -921,7 +890,7 @@ namespace ome
     {
       map_type::const_iterator i = discriminating_map.find(key);
       if (i == discriminating_map.end())
-        throw boost::bad_get();
+        throw ome::compat::bad_variant_access();
 
       return i->second;
     }
@@ -933,7 +902,7 @@ namespace ome
       MetadataMap newmap;
       for (const auto& m : discriminating_map)
         {
-          boost::apply_visitor(detail::MetadataMapFlattenVisitor(newmap, m.first), m.second);
+          ome::compat::visit(detail::MetadataMapFlattenVisitor(newmap, m.first), m.second);
         }
       return newmap;
     }
@@ -956,7 +925,7 @@ namespace std
     operator<< (basic_ostream<charT,traits>& os,
                 const ::ome::files::MetadataMap::value_type& vt)
     {
-      boost::apply_visitor(::ome::files::detail::MetadataMapValueTypeOStreamVisitor(os), vt);
+      ome::compat::visit(::ome::files::detail::MetadataMapValueTypeOStreamVisitor(os), vt);
       return os;
     }
 
@@ -974,7 +943,7 @@ namespace std
     {
       for (const auto& m : map)
         {
-          boost::apply_visitor(::ome::files::detail::MetadataMapOStreamVisitor(os, m.first), m.second);
+          ome::compat::visit(::ome::files::detail::MetadataMapOStreamVisitor(os, m.first), m.second);
         }
       return os;
     }

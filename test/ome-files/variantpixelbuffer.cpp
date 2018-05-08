@@ -100,7 +100,7 @@ TEST_P(VariantPixelBufferTest, ConstructSize)
 /*
  * Assign buffer and check.
  */
-struct AssignTestVisitor : public boost::static_visitor<>
+struct AssignTestVisitor
 {
   VariantPixelBuffer& buf;
 
@@ -135,7 +135,7 @@ struct AssignTestVisitor : public boost::static_visitor<>
  * purpose is to fill a buffer with a unique arrangement of values for
  * checking storage ordering.
  */
-struct RandomAssignTestVisitor : public boost::static_visitor<>
+struct RandomAssignTestVisitor
 {
   VariantPixelBuffer& buf;
 
@@ -199,7 +199,7 @@ struct RandomAssignTestVisitor : public boost::static_visitor<>
 /*
  * Array test.
  */
-struct ArrayTestVisitor : public boost::static_visitor<>
+struct ArrayTestVisitor
 {
   VariantPixelBuffer& buf;
   const VariantPixelBuffer& cbuf;
@@ -225,7 +225,7 @@ struct ArrayTestVisitor : public boost::static_visitor<>
 /*
  * Construct unmanaged buffer with extents.
  */
-struct ConstructExtentRefTestVisitor : public boost::static_visitor<>
+struct ConstructExtentRefTestVisitor
 {
   template<typename T>
   void
@@ -247,14 +247,14 @@ struct ConstructExtentRefTestVisitor : public boost::static_visitor<>
     ASSERT_EQ(10U, mbuf.num_elements());
 
     AssignTestVisitor av(mbuf);
-    boost::apply_visitor(av, mbuf.vbuffer());
+    ome::compat::visit(av, mbuf.vbuffer());
   }
 };
 
 /*
  * Construct unmanaged buffer with ranges.
  */
-struct ConstructRangeRefTestVisitor : public boost::static_visitor<>
+struct ConstructRangeRefTestVisitor
 {
   template<typename T>
   void
@@ -272,14 +272,14 @@ struct ConstructRangeRefTestVisitor : public boost::static_visitor<>
     ASSERT_EQ(100U, mbuf.num_elements());
 
     AssignTestVisitor av(mbuf);
-    boost::apply_visitor(av, mbuf.vbuffer());
+    ome::compat::visit(av, mbuf.vbuffer());
   }
 };
 
 /*
  * Data test.
  */
-struct DataTestVisitor : public boost::static_visitor<>
+struct DataTestVisitor
 {
   VariantPixelBuffer& buf;
   const VariantPixelBuffer& cbuf;
@@ -309,7 +309,7 @@ struct DataTestVisitor : public boost::static_visitor<>
 /*
  * Managed test.
  */
-struct ManagedTestVisitor : public boost::static_visitor<>
+struct ManagedTestVisitor
 {
   const VariantPixelBufferTestParameters& params;
 
@@ -351,7 +351,7 @@ struct ManagedTestVisitor : public boost::static_visitor<>
 /*
  * Origin test.
  */
-struct OriginTestVisitor : public boost::static_visitor<>
+struct OriginTestVisitor
 {
   VariantPixelBuffer& buf;
   const VariantPixelBuffer& cbuf;
@@ -376,7 +376,7 @@ struct OriginTestVisitor : public boost::static_visitor<>
 /*
  * Get index.
  */
-struct GetIndexTestVisitor : public boost::static_visitor<>
+struct GetIndexTestVisitor
 {
   VariantPixelBuffer& buf;
   const VariantPixelBuffer& cbuf;
@@ -413,7 +413,7 @@ struct GetIndexTestVisitor : public boost::static_visitor<>
 /*
  * Set index.
  */
-struct SetIndexTestVisitor : public boost::static_visitor<>
+struct SetIndexTestVisitor
 {
   VariantPixelBuffer& buf;
   const VariantPixelBuffer& cbuf;
@@ -452,7 +452,7 @@ struct SetIndexTestVisitor : public boost::static_visitor<>
 /*
  * Set index death test.
  */
-struct SetIndexDeathTestVisitor : public boost::static_visitor<>
+struct SetIndexDeathTestVisitor
 {
   VariantPixelBuffer& buf;
   const VariantPixelBuffer& cbuf;
@@ -483,7 +483,7 @@ struct SetIndexDeathTestVisitor : public boost::static_visitor<>
 /*
  * Stream input test.
  */
-struct StreamInputTestVisitor : public boost::static_visitor<>
+struct StreamInputTestVisitor
 {
   VariantPixelBuffer& buf;
   const VariantPixelBuffer& cbuf;
@@ -526,7 +526,7 @@ struct StreamInputTestVisitor : public boost::static_visitor<>
 /*
  * Stream output test.
  */
-struct StreamOutputTestVisitor : public boost::static_visitor<>
+struct StreamOutputTestVisitor
 {
   VariantPixelBuffer& buf;
   const VariantPixelBuffer& cbuf;
@@ -588,7 +588,7 @@ TEST_P(VariantPixelBufferTest, ConstructExtent)
   ASSERT_EQ(buf.num_elements(), 10U);
 
   AssignTestVisitor v(buf);
-  boost::apply_visitor(v, buf.vbuffer());
+  ome::compat::visit(v, buf.vbuffer());
 }
 
 TEST_P(VariantPixelBufferTest, ConstructExtentRef)
@@ -600,7 +600,7 @@ TEST_P(VariantPixelBufferTest, ConstructExtentRef)
                          params.type);
 
   ConstructExtentRefTestVisitor v;
-  boost::apply_visitor(v, buf.vbuffer());
+  ome::compat::visit(v, buf.vbuffer());
 }
 
 TEST_P(VariantPixelBufferTest, ConstructRange)
@@ -612,7 +612,7 @@ TEST_P(VariantPixelBufferTest, ConstructRange)
   ASSERT_EQ(buf.num_elements(), 10U);
 
   AssignTestVisitor v(buf);
-  boost::apply_visitor(v, buf.vbuffer());
+  ome::compat::visit(v, buf.vbuffer());
 }
 
 TEST_P(VariantPixelBufferTest, ConstructRangeRef)
@@ -624,7 +624,7 @@ TEST_P(VariantPixelBufferTest, ConstructRangeRef)
                          params.type);
 
   ConstructRangeRefTestVisitor v;
-  boost::apply_visitor(v, buf.vbuffer());
+  ome::compat::visit(v, buf.vbuffer());
 }
 
 TEST_P(VariantPixelBufferTest, ConstructCopy)
@@ -643,13 +643,13 @@ TEST_P(VariantPixelBufferTest, ConstructCopy)
                           params.type);
   ASSERT_EQ(buf1.num_elements(), 10U);
   AssignTestVisitor v1(buf1);
-  boost::apply_visitor(v1, buf1.vbuffer());
+  ome::compat::visit(v1, buf1.vbuffer());
 
   VariantPixelBuffer buf2(boost::extents[5][2][1][1][1][1][1][1][1],
                           params.type);
   ASSERT_EQ(buf1.num_elements(), 10U);
   AssignTestVisitor v2(buf1);
-  boost::apply_visitor(v2, buf1.vbuffer());
+  ome::compat::visit(v2, buf1.vbuffer());
 
   ASSERT_EQ(buf1, buf1);
   ASSERT_EQ(buf2, buf2);
@@ -672,9 +672,9 @@ TEST_P(VariantPixelBufferTest, OperatorEquals)
                           PixelBufferBase::make_storage_order(ome::xml::model::enums::DimensionOrder::XYZTC, true));
 
   RandomAssignTestVisitor v1(buf1);
-  boost::apply_visitor(v1, buf1.vbuffer());
+  ome::compat::visit(v1, buf1.vbuffer());
   RandomAssignTestVisitor v2(buf2);
-  boost::apply_visitor(v2, buf2.vbuffer());
+  ome::compat::visit(v2, buf2.vbuffer());
 
   EXPECT_TRUE(buf1 == buf2);
   EXPECT_FALSE(buf1 != buf2);
@@ -692,9 +692,9 @@ TEST_P(VariantPixelBufferTest, OperatorEqualsIncompatibleTypes)
                           PixelBufferBase::make_storage_order(ome::xml::model::enums::DimensionOrder::XYZTC, true));
 
   RandomAssignTestVisitor v1(buf1);
-  boost::apply_visitor(v1, buf1.vbuffer());
+  ome::compat::visit(v1, buf1.vbuffer());
   RandomAssignTestVisitor v2(buf2);
-  boost::apply_visitor(v2, buf2.vbuffer());
+  ome::compat::visit(v2, buf2.vbuffer());
 
   EXPECT_FALSE(buf1 == buf2);
   EXPECT_FALSE(buf2 == buf1);
@@ -714,7 +714,7 @@ TEST_P(VariantPixelBufferTest, OperatorNotEquals)
                           PixelBufferBase::make_storage_order(ome::xml::model::enums::DimensionOrder::XYZTC, false));
 
   RandomAssignTestVisitor v1(buf1);
-  boost::apply_visitor(v1, buf1.vbuffer());
+  ome::compat::visit(v1, buf1.vbuffer());
 
   EXPECT_TRUE(buf1 != buf2);
   EXPECT_TRUE(buf2 != buf1);
@@ -734,7 +734,7 @@ TEST_P(VariantPixelBufferTest, OperatorNotEqualsIncompatibleTypes)
                           PixelBufferBase::make_storage_order(ome::xml::model::enums::DimensionOrder::XYZTC, false));
 
   RandomAssignTestVisitor v1(buf1);
-  boost::apply_visitor(v1, buf1.vbuffer());
+  ome::compat::visit(v1, buf1.vbuffer());
 
   EXPECT_TRUE(buf1 != buf2);
   EXPECT_FALSE(buf1 == buf2);
@@ -758,13 +758,13 @@ TEST_P(VariantPixelBufferTest, OperatorAssign)
                           PixelBufferBase::make_storage_order(ome::xml::model::enums::DimensionOrder::XYTCZ, false));
 
   RandomAssignTestVisitor v1(buf1);
-  boost::apply_visitor(v1, buf1.vbuffer());
+  ome::compat::visit(v1, buf1.vbuffer());
   RandomAssignTestVisitor v2(buf2);
-  boost::apply_visitor(v2, buf2.vbuffer());
+  ome::compat::visit(v2, buf2.vbuffer());
   RandomAssignTestVisitor v3(buf3);
-  boost::apply_visitor(v3, buf3.vbuffer());
+  ome::compat::visit(v3, buf3.vbuffer());
   RandomAssignTestVisitor v4(buf4);
-  boost::apply_visitor(v4, buf4.vbuffer());
+  ome::compat::visit(v4, buf4.vbuffer());
 
   EXPECT_TRUE(buf1 == buf1);
   EXPECT_TRUE(buf1 != buf2);
@@ -789,7 +789,7 @@ TEST_P(VariantPixelBufferTest, Array)
                          params.type);
 
   ArrayTestVisitor v(buf);
-  boost::apply_visitor(v, buf.vbuffer());
+  ome::compat::visit(v, buf.vbuffer());
 }
 
 TEST_P(VariantPixelBufferTest, Data)
@@ -800,7 +800,7 @@ TEST_P(VariantPixelBufferTest, Data)
                          params.type);
 
   DataTestVisitor v(buf);
-  boost::apply_visitor(v, buf.vbuffer());
+  ome::compat::visit(v, buf.vbuffer());
 }
 
 TEST_P(VariantPixelBufferTest, Valid)
@@ -823,7 +823,7 @@ TEST_P(VariantPixelBufferTest, Managed)
                          params.type);
 
   ManagedTestVisitor v(GetParam());
-  boost::apply_visitor(v, buf.vbuffer());
+  ome::compat::visit(v, buf.vbuffer());
 }
 
 TEST_P(VariantPixelBufferTest, NumElements)
@@ -918,7 +918,7 @@ TEST_P(VariantPixelBufferTest, Origin)
                          params.type);
 
   OriginTestVisitor v(buf);
-  boost::apply_visitor(v, buf.vbuffer());
+  ome::compat::visit(v, buf.vbuffer());
 }
 
 TEST_P(VariantPixelBufferTest, StorageOrder)
@@ -965,9 +965,9 @@ TEST_P(VariantPixelBufferTest, GetIndex)
   ASSERT_TRUE(buf.data());
 
   AssignTestVisitor v1(buf);
-  boost::apply_visitor(v1, buf.vbuffer());
+  ome::compat::visit(v1, buf.vbuffer());
   GetIndexTestVisitor v2(buf);
-  boost::apply_visitor(v2, buf.vbuffer());
+  ome::compat::visit(v2, buf.vbuffer());
 }
 
 TEST_P(VariantPixelBufferTest, SetIndex)
@@ -980,7 +980,7 @@ TEST_P(VariantPixelBufferTest, SetIndex)
   ASSERT_TRUE(buf.data());
 
   SetIndexTestVisitor v(buf);
-  boost::apply_visitor(v, buf.vbuffer());
+  ome::compat::visit(v, buf.vbuffer());
 }
 
 TEST_P(VariantPixelBufferTest, SetIndexDeathTest)
@@ -994,7 +994,7 @@ TEST_P(VariantPixelBufferTest, SetIndexDeathTest)
                          params.type);
 
   SetIndexDeathTestVisitor v(buf);
-  boost::apply_visitor(v, buf.vbuffer());
+  ome::compat::visit(v, buf.vbuffer());
 #endif // ! NDEBUG && ! BOOST_DISABLE_ASSERTS
 }
 
@@ -1006,7 +1006,7 @@ TEST_P(VariantPixelBufferTest, StreamInput)
                          params.type);
 
   StreamInputTestVisitor v(buf);
-  boost::apply_visitor(v, buf.vbuffer());
+  ome::compat::visit(v, buf.vbuffer());
 }
 
 TEST_P(VariantPixelBufferTest, StreamOutput)
@@ -1017,7 +1017,7 @@ TEST_P(VariantPixelBufferTest, StreamOutput)
                          params.type);
 
   StreamOutputTestVisitor v(buf);
-  boost::apply_visitor(v, buf.vbuffer());
+  ome::compat::visit(v, buf.vbuffer());
 }
 
 const std::vector<VariantPixelBufferTestParameters> variant_params

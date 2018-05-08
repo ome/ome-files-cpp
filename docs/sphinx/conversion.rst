@@ -537,21 +537,22 @@ flexibility is needed, this is available.
 A fixed set of types
 ^^^^^^^^^^^^^^^^^^^^
 
-:cpp:class:`boost::variant` may be used to store a limited set of
-different types: This avoids the :cpp:class:`boost::any` problem of
-not being able to handle all possible types, since the scope is
-limited to a set of allowed types, and a :cpp:type:`static_visitor`
-can ensure that all types are supported by the code at compile time.
+:cpp:class:`ome::compat::variant` (the equivalent of the C++17
+`std::variant`) may be used to store a limited set of different types.
+This avoids the :cpp:class:`std::any` problem of not being able to
+handle all possible types, since the scope is limited to a set of
+allowed types, and a :cpp:type:`Visitor` can ensure that all types are
+supported by the code at compile time.
 
 .. code-block:: cpp
 
-  typedef boost::variant<int, std::string> variants;
+  typedef ome::compat::variant<int, std::string> variants;
   std::vector<variants> v;
   v.push_back(43);
   v.push_back("ATTO 647N");
 
 - Store a set of discriminated types
-- “External polymorphism” via :cpp:type:`static_visitor`
+- “External polymorphism” via a :cpp:type:`Visitor`
 - Used to store original metadata
 - Used to store nD pixel data of different pixel types
 
@@ -567,7 +568,7 @@ an :cpp:class:`std::shared_ptr` since it can behave as a value type
 
 
 Java uses polymorphism to store and pass the root :cpp:class:`Object`
-around.  The :cpp:class:`boost::variant` and :cpp:class:`boost::any`
+around.  The :cpp:class:`std::variant` and :cpp:class:`std::any`
 approaches use templates to (internally) create a common base and
 manage the stored objects.  However, the end user does not need to
 deal with this complexity directly—the use of the types is quite
@@ -603,7 +604,7 @@ A flattened map is created using the following method:
       for (MetadataMap::const_iterator i = oldmap.begin();
            i != oldmap.end(); ++i) {
         MetadataMapFlattenVisitor v(newmap, i->first);
-        boost::apply_visitor(v, i->second);
+        ome::compat::visit(v, i->second);
       }
 
       return newmap;
@@ -614,7 +615,7 @@ The :cpp:class:`MetadataMapFlattenVisitor` is implemented thusly:
 .. code-block:: cpp
 
     // Flatten MetadataMap vector values
-    struct MetadataMapFlattenVisitor : public boost::static_visitor<> {
+    struct MetadataMapFlattenVisitor {
       MetadataMap& map; // Map of flattened elements
       const MetadataMap::key_type& key; // Current key
 
@@ -642,22 +643,20 @@ The :cpp:class:`MetadataMapFlattenVisitor` is implemented thusly:
       }
     };
 
-The :cpp:class:`MetadataMapFlattenVisitor` is derived from
-:cpp:class:`boost::static_visitor`, and its templated operator method
-is specialized and expanded once for each type supported by the
-variant type used by the map.  In the above example, two separate
-overloaded operators are provided, one for scalar values which is a
-simple copy, and one for vector values which splits the elements into
-separate keys in the new map.  The important part is the call to
-:cpp:func:`apply_visitor`, which takes as arguments the visitor object
+The :cpp:class:`MetadataMapFlattenVisitor` contains a templated
+operator method specialized and expanded once for each type supported
+by the variant type used by the map.  In the above example, two
+separate overloaded operators are provided, one for scalar values
+which is a simple copy, and one for vector values which splits the
+elements into separate keys in the new map.  The important part is the
+call to :cpp:func:`visit`, which takes as arguments the visitor object
 and the variant to apply it to.
 
 This could be done with a large set of conditionals using
-``boost::get<T>(value)`` for each supported type.  The benefit of the
-:cpp:class:`boost::static_visitor` approach is that it ensures that
-all the types are supported *at compile time*, and in effect results
-in the same code.  If any types are not supported, the code will fail
-to compile.
+``ome::compat::get<T>(value)`` for each supported type.  The advantage
+of the visitor approach is that it ensures that all the types are
+supported *at compile time*, and in effect results in the same code.
+If any types are not supported, the code will fail to compile.
 
 Variant example: VariantPixelBuffer equality comparison
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -686,19 +685,17 @@ This is implemented using an overloaded equality operator:
     bool VariantPixelBuffer::operator ==
         (const VariantPixelBuffer& rhs) const
     {
-      return boost::apply_visitor(PBCompareVisitor(),
-                                  buffer, rhs.buffer);
+      return ome::compat::visit(PBCompareVisitor(),
+                                buffer, rhs.buffer);
     }
 
-As before, this is implemented in terms of a
-:cpp:class:`boost::static_visitor`, but note that this time it is
-specialized for ``bool``, meaning that the return type of
-:cpp:func:`apply_visitor` will also be ``bool``, and the operator
-methods must also return this type.
+As before, this is implemented in terms of a visitor, but this time
+the operator methods return ``bool`` meaning that the return type of
+:cpp:func:`visitor` will also be ``bool``.
 
 .. code-block:: cpp
 
-    struct PBCompareVisitor : public boost::static_visitor<bool> {
+    struct PBCompareVisitor {
       template <typename T, typename U>
       bool operator() (const T& /* lhs */,
                        const U& /* rhs */) const {
@@ -713,16 +710,16 @@ methods must also return this type.
     };
 
 Unlike the last example, the operator methods now have two arguments,
-both of which are variant types, and the :cpp:func:`apply_visitor`
-call is passed two variant objects in addition to the visitor object.
-This causes the templates to be expanded for all pairwise combinations
-of the possible types.  When the types are not equal, the first
-templated operator is called, which always returns false.  When the
-types are equal the second operator is called; this checks both
-operands are not null and then performs an equality comparison using
-the buffer contents.  Given that all the operators are inline, we
-would hope that a good compiler would cause all the false cases to be
-optimized out after expansion.
+both of which are variant types, and the :cpp:func:`visit` call is
+passed two variant objects in addition to the visitor object.  This
+causes the templates to be expanded for all pairwise combinations of
+the possible types.  When the types are not equal, the first templated
+operator is called, which always returns false.  When the types are
+equal the second operator is called; this checks both operands are not
+null and then performs an equality comparison using the buffer
+contents.  Given that all the operators are inline, we would hope that
+a good compiler would cause all the false cases to be optimized out
+after expansion.
 
 Variant example: VariantPixelBuffer SFINAE
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -748,7 +745,7 @@ integer, floating point, complex floating point and bitmask cases.
 
 .. code-block:: cpp
 
-    struct TypeCategoryVisitor : public boost::static_visitor<>
+    struct TypeCategoryVisitor
     {
       typedef ::ome::files::PixelProperties<::ome::xml::model::enums::PixelType::BIT>::std_type bit_type;
 
@@ -794,8 +791,8 @@ integer, floating point, complex floating point and bitmask cases.
       }
     };
 
-This visitor may be used with :cpp:func:`apply_visitor` in a similar
-manner to the previously demonstrated visitors.
+This visitor may be used with :cpp:func:`visit` in a similar manner to
+the previously demonstrated visitors.
 
 :cpp:class:`enable_if` has two parameters, the first being a
 conditional, the second being the return type (in this example, all

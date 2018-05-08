@@ -176,7 +176,7 @@ namespace
   // any pixel type
   // The static_visitor specialization is the required return type of
   // the operator() methods and boost::apply_visitor()
-  struct MinMaxVisitor : public boost::static_visitor<std::pair<double, double>>
+  struct MinMaxVisitor
   {
     // The min and max values will be returned in a pair.  double is
     // used since it can contain the value for any pixel type
@@ -260,7 +260,7 @@ namespace
 
     // Create and apply visitor
     MinMaxVisitor visitor;
-    MinMaxVisitor::result_type result = boost::apply_visitor(visitor, variant.vbuffer());
+    MinMaxVisitor::result_type result = ome::compat::visit(visitor, variant.vbuffer());
 
     std::cout << "Min is " << result.first
               << ", max is " << result.second << '\n';

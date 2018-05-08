@@ -48,7 +48,7 @@ using ::ome::xml::model::enums::PixelType;
 namespace
 {
 
-  struct PBCopyVisitor : public boost::static_visitor<>
+  struct PBCopyVisitor
   {
   private:
     VariantPixelBuffer::variant_buffer_type& dest;
@@ -66,7 +66,7 @@ namespace
     }
   };
 
-  struct PBValidVisitor : public boost::static_visitor<bool>
+  struct PBValidVisitor
   {
     template <typename T>
     bool
@@ -78,7 +78,7 @@ namespace
     }
   };
 
-  struct PBManagedVisitor : public boost::static_visitor<bool>
+  struct PBManagedVisitor
   {
     template <typename T>
     bool
@@ -90,7 +90,7 @@ namespace
     }
   };
 
-  struct PBNumElementsVisitor : public boost::static_visitor<boost::multi_array_types::size_type>
+  struct PBNumElementsVisitor
   {
     template <typename T>
     boost::multi_array_types::size_type
@@ -102,7 +102,7 @@ namespace
     }
   };
 
-  struct PBNumDimensionsVisitor : public boost::static_visitor<boost::multi_array_types::size_type>
+  struct PBNumDimensionsVisitor
   {
     template <typename T>
     boost::multi_array_types::size_type
@@ -114,7 +114,7 @@ namespace
     }
   };
 
-  struct PBShapeVisitor : public boost::static_visitor<const boost::multi_array_types::size_type *>
+  struct PBShapeVisitor
   {
     template <typename T>
     const boost::multi_array_types::size_type *
@@ -126,7 +126,7 @@ namespace
     }
   };
 
-  struct PBStridesVisitor : public boost::static_visitor<const boost::multi_array_types::index *>
+  struct PBStridesVisitor
   {
     template <typename T>
     const boost::multi_array_types::index *
@@ -138,7 +138,7 @@ namespace
     }
   };
 
-  struct PBIndexBasesVisitor : public boost::static_visitor<const boost::multi_array_types::index *>
+  struct PBIndexBasesVisitor
   {
     template <typename T>
     const boost::multi_array_types::index *
@@ -150,7 +150,7 @@ namespace
     }
   };
 
-  struct PBStorageOrderVisitor : public boost::static_visitor<const VariantPixelBuffer::storage_order_type *>
+  struct PBStorageOrderVisitor
   {
     template <typename T>
     const VariantPixelBuffer::storage_order_type *
@@ -162,7 +162,7 @@ namespace
     }
   };
 
-  struct PBRawBufferVisitor : public boost::static_visitor<VariantPixelBuffer::raw_type *>
+  struct PBRawBufferVisitor
   {
     template <typename T>
     VariantPixelBuffer::raw_type *
@@ -174,7 +174,7 @@ namespace
     }
   };
 
-  struct PBConstRawBufferVisitor : public boost::static_visitor<const VariantPixelBuffer::raw_type *>
+  struct PBConstRawBufferVisitor
   {
     template <typename T>
     const VariantPixelBuffer::raw_type *
@@ -187,7 +187,7 @@ namespace
   };
 
   template<typename T>
-  struct PBBufferVisitor : public boost::static_visitor<T *>
+  struct PBBufferVisitor
   {
     T *
     operator() (T& v)
@@ -205,7 +205,7 @@ namespace
     }
   };
 
-  struct PBCompareVisitor : public boost::static_visitor<bool>
+  struct PBCompareVisitor
   {
     template <typename T, typename U>
     bool
@@ -222,7 +222,7 @@ namespace
     }
   };
 
-  struct PBOperatorAssignVisitor : public boost::static_visitor<>
+  struct PBOperatorAssignVisitor
   {
     template <typename T, typename U>
     void
@@ -253,7 +253,7 @@ namespace
   };
 
   template <typename InputIterator>
-  struct PBAssignVisitor : public boost::static_visitor<>
+  struct PBAssignVisitor
   {
     InputIterator begin, end;
 
@@ -284,7 +284,7 @@ namespace
     }
   };
 
-  struct PBPixelTypeVisitor : public boost::static_visitor<PixelType>
+  struct PBPixelTypeVisitor
   {
     template <typename T>
     PixelType
@@ -296,7 +296,7 @@ namespace
     }
   };
 
-  struct PBPixelEndianVisitor : public boost::static_visitor<EndianType>
+  struct PBPixelEndianVisitor
   {
     template <typename T>
     EndianType
@@ -319,104 +319,104 @@ namespace ome
       buffer()
     {
       PBCopyVisitor v(this->buffer);
-      boost::apply_visitor(v, buffer.buffer);
+      ome::compat::visit(v, buffer.buffer);
     }
 
     bool
     VariantPixelBuffer::valid() const
     {
       PBValidVisitor v;
-      return boost::apply_visitor(v, buffer);
+      return ome::compat::visit(v, buffer);
     }
 
     bool
     VariantPixelBuffer::managed() const
     {
       PBManagedVisitor v;
-      return boost::apply_visitor(v, buffer);
+      return ome::compat::visit(v, buffer);
     }
 
     boost::multi_array_types::size_type
     VariantPixelBuffer::num_elements() const
     {
       PBNumElementsVisitor v;
-      return boost::apply_visitor(v, buffer);
+      return ome::compat::visit(v, buffer);
     }
 
     boost::multi_array_types::size_type
     VariantPixelBuffer::num_dimensions() const
     {
       PBNumDimensionsVisitor v;
-      return boost::apply_visitor(v, buffer);
+      return ome::compat::visit(v, buffer);
     }
 
     const boost::multi_array_types::size_type *
     VariantPixelBuffer::shape() const
     {
       PBShapeVisitor v;
-      return boost::apply_visitor(v, buffer);
+      return ome::compat::visit(v, buffer);
     }
 
     const boost::multi_array_types::index *
     VariantPixelBuffer::strides() const
     {
       PBStridesVisitor v;
-      return boost::apply_visitor(v, buffer);
+      return ome::compat::visit(v, buffer);
     }
 
     const boost::multi_array_types::index *
     VariantPixelBuffer::index_bases() const
     {
       PBIndexBasesVisitor v;
-      return boost::apply_visitor(v, buffer);
+      return ome::compat::visit(v, buffer);
     }
 
     const VariantPixelBuffer::storage_order_type&
     VariantPixelBuffer::storage_order() const
     {
       PBStorageOrderVisitor v;
-      return *(boost::apply_visitor(v, buffer));
+      return *(ome::compat::visit(v, buffer));
     }
 
     PixelType
     VariantPixelBuffer::pixelType() const
     {
       PBPixelTypeVisitor v;
-      return boost::apply_visitor(v, buffer);
+      return ome::compat::visit(v, buffer);
     }
 
     EndianType
     VariantPixelBuffer::endianType() const
     {
       PBPixelEndianVisitor v;
-      return boost::apply_visitor(v, buffer);
+      return ome::compat::visit(v, buffer);
     }
 
     VariantPixelBuffer::raw_type *
     VariantPixelBuffer::data()
     {
       PBRawBufferVisitor v;
-      return boost::apply_visitor(v, buffer);
+      return ome::compat::visit(v, buffer);
     }
 
     const VariantPixelBuffer::raw_type *
     VariantPixelBuffer::data() const
     {
       PBConstRawBufferVisitor v;
-      return boost::apply_visitor(v, buffer);
+      return ome::compat::visit(v, buffer);
     }
 
     VariantPixelBuffer&
     VariantPixelBuffer::operator = (const VariantPixelBuffer& rhs)
     {
-      boost::apply_visitor(PBOperatorAssignVisitor(), buffer, rhs.buffer);
+      ome::compat::visit(PBOperatorAssignVisitor(), buffer, rhs.buffer);
       return *this;
     }
 
     bool
     VariantPixelBuffer::operator == (const VariantPixelBuffer& rhs) const
     {
-      return boost::apply_visitor(PBCompareVisitor(), buffer, rhs.buffer);
+      return ome::compat::visit(PBCompareVisitor(), buffer, rhs.buffer);
     }
 
     bool

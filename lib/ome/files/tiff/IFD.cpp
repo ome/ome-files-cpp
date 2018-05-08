@@ -118,7 +118,7 @@ namespace
   // chunks where the tile widths are compatible, or individual
   // scanlines where they are not compatible.
 
-  struct ReadVisitor : public boost::static_visitor<>
+  struct ReadVisitor
   {
     const IFD&                              ifd;
     const TileInfo&                         tileinfo;
@@ -317,7 +317,7 @@ namespace
     }
   };
 
-  struct WriteVisitor : public boost::static_visitor<>
+  struct WriteVisitor
   {
     IFD&                                    ifd;
     std::vector<TileCoverage>&              tilecoverage;
@@ -1263,7 +1263,7 @@ namespace ome
         std::vector<dimension_size_type> tiles(info.tileCoverage(region));
 
         ReadVisitor v(*this, info, region, tiles);
-        boost::apply_visitor(v, dest.vbuffer());
+        ome::compat::visit(v, dest.vbuffer());
       }
 
       void
@@ -1279,7 +1279,7 @@ namespace ome
         readImage(tmp, x, y, w, h);
 
         detail::CopySubchannelVisitor v(dest, subC);
-        boost::apply_visitor(v, tmp.vbuffer());
+        ome::compat::visit(v, tmp.vbuffer());
       }
 
       void
@@ -1300,7 +1300,7 @@ namespace ome
         buf.setBuffer(shape, PixelType::UINT16, order_planar);
 
         std::shared_ptr<PixelBuffer<PixelProperties<PixelType::UINT16>::std_type>> uint16_buffer
-          (boost::get<std::shared_ptr<PixelBuffer<PixelProperties<PixelType::UINT16>::std_type>>>(buf.vbuffer()));
+          (ome::compat::get<std::shared_ptr<PixelBuffer<PixelProperties<PixelType::UINT16>::std_type>>>(buf.vbuffer()));
         assert(uint16_buffer);
 
         for (VariantPixelBuffer::size_type s = 0U; s < shape[DIM_SUBCHANNEL]; ++s)
@@ -1407,7 +1407,7 @@ namespace ome
         std::vector<dimension_size_type> tiles(info.tileCoverage(region));
 
         WriteVisitor v(*this, impl->coverage, impl->tilecache, info, region, tiles);
-        boost::apply_visitor(v, source.vbuffer());
+        ome::compat::visit(v, source.vbuffer());
       }
 
       void

@@ -53,7 +53,7 @@
 
 #include <ome/files/PixelProperties.h>
 
-#include <ome/common/variant.h>
+#include <ome/compat/variant.h>
 
 #include <ome/xml/model/enums/DimensionOrder.h>
 
@@ -454,7 +454,16 @@ namespace ome
       bool
       managed() const
       {
-        return (boost::get<std::shared_ptr<array_type>>(&multiarray) != nullptr);
+        bool managed = true;
+        try
+          {
+            ome::compat::get<std::shared_ptr<array_type>>(multiarray) != nullptr;
+          }
+        catch (ome::compat::bad_variant_access)
+          {
+            managed = false;
+          }
+        return managed;
       }
 
       /**
@@ -816,16 +825,16 @@ namespace ome
        * external buffer, the lifetime of the buffer must exceed that
        * of this class instance.
        *
-       * Note that a @c boost::variant is used here because it's not
-       * possible to safely reference the common base or cast between
-       * them.  A @c shared_ptr is used here so that it is possible to
-       * resize the array by replacing the existing array and avoid
-       * the overhead of large array copies during assignment.  It
-       * also permits efficient shallow copying in the absence of a
-       * C++11 move constructor for @c MultiArray types.
+       * Note that a @c ome::compat::variant is used here because it's
+       * not possible to safely reference the common base or cast
+       * between them.  A @c shared_ptr is used here so that it is
+       * possible to resize the array by replacing the existing array
+       * and avoid the overhead of large array copies during
+       * assignment.  It also permits efficient shallow copying in the
+       * absence of a C++11 move constructor for @c MultiArray types.
        */
-      boost::variant<std::shared_ptr<array_type>,
-                     std::shared_ptr<array_ref_type>> multiarray;
+      ome::compat::variant<std::shared_ptr<array_type>,
+                           std::shared_ptr<array_ref_type>> multiarray;
     };
 
     namespace detail
@@ -833,7 +842,7 @@ namespace ome
 
       /// Find a PixelBuffer data array of a specific pixel type.
       template<typename T>
-      struct PixelBufferArrayVisitor : public boost::static_visitor<typename PixelBuffer<T>::array_ref_type *>
+      struct PixelBufferArrayVisitor
       {
         /**
          * PixelBuffer of any type.
@@ -853,7 +862,7 @@ namespace ome
 
       /// Find a PixelBuffer data array of a specific pixel type.
       template<typename T>
-      struct PixelBufferConstArrayVisitor : public boost::static_visitor<const typename PixelBuffer<T>::array_ref_type *>
+      struct PixelBufferConstArrayVisitor
       {
         /**
          * PixelBuffer of any type.
@@ -878,7 +887,7 @@ namespace ome
     PixelBuffer<T>::array()
     {
       detail::PixelBufferArrayVisitor<T> v;
-      return *(boost::apply_visitor(v, multiarray));
+      return *(ome::compat::visit(v, multiarray));
     }
 
     template<typename T>
@@ -886,7 +895,7 @@ namespace ome
     PixelBuffer<T>::array() const
     {
       detail::PixelBufferConstArrayVisitor<T> v;
-      return *(boost::apply_visitor(v, multiarray));
+      return *(ome::compat::visit(v, multiarray));
     }
 
   }

@@ -43,7 +43,7 @@
 #include <ome/files/PixelBuffer.h>
 #include <ome/files/PixelProperties.h>
 
-#include <ome/common/variant.h>
+#include <ome/compat/variant.h>
 
 // Required with Boost 1.53 after variant include.
 #include <boost/preprocessor.hpp>
@@ -64,75 +64,37 @@ namespace ome
      * endian variants).
      *
      * For high performance access to the pixel data, use of a @c
-     * boost::static_visitor is recommended.  This has the benefit of
-     * generalising the algorithm to operate on all PixelBuffer types,
-     * as well as allowing special casing for particular types
-     * (e.g. integer vs. float, signed vs. unsigned, simple
-     * vs. complex, or any other distinction which affects the
-     * algorithm).  This will also allow subsetting of the data if
-     * required, again for all pixel types with special casing being
-     * possible.
+     * Visitor is recommended.  This has the benefit of generalising
+     * the algorithm to operate on all PixelBuffer types, as well as
+     * allowing special casing for particular type (e.g. integer vs.
+     * float, signed vs. unsigned, simple vs. complex, or any other
+     * distinction which affects the algorithm).  This will also allow
+     * subsetting of the data if required, again for all pixel types
+     * with special casing being possible.
      *
      * @todo Add support for subsetting dimensions.
      */
     class VariantPixelBuffer
     {
-    private:
-      /*
-       * The following series of typedefs may appear a little
-       * complicated, and perhaps unnecessary, but they do have a
-       * purpose.  They exist to work around pre-C++11 compiler
-       * limitations (lack of variadic templates), primarily a limit
-       * to the maximum number of types which may be used with
-       * boost::variant.  To exceed this limit (minimum guaranteed is
-       * 10), boost::mpl sequences are used to define the variant
-       * types.  These also have length limits, so the type list is
-       * built up by defining separate type sequences, then
-       * concatenating them, and transforming them to provide list
-       * variants.  Note that none of this is code per se; it's all
-       * compile-time template expansion which evaluates to a list of
-       * permitted types.
-       */
-
-      /// Integer pixel types.
-      typedef boost::mpl::vector<PixelProperties<::ome::xml::model::enums::PixelType::INT8>,
-                                 PixelProperties<::ome::xml::model::enums::PixelType::INT16>,
-                                 PixelProperties<::ome::xml::model::enums::PixelType::INT32>,
-                                 PixelProperties<::ome::xml::model::enums::PixelType::UINT8>,
-                                 PixelProperties<::ome::xml::model::enums::PixelType::UINT16>,
-                                 PixelProperties<::ome::xml::model::enums::PixelType::UINT32>,
-                                 PixelProperties<::ome::xml::model::enums::PixelType::BIT>> integer_pixel_types;
-
-      /// Floating-point pixel types.
-      typedef boost::mpl::vector< PixelProperties<::ome::xml::model::enums::PixelType::FLOAT>,
-                                  PixelProperties<::ome::xml::model::enums::PixelType::DOUBLE>,
-                                  PixelProperties<::ome::xml::model::enums::PixelType::COMPLEXFLOAT>,
-                                  PixelProperties<::ome::xml::model::enums::PixelType::COMPLEXDOUBLE>> float_pixel_types;
-
-      /// Aggregate view of all numeric types.
-      typedef boost::mpl::joint_view<integer_pixel_types,
-                                     float_pixel_types>::type basic_pixel_types_view;
-
-      /// Convert T into a buffer.
-      template<typename T>
-      struct make_buffer
-      {
-        /// Buffer type.
-        typedef std::shared_ptr<PixelBuffer<typename T::std_type>> type;
-      };
-
-      /// Aggregate view of all buffer types.
-      typedef boost::mpl::transform_view<basic_pixel_types_view, make_buffer<boost::mpl::_1>>::type pixel_buffer_types_view;
-
-      /// Empty vector placeholder.
-      typedef boost::mpl::vector<> empty_types;
-
-      /// List of all pixel buffer types.
-      typedef boost::mpl::insert_range<empty_types, boost::mpl::end<empty_types>::type, pixel_buffer_types_view>::type pixel_buffer_types;
-
     public:
+
+      /// Map a PixelType enum to a shared buffer using a standard language type.
+      template<int P>
+      using PT = std::shared_ptr<PixelBuffer<typename PixelProperties<P>::std_type>>;
+
       /// Buffer type, allowing assignment of all buffer types.
-      typedef boost::make_variant_over<pixel_buffer_types>::type variant_buffer_type;
+      using variant_buffer_type =
+        ome::compat::variant<PT<::ome::xml::model::enums::PixelType::INT8>,
+                             PT<::ome::xml::model::enums::PixelType::INT16>,
+                             PT<::ome::xml::model::enums::PixelType::INT32>,
+                             PT<::ome::xml::model::enums::PixelType::UINT8>,
+                             PT<::ome::xml::model::enums::PixelType::UINT16>,
+                             PT<::ome::xml::model::enums::PixelType::UINT32>,
+                             PT<::ome::xml::model::enums::PixelType::BIT>,
+                             PT<::ome::xml::model::enums::PixelType::FLOAT>,
+                             PT<::ome::xml::model::enums::PixelType::DOUBLE>,
+                             PT<::ome::xml::model::enums::PixelType::COMPLEXFLOAT>,
+                             PT<::ome::xml::model::enums::PixelType::COMPLEXDOUBLE>>;
 
       /// Raw pixel type used in public interfaces.
       typedef PixelProperties<::ome::xml::model::enums::PixelType::UINT8>::std_type raw_type;
@@ -660,7 +622,7 @@ namespace ome
 
       /// Find a PixelBuffer data array of a specific pixel type.
       template<typename T>
-      struct VariantPixelBufferVisitor : public boost::static_visitor<PixelBuffer<T> *>
+      struct VariantPixelBufferVisitor
       {
         /**
          * PixelBuffer of correct type.
@@ -693,7 +655,7 @@ namespace ome
 
       /// Find a PixelBuffer data array of a specific pixel type.
       template<typename T>
-      struct VariantPixelBufferConstVisitor : public boost::static_visitor<const PixelBuffer<T> *>
+      struct VariantPixelBufferConstVisitor
       {
         /**
          * PixelBuffer of correct type.
@@ -726,7 +688,7 @@ namespace ome
 
       /// Assign a PixelBuffer from an input iterator.
       template <typename InputIterator>
-      struct VariantPixelBufferAssignVisitor : public boost::static_visitor<>
+      struct VariantPixelBufferAssignVisitor
       {
         /// Input start.
         InputIterator begin;
@@ -772,7 +734,7 @@ namespace ome
 
       /// Read data into a PixelBuffer.
       template<class charT, class traits>
-      struct VariantPixelBufferReadVisitor : public boost::static_visitor<>
+      struct VariantPixelBufferReadVisitor
       {
         /// The input stream.
         std::basic_istream<charT,traits>& stream;
@@ -803,7 +765,7 @@ namespace ome
 
       /// Write data from a PixelBuffer.
       template<class charT, class traits>
-      struct VariantPixelBufferWriteVisitor : public boost::static_visitor<>
+      struct VariantPixelBufferWriteVisitor
       {
         /// The output stream.
         std::basic_ostream<charT,traits>& stream;
@@ -833,7 +795,7 @@ namespace ome
       };
 
       /// Copy a single subchannel from a PixelBuffer.
-      struct CopySubchannelVisitor : public boost::static_visitor<>
+      struct CopySubchannelVisitor
       {
         /// Destination pixel buffer.
         VariantPixelBuffer& dest;
@@ -877,7 +839,7 @@ namespace ome
           /// differ, to allow user control over storage order.
           dest.setBuffer(dest_shape, v->pixelType(), order);
 
-          T& destbuf = boost::get<T>(dest.vbuffer());
+          T& destbuf = ome::compat::get<T>(dest.vbuffer());
 
           typename boost::multi_array_types::index_gen indices;
           typedef boost::multi_array_types::index_range range;
@@ -886,7 +848,7 @@ namespace ome
       };
 
       /// Merge a single subchannel into a PixelBuffer.
-      struct MergeSubchannelVisitor : public boost::static_visitor<>
+      struct MergeSubchannelVisitor
       {
         /// Destination pixel buffer.
         VariantPixelBuffer& dest;
@@ -914,7 +876,7 @@ namespace ome
         void
         operator()(const T& v)
         {
-          T& destbuf = boost::get<T>(dest.vbuffer());
+          T& destbuf = ome::compat::get<T>(dest.vbuffer());
 
           typename boost::multi_array_types::index_gen indices;
           typedef boost::multi_array_types::index_range range;
@@ -930,7 +892,7 @@ namespace ome
     VariantPixelBuffer::array()
     {
       detail::VariantPixelBufferVisitor<T> v;
-      return boost::apply_visitor(v, buffer)->array();
+      return ome::compat::visit(v, buffer)->array();
     }
 
     /// @copydoc PixelBuffer::array() const
@@ -939,7 +901,7 @@ namespace ome
     VariantPixelBuffer::array() const
     {
       detail::VariantPixelBufferConstVisitor<T> v;
-      return boost::apply_visitor(v, buffer)->array();
+      return ome::compat::visit(v, buffer)->array();
     }
 
     template<typename T>
@@ -947,7 +909,7 @@ namespace ome
     VariantPixelBuffer::data()
     {
       detail::VariantPixelBufferVisitor<T> v;
-      return boost::apply_visitor(v, buffer)->data();
+      return ome::compat::visit(v, buffer)->data();
     }
 
     template<typename T>
@@ -955,7 +917,7 @@ namespace ome
     VariantPixelBuffer::data() const
     {
       detail::VariantPixelBufferConstVisitor<T> v;
-      return boost::apply_visitor(v, buffer)->data();
+      return ome::compat::visit(v, buffer)->data();
     }
 
     template<typename T>
@@ -963,7 +925,7 @@ namespace ome
     VariantPixelBuffer::origin() const
     {
       detail::VariantPixelBufferConstVisitor<T> v;
-      return boost::apply_visitor(v, buffer)->origin();
+      return ome::compat::visit(v, buffer)->origin();
     }
 
     /**
@@ -979,7 +941,7 @@ namespace ome
                                InputIterator end)
     {
       detail::VariantPixelBufferAssignVisitor<InputIterator> v(begin, end);
-      boost::apply_visitor(v, buffer);
+      ome::compat::visit(v, buffer);
     }
 
     template<class charT, class traits>
@@ -987,7 +949,7 @@ namespace ome
     VariantPixelBuffer::read(std::basic_istream<charT,traits>& stream)
     {
       detail::VariantPixelBufferReadVisitor<charT, traits> v(stream);
-      boost::apply_visitor(v, buffer);
+      ome::compat::visit(v, buffer);
     }
 
     template<class charT, class traits>
@@ -995,7 +957,7 @@ namespace ome
     VariantPixelBuffer::write(std::basic_ostream<charT,traits>& stream) const
     {
       detail::VariantPixelBufferWriteVisitor<charT, traits> v(stream);
-      boost::apply_visitor(v, buffer);
+      ome::compat::visit(v, buffer);
     }
 
   }

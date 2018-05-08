@@ -379,7 +379,7 @@ TEST_P(FormatWriterTest, DefaultPixels)
 namespace
 {
 
-  struct OutputPixelsTest : public boost::static_visitor<>
+  struct OutputPixelsTest
   {
     const FormatWriterTestParameters& params;
     FormatWriterCustom& writer;
@@ -446,7 +446,7 @@ TEST_P(FormatWriterTest, OutputPixels)
                          params.type);
 
   OutputPixelsTest v(params, w, buf);
-  boost::apply_visitor(v, buf.vbuffer());
+  ome::compat::visit(v, buf.vbuffer());
 }
 
 TEST_P(FormatWriterTest, DefaultSeries)
