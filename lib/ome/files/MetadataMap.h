@@ -42,6 +42,7 @@
 #include <cmath>
 #include <cstdint>
 #include <iomanip>
+#include <iterator>
 #include <map>
 #include <ostream>
 #include <sstream>
