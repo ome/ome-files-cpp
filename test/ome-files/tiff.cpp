@@ -92,7 +92,7 @@ namespace
   struct is_complex<std::complex<T>>
     : boost::true_type {};
 
-  struct DumpPixelBufferVisitor : public boost::static_visitor<>
+  struct DumpPixelBufferVisitor
   {
     typedef ::ome::files::PixelProperties<::ome::xml::model::enums::PixelType::BIT>::std_type bit_type;
 
@@ -201,7 +201,7 @@ namespace
                             std::ostream&             stream)
   {
     DumpPixelBufferVisitor v(stream);
-    boost::apply_visitor(v, buf.vbuffer());
+    ome::compat::visit(v, buf.vbuffer());
   }
 
 }
@@ -934,7 +934,7 @@ public:
     VariantPixelBuffer pngdata_chunky;
     pngdata_chunky.setBuffer(shape, PT::UINT8, order_chunky);
 
-    std::shared_ptr<PixelBuffer<PixelProperties<PT::UINT8>::std_type>>& uint8_pngdata_chunky(boost::get<std::shared_ptr<PixelBuffer<PixelProperties<PT::UINT8>::std_type>>>(pngdata_chunky.vbuffer()));
+    std::shared_ptr<PixelBuffer<PixelProperties<PT::UINT8>::std_type>>& uint8_pngdata_chunky(ome::compat::get<std::shared_ptr<PixelBuffer<PixelProperties<PT::UINT8>::std_type>>>(pngdata_chunky.vbuffer()));
     std::vector<png_bytep> row_pointers(pheight);
     for (dimension_size_type y = 0; y < pheight; ++y)
       {
@@ -986,7 +986,7 @@ public:
         VariantPixelBuffer dest(boost::extents[shape[0]][shape[1]][shape[2]][shape[3]][shape[4]][shape[5]][shape[6]][shape[7]][shape[8]], pixeltype, src.storage_order());
 
         PixelTypeConversionVisitor<PT::UINT8> v(src, dest);
-        boost::apply_visitor(v, dest.vbuffer());
+        ome::compat::visit(v, dest.vbuffer());
 
         pngdata_map_type::key_type key(xsize, ysize, pixeltype, planarconfig);
         std::pair<pngdata_map_type::iterator,bool> ins
@@ -1577,7 +1577,7 @@ TEST_P(PixelTest, WriteTIFF)
 
         // Temporary subrange to write into tile
         PixelSubrangeVisitor sv(t.x, t.y);
-        boost::apply_visitor(sv, pixels.vbuffer(), vb.vbuffer());
+        ome::compat::visit(sv, pixels.vbuffer(), vb.vbuffer());
 
         wifd->writeImage(vb, t.x, t.y, t.w, t.h);
       }

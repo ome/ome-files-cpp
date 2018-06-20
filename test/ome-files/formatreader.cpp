@@ -951,7 +951,7 @@ TEST_P(FormatReaderTest, FlatFile)
 
 TEST_P(FormatReaderTest, DefaultMetadata)
 {
-  EXPECT_THROW(r.getMetadataValue("Key"), boost::bad_get);
+  EXPECT_THROW(r.getMetadataValue("Key"), ome::compat::bad_variant_access);
   EXPECT_THROW(r.getSeriesMetadataValue("Key"), std::logic_error);
   EXPECT_TRUE(r.getGlobalMetadata().empty());
   EXPECT_THROW(r.getSeriesMetadata(), std::logic_error);
@@ -967,10 +967,10 @@ TEST_P(FormatReaderTest, FlatMetadata)
   EXPECT_NO_THROW(r.setMetadataFiltered(true));
   r.setId("flat");
 
-  EXPECT_THROW(r.getMetadataValue("Key"), boost::bad_get);
+  EXPECT_THROW(r.getMetadataValue("Key"), ome::compat::bad_variant_access);
   EXPECT_EQ(r.getMetadataValue("Institution"), MetadataMap::value_type("University of Dundee"));
   EXPECT_EQ(r.getSeriesMetadataValue("Organism"), MetadataMap::value_type("Mus musculus"));
-  EXPECT_THROW(r.getSeriesMetadataValue("Key"), boost::bad_get);
+  EXPECT_THROW(r.getSeriesMetadataValue("Key"), ome::compat::bad_variant_access);
   EXPECT_EQ(1U, r.getGlobalMetadata().size());
   EXPECT_EQ(1U, r.getSeriesMetadata().size());
   EXPECT_EQ(4U, r.getCoreMetadataList().size());
@@ -1021,7 +1021,7 @@ TEST_P(FormatReaderTest, DefaultPixels)
 namespace
 {
 
-  struct FlatPixelsTest : public boost::static_visitor<>
+  struct FlatPixelsTest
   {
     FormatReaderCustom& reader;
     VariantPixelBuffer& buf;
@@ -1085,7 +1085,7 @@ TEST_P(FormatReaderTest, FlatPixels)
                          r.getPixelType());
 
   FlatPixelsTest v(r, buf);
-  boost::apply_visitor(v, buf.vbuffer());
+  ome::compat::visit(v, buf.vbuffer());
 }
 
 const std::vector<FormatReaderTestParameters> variant_params

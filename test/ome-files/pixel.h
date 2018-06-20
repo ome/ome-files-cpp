@@ -114,24 +114,24 @@ pixel_value<::ome::files::PixelEndianProperties<::ome::xml::model::enums::PixelT
  * types.
  */
 template<int P>
-struct PixelTypeConversionVisitor : public boost::static_visitor<>
+struct PixelTypeConversionVisitor
 {
   typedef typename ::ome::files::PixelProperties<P>::std_type src_type;
   typedef ::ome::files::PixelProperties<::ome::xml::model::enums::PixelType::BIT>::std_type bit_type;
 
-  const std::shared_ptr<::ome::files::PixelBuffer<src_type>> *src;
+  const std::shared_ptr<::ome::files::PixelBuffer<src_type>>& src;
   ::ome::files::VariantPixelBuffer& dest;
 
   PixelTypeConversionVisitor(const ::ome::files::VariantPixelBuffer& src,
                              ::ome::files::VariantPixelBuffer& dest):
-    src(boost::get<std::shared_ptr<::ome::files::PixelBuffer<src_type>>>(&src.vbuffer())),
+    src(ome::compat::get<std::shared_ptr<::ome::files::PixelBuffer<src_type>>>(src.vbuffer())),
     dest(dest)
   {
 
-    if (!(this->src && *this->src))
+    if (!this->src)
       throw std::runtime_error("Null source buffer or incorrect pixel type");
 
-    if((*this->src)->num_elements() != dest.num_elements())
+    if(this->src->num_elements() != dest.num_elements())
       throw std::runtime_error("Array size mismatch");
   }
 
@@ -143,7 +143,7 @@ struct PixelTypeConversionVisitor : public boost::static_visitor<>
     >::type
   operator() (std::shared_ptr<::ome::files::PixelBuffer<T>>& lhs)
   {
-    const src_type *src_buf = (*src)->data();
+    const src_type *src_buf = src->data();
     T *dest_buf = lhs->data();
 
     float oldmin = static_cast<float>(std::numeric_limits<src_type>::min());
@@ -152,7 +152,7 @@ struct PixelTypeConversionVisitor : public boost::static_visitor<>
     float newmax = static_cast<float>(std::numeric_limits<T>::max());
 
     for (::ome::files::VariantPixelBuffer::size_type i = 0;
-         i != (*src)->num_elements();
+         i != src->num_elements();
          ++i)
       {
 
@@ -169,7 +169,7 @@ struct PixelTypeConversionVisitor : public boost::static_visitor<>
     >::type
   operator() (std::shared_ptr<::ome::files::PixelBuffer<T>>& lhs)
   {
-    const src_type *src_buf = (*src)->data();
+    const src_type *src_buf = src->data();
     T *dest_buf = lhs->data();
 
     float oldmin = static_cast<float>(std::numeric_limits<src_type>::min());
@@ -178,7 +178,7 @@ struct PixelTypeConversionVisitor : public boost::static_visitor<>
     float newmax = 1.0f;
 
     for (::ome::files::VariantPixelBuffer::size_type i = 0;
-         i != (*src)->num_elements();
+         i != src->num_elements();
          ++i)
       {
         dest_buf[i] = static_cast<T>((static_cast<float>(src_buf[i] - oldmin) *
@@ -194,7 +194,7 @@ struct PixelTypeConversionVisitor : public boost::static_visitor<>
     >::type
   operator() (std::shared_ptr<::ome::files::PixelBuffer<T>>& lhs)
   {
-    const src_type *src_buf = (*src)->data();
+    const src_type *src_buf = src->data();
     T *dest_buf = lhs->data();
 
     float oldmin = static_cast<float>(std::numeric_limits<src_type>::min());
@@ -203,7 +203,7 @@ struct PixelTypeConversionVisitor : public boost::static_visitor<>
     float newmax = 1.0f;
 
     for (::ome::files::VariantPixelBuffer::size_type i = 0;
-         i != (*src)->num_elements();
+         i != src->num_elements();
          ++i)
       {
         dest_buf[i] = T((static_cast<typename T::value_type>((src_buf[i] - oldmin) *
@@ -218,11 +218,11 @@ struct PixelTypeConversionVisitor : public boost::static_visitor<>
   void
   operator() (std::shared_ptr<::ome::files::PixelBuffer<bit_type>>& lhs)
   {
-    const src_type *src_buf = (*src)->data();
+    const src_type *src_buf = src->data();
     bit_type *dest_buf = lhs->data();
 
     for (::ome::files::VariantPixelBuffer::size_type i = 0;
-         i != (*src)->num_elements();
+         i != src->num_elements();
          ++i)
       {
         dest_buf[i] = (static_cast<float>(src_buf[i] - std::numeric_limits<src_type>::min()) /
@@ -231,7 +231,7 @@ struct PixelTypeConversionVisitor : public boost::static_visitor<>
   }
 };
 
-struct PixelSubrangeVisitor : public boost::static_visitor<>
+struct PixelSubrangeVisitor
 {
   ::ome::files::dimension_size_type x;
   ::ome::files::dimension_size_type y;

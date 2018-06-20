@@ -521,7 +521,7 @@ In many situations, it is desirable to work with arbitrary pixel
 types, or at least the set of pixel types defined in the OME data
 model in its :cpp:class:`PixelType` enumeration.  The
 :cpp:class:`VariantPixelBuffer` fulfills this need, using
-:cpp:class:`boost::variant` to allow it to contain a
+:cpp:class:`ome::compat::variant` to allow it to contain a
 :cpp:class:`PixelBuffer` specialized for any of the pixel types in the
 OME data model.  This is used to allow transfer and processing of any
 supported pixel type, for example by the :cpp:class:`FormatReader`
@@ -534,18 +534,17 @@ that each operation upon the pixel data, for example for display or
 analysis, may require implementing separately for each pixel type.
 This imposes a significant testing and maintenance burden.
 :cpp:class:`VariantPixelBuffer` solves this problem through use of
-:cpp:func:`boost::apply_visitor` and
-:cpp:class:`boost::static_visitor`, which allow algorithms to be
-defined in a template and compiled for each pixel type.  They also
-allow algorithms to be specialized for different classes of pixel
-type, for example signed vs. unsigned, integer vs. floating point, or
-simple vs. complex, or special-cased per type e.g. for bitmasks.  When
-:cpp:func:`boost::apply_visitor` is called with a specified algorithm
-and :cpp:class:`VariantPixelBuffer` object, it will select the
-matching algorithm for the pixel type contained within the buffer, and
-then invoke it on the buffer.  This permits the programmer to support
-arbitrary pixel types without creating a maintenance nightmare, and
-without unnecessary code duplication.
+:cpp:func:`ome::compat::visit` and static visitor classes, which allow
+algorithms to be defined in a template and compiled for each pixel
+type.  They also allow algorithms to be specialized for different
+classes of pixel type, for example signed vs. unsigned, integer
+vs. floating point, or simple vs. complex, or special-cased per type
+e.g. for bitmasks.  When :cpp:func:`ome::compat::visit` is called with
+a specified algorithm and :cpp:class:`VariantPixelBuffer` object, it
+will select the matching algorithm for the pixel type contained within
+the buffer, and then invoke it on the buffer.  This permits the
+programmer to support arbitrary pixel types without creating a
+maintenance nightmare, and without unnecessary code duplication.
 
 The 9D pixel buffer makes a distinction between the logical dimension
 order (used by the API) and the storage order (the layout of the pixel

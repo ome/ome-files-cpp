@@ -100,7 +100,7 @@ TEST_F(MetadataMapTest, Assign)
 
 TEST_F(MetadataMapTest, SetVariant)
 {
-  // Setting using boost::variant.
+  // Setting using ome::compat::variant
 
   m.clear();
   MetadataMap::value_type v, vget;
@@ -109,7 +109,7 @@ TEST_F(MetadataMapTest, SetVariant)
   m.set("uint", v);
 
   ASSERT_TRUE(m.get("uint", vget));
-  ASSERT_EQ(boost::get<uint32_t>(vget), ui);
+  ASSERT_EQ(ome::compat::get<uint32_t>(vget), ui);
 
   uint32_t uiget = 345;
   ASSERT_TRUE(m.get("uint", uiget));
@@ -119,7 +119,7 @@ TEST_F(MetadataMapTest, SetVariant)
   m.set("stringval", v);
 
   ASSERT_TRUE(m.get("stringval", vget));
-  ASSERT_EQ(boost::get<std::string>(vget), "str");
+  ASSERT_EQ(ome::compat::get<std::string>(vget), "str");
 
   std::string sget("invalid");
   ASSERT_TRUE(m.get("stringval", sget));
@@ -129,7 +129,7 @@ TEST_F(MetadataMapTest, SetVariant)
 TEST_F(MetadataMapTest, SetSpecific)
 {
   // Setting using specific types directly, which will be converted to
-  // boost::variant on the fly.
+  // ome::compat::variant on the fly.
 
   m.clear();
 
@@ -174,7 +174,7 @@ TEST_F(MetadataMapTest, Get)
   MetadataMap::value_type v;
   v = 43;
   ASSERT_TRUE(m.get("int1", v));
-  ASSERT_EQ(boost::get<int32_t>(v), 82);
+  ASSERT_EQ(ome::compat::get<int32_t>(v), 82);
 
   std::vector<double> vd;
   vd.push_back(43.2342);
@@ -216,7 +216,7 @@ TEST_F(MetadataMapTest, GetReference)
   ASSERT_EQ(v2, 82);
 
   MetadataMap::value_type& v3 = m.get<MetadataMap::value_type>("int1");
-  ASSERT_EQ(boost::get<int32_t>(v3), 82);
+  ASSERT_EQ(ome::compat::get<int32_t>(v3), 82);
 }
 
 TEST_F(MetadataMapTest, GetConstReference)
@@ -231,13 +231,13 @@ TEST_F(MetadataMapTest, GetConstReference)
   ASSERT_EQ(v2, 82);
 
   const MetadataMap::value_type& v3 = cm.get<MetadataMap::value_type>("int1");
-  ASSERT_EQ(boost::get<int32_t>(v3), 82);
+  ASSERT_EQ(ome::compat::get<int32_t>(v3), 82);
 }
 
 TEST_F(MetadataMapTest, GetReferenceFail)
 {
-  ASSERT_THROW(m.get<int32_t>("invalid"), boost::bad_get);
-  ASSERT_THROW(m.get<double>("int1"), boost::bad_get);
+  ASSERT_THROW(m.get<int32_t>("invalid"), ome::compat::bad_variant_access);
+  ASSERT_THROW(m.get<double>("int1"), ome::compat::bad_variant_access);
 }
 
 TEST_F(MetadataMapTest, Append)
@@ -264,7 +264,7 @@ TEST_F(MetadataMapTest, GetInvalidFail)
   MetadataMap::value_type v;
   v = 64;
   ASSERT_FALSE(m.get("invalid", v));
-  ASSERT_EQ(boost::get<int>(v), 64);
+  ASSERT_EQ(ome::compat::get<int>(v), 64);
 }
 
 TEST_F(MetadataMapTest, GetBadTypeFail)

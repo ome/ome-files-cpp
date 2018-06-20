@@ -895,7 +895,7 @@ namespace ome
        * @param field the name associated with the metadata field.
        * @returns the value.
        *
-       * @throws boost::bad_get on failure if the key was not found.
+       * @throws ome::compat::bad_variant_access on failure if the key was not found.
        */
       virtual
       const MetadataMap::value_type&
@@ -910,7 +910,7 @@ namespace ome
        * @param field the name associated with the metadata field.
        * @returns the value.
        *
-       * @throws boost::bad_get on failure if the key was not found.
+       * @throws ome::compat::bad_variant_access on failure if the key was not found.
        */
       virtual
       const MetadataMap::value_type&

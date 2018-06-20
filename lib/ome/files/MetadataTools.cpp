@@ -1078,7 +1078,7 @@ namespace ome
               while (ids.find(id) != ids.end());
 
               std::ostringstream value;
-              boost::apply_visitor(::ome::files::detail::MetadataMapValueTypeOStreamVisitor(value), i->second);
+              ome::compat::visit(::ome::files::detail::MetadataMapValueTypeOStreamVisitor(value), i->second);
 
               std::shared_ptr<OriginalMetadataAnnotation> orig(std::make_shared<OriginalMetadataAnnotation>());
               orig->setID(id);
