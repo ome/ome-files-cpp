@@ -247,30 +247,6 @@ namespace ome
         setTileType(TileType type);
 
         /**
-         * Get the current tile being written.
-         *
-         * This is the tile currently being modified pending flush.
-         *
-         * @returns the current tile.
-         */
-        dimension_size_type
-        getCurrentTile() const;
-
-        /**
-         * Set the current tile being written.
-         *
-         * This is the tile currently being modified pending flush.
-         *
-         * @note This should not be set by hand; it will be updated by
-         * the code writing out tile data called internally by
-         * writeImage().
-         *
-         * @param tile the current tile.
-         */
-        void
-        setCurrentTile(dimension_size_type tile);
-
-        /**
          * Get tiling metadata.
          *
          * @returns the TileInfo metadata for this IFD.
