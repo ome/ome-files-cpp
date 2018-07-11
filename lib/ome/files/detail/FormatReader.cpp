@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -87,7 +88,6 @@ namespace ome
         plane(0),
         core(),
         resolution(0),
-        flattenedResolutions(true),
         suffixNecessary(true),
         suffixSufficient(true),
         companionFiles(false),
@@ -772,11 +772,7 @@ namespace ome
       FormatReader::getSeriesCount() const
       {
         assertId(currentId, true);
-        dimension_size_type size = core.size();
-        if (!hasFlattenedResolutions()) {
-          size = coreIndexToSeries(core.size() - 1) + 1;
-        }
-        return size;
+        return coreIndexToSeries(core.size() - 1) + 1;
       }
 
       void
@@ -1176,18 +1172,13 @@ namespace ome
       {
         dimension_size_type index = 0;
 
-        if (hasFlattenedResolutions())
+        if (series >= core.size())
           {
-            // coreIndex and series are identical
-            if (series >= core.size())
-              {
-                boost::format fmt("Invalid series: %1%");
-                fmt % series;
-                throw std::logic_error(fmt.str());
-              }
-            index = series;
+            boost::format fmt("Invalid series: %1%");
+            fmt % series;
+            throw std::logic_error(fmt.str());
           }
-        else if (this->series == series)
+        if (this->series == series)
           {
             // Use corresponding coreIndex
             index = coreIndex - resolution;
@@ -1234,19 +1225,13 @@ namespace ome
       {
         dimension_size_type series = 0;
 
-        if (index >= core.size())
+        if (core.size() == 0)
           {
             boost::format fmt("Invalid index: %1%");
             fmt % index;
             throw std::logic_error(fmt.str());
           }
-
-        if (hasFlattenedResolutions())
-          {
-            // coreIndex and series are identical
-            series = index;
-          }
-        else if (coreIndex == index)
+        if (coreIndex == index)
           {
             // Use corresponding series
             series = this->series;
@@ -1283,11 +1268,7 @@ namespace ome
       {
         assertId(currentId, true);
 
-        dimension_size_type count = 1;
-        if (!hasFlattenedResolutions())
-          count = core.at(seriesToCoreIndex(getSeries()))->resolutionCount;
-
-        return count;
+        return core.at(seriesToCoreIndex(getSeries()))->resolutionCount;
       }
 
       void
@@ -1309,19 +1290,6 @@ namespace ome
       FormatReader::getResolution() const
       {
         return resolution;
-      }
-
-      bool
-      FormatReader::hasFlattenedResolutions() const
-      {
-        return flattenedResolutions;
-      }
-
-      void
-      FormatReader::setFlattenedResolutions(bool flatten)
-      {
-        assertId(currentId, false);
-        flattenedResolutions = flatten;
       }
 
       dimension_size_type

@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -56,7 +57,6 @@ namespace info
     group(false),
     stitch(false),
     separate(false),
-    flat(false),
     series(0),
     resolution(0),
     format(),
@@ -126,8 +126,6 @@ namespace info
     reader.add_options()
       ("format", opt::value<std::string>(&this->format),
        "Use the specified format reader")
-      ("flat", "Flatten subresolutions")
-      ("no-flat", "Do not flatten subresolutions (default)")
       ("merge", "Combine separate channels into an RGB image")
       ("no-merge", "Do not combine separate channels into an RGB image (default)")
       ("group", "Files in multi-file datasets are grouped as a single dataset")
@@ -139,7 +137,7 @@ namespace info
       ("series", opt::value<ome::files::dimension_size_type>(&this->series),
        "Use the specified series")
       ("resolution", opt::value<ome::files::dimension_size_type>(&this->resolution),
-       "Use the specified subresolution (only if unflattened)")
+       "Use the specified subresolution")
       ("input-order",
        opt::value<std::string>(&this->inputOrderString),
        "Override the dimension input order")
@@ -235,11 +233,6 @@ namespace info
       this->verbosity = MSG_VERBOSE;
     if (vm.count("debug"))
       this->verbosity = MSG_DEBUG;
-
-    if (vm.count("flat"))
-      this->flat = true;
-    if (vm.count("no-flat"))
-      this->flat = false;
 
     if (vm.count("merge"))
       this->merge = true;

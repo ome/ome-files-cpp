@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -1243,30 +1244,6 @@ namespace ome
       virtual
       dimension_size_type
       getResolution() const = 0;
-
-      /**
-       * Get resolution flattening.
-       *
-       * @returns @c true if flattening is enabled, @c false otherwise.
-       */
-      virtual
-      bool
-      hasFlattenedResolutions() const = 0;
-
-      /**
-       * Set resolution flattening.
-       *
-       * This controls whether or not resolution levels are flattened
-       * into individual series.  This alters the behaviour of
-       * setSeries() and getSeries() but does not affect the behaviour
-       * of setCoreIndex() and getCoreIndex(), which are
-       * resolution-independent.
-       *
-       * @param flatten @c true to enable flattening, @c false to disable.
-       */
-      virtual
-      void
-      setFlattenedResolutions(bool flatten) = 0;
     };
 
   }

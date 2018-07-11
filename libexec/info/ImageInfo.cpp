@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -155,7 +156,6 @@ namespace info
     reader->setGroupFiles(opts.group);
     MetadataOptions mopts(opts.showcore ? MetadataOptions::METADATA_ALL : MetadataOptions::METADATA_MINIMUM);
     reader->setMetadataOptions(mopts);
-    reader->setFlattenedResolutions(opts.flat);
   }
 
   void
@@ -211,7 +211,7 @@ namespace info
         // << ':' << '\n';
 
         dimension_size_type rc = reader->getResolutionCount();
-        if (!opts.flat && rc > 1)
+        if (rc > 1)
           {
             stream << "\tResolutions = " << rc << '\n';
             for (dimension_size_type r = 0; r < rc; ++r)

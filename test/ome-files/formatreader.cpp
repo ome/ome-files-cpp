@@ -8,6 +8,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -194,7 +195,7 @@ protected:
   {
     ::ome::files::detail::FormatReader::initFile(id);
 
-    if (id == "test" || id == "flat")
+    if (id == "basic")
       {
         metadata["Institution"] = "University of Dundee";
 
@@ -298,7 +299,7 @@ TEST_P(FormatReaderTest, DefaultConstruct)
 
 TEST_P(FormatReaderTest, ReaderProperties)
 {
-  r.setId("test");
+  r.setId("basic");
   ASSERT_EQ(props.name, r.getFormat());
   ASSERT_EQ(props.description, r.getFormatDescription());
   ASSERT_TRUE(props.suffixes == r.getSuffixes());
@@ -350,9 +351,9 @@ TEST_P(FormatReaderTest, DefaultClose)
   EXPECT_NO_THROW(r.close());
 }
 
-TEST_P(FormatReaderTest, FlatClose)
+TEST_P(FormatReaderTest, BasicClose)
 {
-  r.setId("flat");
+  r.setId("basic");
   EXPECT_NO_THROW(r.close());
 }
 
@@ -394,114 +395,10 @@ TEST_P(FormatReaderTest, DefaultCoreMetadata)
   EXPECT_THROW(r.getResolutionCount(), std::logic_error);
 }
 
-TEST_P(FormatReaderTest, FlatCoreMetadata)
+TEST_P(FormatReaderTest, SubresolutionCoreMetadata)
 {
   const FormatReaderTestParameters& params(GetParam());
 
-  r.setId("flat");
-
-  EXPECT_EQ(200U, r.getImageCount());
-  EXPECT_FALSE(r.isRGB(0));
-  EXPECT_TRUE(r.isRGB(1));
-  EXPECT_EQ(512U, r.getSizeX());
-  EXPECT_EQ(1024U, r.getSizeY());
-  EXPECT_EQ(20U, r.getSizeZ());
-  EXPECT_EQ(5U, r.getSizeT());
-  EXPECT_EQ(4U, r.getSizeC());
-  EXPECT_EQ(params.type, r.getPixelType());
-  EXPECT_EQ(::ome::files::bitsPerPixel(params.type), r.getBitsPerPixel());
-  EXPECT_EQ(2U, r.getEffectiveSizeC());
-  EXPECT_EQ(1U, r.getRGBChannelCount(0));
-  EXPECT_EQ(3U, r.getRGBChannelCount(1));
-  EXPECT_FALSE(r.isIndexed());
-  EXPECT_TRUE(r.isFalseColor());
-  EXPECT_NO_THROW(r.getModuloZ());
-  EXPECT_NO_THROW(r.getModuloT());
-  EXPECT_NO_THROW(r.getModuloC());
-  EXPECT_EQ(5U, r.getModuloZ().size());
-  EXPECT_EQ(1U, r.getModuloT().size());
-  EXPECT_EQ(1U, r.getModuloC().size());
-  EXPECT_EQ(64U, r.getThumbSizeX());
-  EXPECT_EQ(128U, r.getThumbSizeY());
-  EXPECT_EQ(params.endian == ::ome::files::ENDIAN_LITTLE, r.isLittleEndian());
-  EXPECT_EQ(std::string("XYZTC"), r.getDimensionOrder());
-  EXPECT_TRUE(r.isOrderCertain());
-  EXPECT_FALSE(r.isThumbnailSeries());
-  EXPECT_FALSE(r.isInterleaved());
-  EXPECT_FALSE(r.isInterleaved(0));
-  EXPECT_FALSE(r.isMetadataComplete());
-  EXPECT_EQ(512U, r.getOptimalTileWidth(0));
-  EXPECT_EQ(std::min((1024U * 1024U) / (512U * r.getRGBChannelCount(0) * ::ome::files::bytesPerPixel(params.type)),
-                     dimension_size_type(1024U)),
-            r.getOptimalTileHeight(0));
-  EXPECT_EQ(512U, r.getOptimalTileWidth(1));
-  EXPECT_EQ(std::min((1024U * 1024U) / (512U * r.getRGBChannelCount(1) * ::ome::files::bytesPerPixel(params.type)),
-                     dimension_size_type(1024U)),
-            r.getOptimalTileHeight(1));
-  EXPECT_EQ(512U, r.getOptimalTileWidth());
-  EXPECT_EQ(std::min((1024U * 1024U) / (512U * r.getRGBChannelCount(1) * ::ome::files::bytesPerPixel(params.type)),
-                     dimension_size_type(1024U)),
-            r.getOptimalTileHeight());
-  EXPECT_EQ(1U, r.getResolutionCount());
-}
-
-TEST_P(FormatReaderTest, SubresolutionFlattenedCoreMetadata)
-{
-  const FormatReaderTestParameters& params(GetParam());
-
-  EXPECT_NO_THROW(r.setFlattenedResolutions(true));
-  r.setId("subres");
-
-  EXPECT_EQ(200U, r.getImageCount());
-  EXPECT_FALSE(r.isRGB(0));
-  EXPECT_TRUE(r.isRGB(1));
-  EXPECT_EQ(512U, r.getSizeX());
-  EXPECT_EQ(1024U, r.getSizeY());
-  EXPECT_EQ(20U, r.getSizeZ());
-  EXPECT_EQ(5U, r.getSizeT());
-  EXPECT_EQ(4U, r.getSizeC());
-  EXPECT_EQ(params.type, r.getPixelType());
-  EXPECT_EQ(::ome::files::bitsPerPixel(params.type), r.getBitsPerPixel());
-  EXPECT_EQ(2U, r.getEffectiveSizeC());
-  EXPECT_EQ(1U, r.getRGBChannelCount(0));
-  EXPECT_EQ(3U, r.getRGBChannelCount(1));
-  EXPECT_FALSE(r.isIndexed());
-  EXPECT_TRUE(r.isFalseColor());
-  EXPECT_NO_THROW(r.getModuloZ());
-  EXPECT_NO_THROW(r.getModuloT());
-  EXPECT_NO_THROW(r.getModuloC());
-  EXPECT_EQ(5U, r.getModuloZ().size());
-  EXPECT_EQ(1U, r.getModuloT().size());
-  EXPECT_EQ(1U, r.getModuloC().size());
-  EXPECT_EQ(64U, r.getThumbSizeX());
-  EXPECT_EQ(128U, r.getThumbSizeY());
-  EXPECT_EQ(params.endian == ::ome::files::ENDIAN_LITTLE, r.isLittleEndian());
-  EXPECT_EQ(std::string("XYZTC"), r.getDimensionOrder());
-  EXPECT_TRUE(r.isOrderCertain());
-  EXPECT_FALSE(r.isThumbnailSeries());
-  EXPECT_FALSE(r.isInterleaved());
-  EXPECT_FALSE(r.isInterleaved(0));
-  EXPECT_FALSE(r.isMetadataComplete());
-  EXPECT_EQ(512U, r.getOptimalTileWidth(0));
-  EXPECT_EQ(std::min((1024U * 1024U) / (512U * r.getRGBChannelCount(0) * ::ome::files::bytesPerPixel(params.type)),
-                     dimension_size_type(1024U)),
-            r.getOptimalTileHeight(0));
-  EXPECT_EQ(512U, r.getOptimalTileWidth(1));
-  EXPECT_EQ(std::min((1024U * 1024U) / (512U * r.getRGBChannelCount(1) * ::ome::files::bytesPerPixel(params.type)),
-                     dimension_size_type(1024U)),
-            r.getOptimalTileHeight(1));
-  EXPECT_EQ(512U, r.getOptimalTileWidth());
-  EXPECT_EQ(std::min((1024U * 1024U) / (512U * r.getRGBChannelCount(1) * ::ome::files::bytesPerPixel(params.type)),
-                     dimension_size_type(1024U)),
-            r.getOptimalTileHeight());
-  EXPECT_EQ(1U, r.getResolutionCount());
-}
-
-TEST_P(FormatReaderTest, SubresolutionUnflattenedCoreMetadata)
-{
-  const FormatReaderTestParameters& params(GetParam());
-
-  EXPECT_NO_THROW(r.setFlattenedResolutions(false));
   r.setId("subres");
 
   EXPECT_EQ(200U, r.getImageCount());
@@ -555,9 +452,9 @@ TEST_P(FormatReaderTest, DefaultLUT)
   EXPECT_THROW(r.getLookupTable(0U, buf), std::logic_error);
 }
 
-TEST_P(FormatReaderTest, FlatLUT)
+TEST_P(FormatReaderTest, BasicLUT)
 {
-  r.setId("flat");
+  r.setId("basic");
 
   VariantPixelBuffer buf;
   EXPECT_THROW(r.getLookupTable(0U, buf), std::runtime_error);
@@ -635,9 +532,9 @@ struct moddims
   }
 };
 
-TEST_P(FormatReaderTest, FlatSeries)
+TEST_P(FormatReaderTest, BasicSeries)
 {
-  r.setId("flat");
+  r.setId("basic");
 
   EXPECT_EQ(4U, r.getSeriesCount());
   EXPECT_NO_THROW(r.setSeries(0));
@@ -732,40 +629,8 @@ TEST_P(FormatReaderTest, FlatSeries)
     }
 }
 
-TEST_P(FormatReaderTest, SubresolutionFlattenedSeries)
+TEST_P(FormatReaderTest, SubresolutionSeries)
 {
-  EXPECT_NO_THROW(r.setFlattenedResolutions(true));
-  r.setId("subres");
-
-  EXPECT_EQ(9U, r.getSeriesCount());
-  EXPECT_NO_THROW(r.setSeries(0));
-  EXPECT_EQ(0U, r.getSeries());
-  EXPECT_EQ(0U, r.seriesToCoreIndex(0));
-  EXPECT_EQ(0U, r.coreIndexToSeries(0));
-  EXPECT_EQ(0U, r.getCoreIndex());
-  EXPECT_NO_THROW(r.setCoreIndex(0));
-  EXPECT_EQ(1U, r.getResolutionCount());
-  EXPECT_EQ(0U, r.getResolution());
-  EXPECT_NO_THROW(r.setResolution(0));
-
-  EXPECT_EQ(0U, r.getIndex(0, 0, 0));
-  EXPECT_EQ(0U, r.getIndex(0, 0, 0, 0, 0, 0));
-  std::array<dimension_size_type, 3> coords;
-  coords[0] = coords[1] = coords[2] = 0;
-  std::array<dimension_size_type, 6> modcoords;
-  modcoords[0] = modcoords[1] = modcoords[2] = modcoords[3] = modcoords[4] = modcoords[5] = 0;
-
-  // EXPECT_EQ should work here, but fails for Boost 1.42; works
-  // in 1.46.
-  dim ncoords = r.getZCTCoords(0U);
-  EXPECT_TRUE(coords == ncoords);
-  moddim modncoords = r.getZCTModuloCoords(0U);
-  EXPECT_TRUE(modcoords == modncoords);
-}
-
-TEST_P(FormatReaderTest, SubresolutionUnflattenedSeries)
-{
-  EXPECT_NO_THROW(r.setFlattenedResolutions(false));
   r.setId("subres");
 
   EXPECT_EQ(5U, r.getSeriesCount());
@@ -802,14 +667,6 @@ TEST_P(FormatReaderTest, DefaultGroupFiles)
   EXPECT_EQ(FormatReader::CANNOT_GROUP, r.fileGroupOption("id"));
 }
 
-TEST_P(FormatReaderTest, DefaultFlatGroupFiles)
-{
-  EXPECT_TRUE(r.isGroupFiles());
-  EXPECT_NO_THROW(r.setGroupFiles(false));
-  EXPECT_FALSE(r.isGroupFiles());
-  EXPECT_EQ(FormatReader::CANNOT_GROUP, r.fileGroupOption("id"));
-}
-
 TEST_P(FormatReaderTest, DefaultProperties)
 {
   EXPECT_FALSE(r.isNormalized());
@@ -827,15 +684,11 @@ TEST_P(FormatReaderTest, DefaultProperties)
   EXPECT_EQ(domains, r.getPossibleDomains("id"));
 
   EXPECT_EQ(std::string("Single file"), r.getDatasetStructureDescription());
-
-  EXPECT_TRUE(r.hasFlattenedResolutions());
-  EXPECT_NO_THROW(r.setFlattenedResolutions(false));
-  EXPECT_FALSE(r.hasFlattenedResolutions());
 }
 
-TEST_P(FormatReaderTest, FlatProperties)
+TEST_P(FormatReaderTest, BasicProperties)
 {
-  r.setId("flat");
+  r.setId("basic");
 
   EXPECT_FALSE(r.isNormalized());
   EXPECT_THROW(r.setNormalized(true), std::logic_error);
@@ -851,37 +704,12 @@ TEST_P(FormatReaderTest, FlatProperties)
   EXPECT_EQ(domains, r.getPossibleDomains("id"));
 
   EXPECT_EQ(std::string("Single file"), r.getDatasetStructureDescription());
-
-  EXPECT_TRUE(r.hasFlattenedResolutions());
-  EXPECT_THROW(r.setFlattenedResolutions(false), std::logic_error);
-  EXPECT_TRUE(r.hasFlattenedResolutions());
 }
 
-TEST_P(FormatReaderTest, SubresolutionFlattenedProperties)
-{
-  EXPECT_NO_THROW(r.setNormalized(true));
-  EXPECT_NO_THROW(r.setOriginalMetadataPopulated(true));
-  EXPECT_NO_THROW(r.setFlattenedResolutions(true));
-  r.setId("subres");
-
-  EXPECT_TRUE(r.isNormalized());
-  EXPECT_TRUE(r.isOriginalMetadataPopulated());
-
-  std::vector<std::string> domains;
-  domains.push_back("Test domain");
-  EXPECT_EQ(domains, r.getDomains());
-  EXPECT_EQ(domains, r.getPossibleDomains("id"));
-
-  EXPECT_EQ(std::string("Single file"), r.getDatasetStructureDescription());
-
-  EXPECT_TRUE(r.hasFlattenedResolutions());
-}
-
-TEST_P(FormatReaderTest, SubresolutionUnflattenedProperties)
+TEST_P(FormatReaderTest, SubresolutionProperties)
 {
   EXPECT_NO_THROW(r.setNormalized(false));
   EXPECT_NO_THROW(r.setOriginalMetadataPopulated(false));
-  EXPECT_NO_THROW(r.setFlattenedResolutions(false));
   r.setId("subres");
 
   EXPECT_FALSE(r.isNormalized());
@@ -893,8 +721,6 @@ TEST_P(FormatReaderTest, SubresolutionUnflattenedProperties)
   EXPECT_EQ(domains, r.getPossibleDomains("id"));
 
   EXPECT_EQ(std::string("Single file"), r.getDatasetStructureDescription());
-
-  EXPECT_FALSE(r.hasFlattenedResolutions());
 }
 
 TEST_P(FormatReaderTest, UsedFiles)
@@ -930,9 +756,9 @@ TEST_P(FormatReaderTest, DefaultFile)
   EXPECT_THROW(r.isUsedFile(sample_path / "2012-06/multi-channel-z-series-time-series.ome.xml"), std::logic_error);
 }
 
-TEST_P(FormatReaderTest, FlatFile)
+TEST_P(FormatReaderTest, BasicFile)
 {
-  r.setId("flat");
+  r.setId("basic");
 
   EXPECT_TRUE(!!r.getCurrentFile());
 
@@ -962,10 +788,10 @@ TEST_P(FormatReaderTest, DefaultMetadata)
   EXPECT_TRUE(r.isMetadataFiltered());
 }
 
-TEST_P(FormatReaderTest, FlatMetadata)
+TEST_P(FormatReaderTest, BasicMetadata)
 {
   EXPECT_NO_THROW(r.setMetadataFiltered(true));
-  r.setId("flat");
+  r.setId("basic");
 
   EXPECT_THROW(r.getMetadataValue("Key"), ome::compat::bad_variant_access);
   EXPECT_EQ(r.getMetadataValue("Institution"), MetadataMap::value_type("University of Dundee"));
@@ -988,9 +814,9 @@ TEST_P(FormatReaderTest, DefaultMetadataStore)
   EXPECT_EQ(store, std::dynamic_pointer_cast<OMEXMLMetadata>(r.getMetadataStore()));
 }
 
-TEST_P(FormatReaderTest, FlatMetadataStore)
+TEST_P(FormatReaderTest, BasicMetadataStore)
 {
-  r.setId("flat");
+  r.setId("basic");
 
   std::shared_ptr<MetadataStore> store(std::make_shared<OMEXMLMetadata>());
 
@@ -1021,13 +847,13 @@ TEST_P(FormatReaderTest, DefaultPixels)
 namespace
 {
 
-  struct FlatPixelsTest
+  struct BasicPixelsTest
   {
     FormatReaderCustom& reader;
     VariantPixelBuffer& buf;
 
-    FlatPixelsTest(FormatReaderCustom& reader,
-                   VariantPixelBuffer& buf):
+    BasicPixelsTest(FormatReaderCustom& reader,
+                    VariantPixelBuffer& buf):
       reader(reader),
       buf(buf)
     {}
@@ -1077,14 +903,14 @@ namespace
 
 }
 
-TEST_P(FormatReaderTest, FlatPixels)
+TEST_P(FormatReaderTest, BasicPixels)
 {
-  r.setId("flat");
+  r.setId("basic");
 
   VariantPixelBuffer buf(boost::extents[512][512][1][1][2][1][1][1][1],
                          r.getPixelType());
 
-  FlatPixelsTest v(r, buf);
+  BasicPixelsTest v(r, buf);
   ome::compat::visit(v, buf.vbuffer());
 }
 
