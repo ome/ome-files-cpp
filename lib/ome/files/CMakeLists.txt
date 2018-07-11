@@ -62,6 +62,7 @@ set(OME_FILES_SOURCES
 
 set(OME_FILES_HEADERS
     CoreMetadata.h
+    CoreMetadataList.h
     FileInfo.h
     FormatException.h
     MetadataMap.h

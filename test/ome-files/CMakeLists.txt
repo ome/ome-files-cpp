@@ -75,6 +75,12 @@ if(BUILD_TESTS)
 
   ome_files_add_test(ome-files/metadatalist metadatalist)
 
+  add_executable(coremetadatalist coremetadatalist.cpp)
+  target_link_libraries(coremetadatalist OME::Files)
+  target_link_libraries(coremetadatalist ome-test)
+
+  ome_files_add_test(ome-files/coremetadatalist coremetadatalist)
+
   add_executable(metadatatools metadatatools.cpp)
   target_link_libraries(metadatatools OME::Files)
   target_link_libraries(metadatatools ome-test)
