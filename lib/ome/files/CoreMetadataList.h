@@ -37,7 +37,7 @@
 #include <ome/files/CoreMetadata.h>
 #include <ome/files/MetadataList.h>
 
-#include <iostream>
+#include <memory>
 
 namespace ome
 {
@@ -52,7 +52,7 @@ namespace ome
      * resolution is an index into the secondary list for a given
      * series.
      */
-    using CoreMetadataList = MetadataList<CoreMetadata>;
+    using CoreMetadataList = MetadataList<std::unique_ptr<CoreMetadata>>;
 
     /**
      * Order resolution levels in a CoreMetadataList.
@@ -69,10 +69,54 @@ namespace ome
         {
           std::sort(secondary.begin(), secondary.end(),
                     [](const auto& lhs, const auto& rhs)
-                    { return lhs.sizeX > rhs.sizeX ||
-                        lhs.sizeY > rhs.sizeY ||
-                        lhs.sizeZ > rhs.sizeZ; });
+                    {
+                      if (lhs == nullptr || rhs == nullptr)
+                        {
+                          throw std::logic_error("CoreMetadata can not be null");
+                        }
+                      return lhs->sizeX > rhs->sizeX ||
+                             lhs->sizeY > rhs->sizeY ||
+                             lhs->sizeZ > rhs->sizeZ;
+                    });
         }
+    }
+
+    /**
+     * Append the content of a CoreMetadataList to another.
+     *
+     * @param src the list to copy.
+     * @param dest the list to append the contents of @c src.
+     */
+    inline void
+    append(const CoreMetadataList& src,
+           CoreMetadataList&       dest)
+    {
+      for (const auto& secondary : src)
+        {
+          std::vector<std::unique_ptr<CoreMetadata>> s;
+          for (const auto& item: secondary)
+            {
+              if (item)
+                s.emplace_back(std::make_unique<CoreMetadata>(*item));
+              else
+                s.emplace_back(std::unique_ptr<CoreMetadata>());
+            }
+          dest.emplace_back(std::move(s));
+        }
+    }
+
+    /**
+     * Copy a CoreMetadataList.
+     *
+     * @param list the list to copy.
+     * @returns a new list.
+     */
+    inline CoreMetadataList
+    copy(const CoreMetadataList& list)
+    {
+      CoreMetadataList ret;
+      append(list, ret);
+      return ret;
     }
 
   }
