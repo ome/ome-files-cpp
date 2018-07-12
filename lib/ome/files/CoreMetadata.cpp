@@ -65,8 +65,7 @@ namespace ome
       falseColor(true),
       metadataComplete(true),
       seriesMetadata(),
-      thumbnail(false),
-      resolutionCount(1)
+      thumbnail(false)
     {
       sizeC.push_back(1U);
     }
@@ -93,8 +92,7 @@ namespace ome
       falseColor(copy.falseColor),
       metadataComplete(copy.metadataComplete),
       seriesMetadata(copy.seriesMetadata),
-      thumbnail(copy.thumbnail),
-      resolutionCount(copy.resolutionCount)
+      thumbnail(copy.thumbnail)
     {
     }
 

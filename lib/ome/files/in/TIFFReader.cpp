@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -114,7 +115,7 @@ namespace ome
               {
                 tiff::ImageJMetadata ijmeta(*ifd0);
 
-                std::shared_ptr<CoreMetadata> ijm(tiff::makeCoreMetadata(*ifd0));
+                auto ijm = tiff::makeCoreMetadata(*ifd0);
 
                 ijm->sizeZ = ijmeta.slices;
                 ijm->sizeT = ijmeta.frames;
@@ -123,7 +124,8 @@ namespace ome
                   ijm->sizeC.push_back(1U);
 
                 core.clear();
-                core.push_back(ijm);
+                core.resize(1);
+                core[0].emplace_back(std::move(ijm));
 
                 dimension_size_type images = 0;
                 for (TIFF::const_iterator i = tiff->begin();

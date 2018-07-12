@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -181,7 +182,7 @@ namespace ome
         core.clear();
 
         std::shared_ptr<const tiff::IFD> prev_ifd;
-        std::shared_ptr<CoreMetadata> prev_core;
+        std::unique_ptr<CoreMetadata> current_core = nullptr;
 
         dimension_size_type current_ifd = 0U;
 
@@ -194,16 +195,20 @@ namespace ome
             // in the preceding IFD, then this is a following
             // timepoint in a series.  Otherwise, a new series is
             // started.
-            if (prev_core && prev_ifd && compare_ifd(*prev_ifd, **i))
+            if (current_core && prev_ifd && compare_ifd(*prev_ifd, **i))
               {
-                ++prev_core->sizeT;
-                prev_core->imageCount = prev_core->sizeT;
+                ++current_core->sizeT;
+                current_core->imageCount = current_core->sizeT;
                 ++(seriesIFDRange.back().end);
               }
             else
               {
-                prev_core = makeCoreMetadata(**i);
-                core.push_back(prev_core);
+                if (current_core)
+                  {
+                    core.push_back({});
+                    core.back().emplace_back(std::move(current_core));
+                  }
+                current_core = makeCoreMetadata(**i);
 
                 tiff::IFDRange range;
                 range.filename = *currentId;
@@ -213,6 +218,12 @@ namespace ome
                 seriesIFDRange.push_back(range);
               }
             prev_ifd = *i;
+          }
+
+        if (current_core)
+          {
+            core.push_back({});
+            core.back().emplace_back(std::move(current_core));
           }
       }
 

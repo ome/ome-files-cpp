@@ -145,10 +145,10 @@ protected:
     return in == "Valid file content\n";
   }
 
-  std::shared_ptr<CoreMetadata>
+  std::unique_ptr<CoreMetadata>
   makeCore()
   {
-    std::shared_ptr<CoreMetadata> c(std::make_shared<CoreMetadata>());
+    auto c = std::make_unique<CoreMetadata>();
 
     c->sizeX = 512;
     c->sizeY = 1024;
@@ -169,7 +169,6 @@ protected:
     c->falseColor = true;
     c->metadataComplete = false;
     c->thumbnail = false;
-    c->resolutionCount = 1;
     c->moduloZ.start = 0.0f;
     c->moduloZ.end = 8.0f;
     c->moduloZ.step = 2.0f;
@@ -201,40 +200,27 @@ protected:
 
         // 4 series
         core.clear();
-        core.push_back(makeCore());
-        core.back()->seriesMetadata["Organism"] = "Mus musculus";
-        core.push_back(makeCore());
-        core.push_back(makeCore());
-        core.push_back(makeCore());
+        core.resize(4);
+        core[0].emplace_back(makeCore());
+        core[0].back()->seriesMetadata["Organism"] = "Mus musculus";
+        core[1].emplace_back(makeCore());
+        core[2].emplace_back(makeCore());
+        core[3].emplace_back(makeCore());
       }
     else if (id == "subres")
       {
         // 5 series, 3 with subresolutions
         core.clear();
-        {
-          std::shared_ptr<CoreMetadata> c(makeCore());
-          c->resolutionCount = 3;
-          core.push_back(c);
-          core.push_back(makeCore());
-          core.push_back(makeCore());
-        }
-
-        {
-          std::shared_ptr<CoreMetadata> c(makeCore());
-          c->resolutionCount = 2;
-          core.push_back(c);
-          core.push_back(makeCore());
-        }
-
-        core.push_back(makeCore());
-        core.push_back(makeCore());
-
-        {
-          std::shared_ptr<CoreMetadata> c(makeCore());
-          c->resolutionCount = 2;
-          core.push_back(c);
-          core.push_back(makeCore());
-        }
+        core.resize(5);
+        core[0].emplace_back(makeCore());
+        core[0].emplace_back(makeCore());
+        core[0].emplace_back(makeCore());
+        core[1].emplace_back(makeCore());
+        core[1].emplace_back(makeCore());
+        core[2].emplace_back(makeCore());
+        core[3].emplace_back(makeCore());
+        core[4].emplace_back(makeCore());
+        core[4].emplace_back(makeCore());
       }
   }
 

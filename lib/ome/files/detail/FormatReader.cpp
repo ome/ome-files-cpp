@@ -154,7 +154,9 @@ namespace ome
         metadata.clear();
 
         core.clear();
-        core.push_back(std::make_shared<CoreMetadata>());
+        core.resize(1);
+        core[0].emplace_back(std::make_unique<CoreMetadata>());
+
 
         // reinitialize the MetadataStore
         // NB: critical for metadata conversion to work properly!
@@ -483,7 +485,7 @@ namespace ome
       FormatReader::getImageCount() const
       {
         assertId(currentId, true);
-        return getCoreMetadata(getCoreIndex()).imageCount;
+        return getCoreMetadata(getSeries(), getResolution()).imageCount;
       }
 
       bool
@@ -497,28 +499,28 @@ namespace ome
       FormatReader::getSizeX() const
       {
         assertId(currentId, true);
-        return getCoreMetadata(getCoreIndex()).sizeX;
+        return getCoreMetadata(getSeries(), getResolution()).sizeX;
       }
 
       dimension_size_type
       FormatReader::getSizeY() const
       {
         assertId(currentId, true);
-        return getCoreMetadata(getCoreIndex()).sizeY;
+        return getCoreMetadata(getSeries(), getResolution()).sizeY;
       }
 
       dimension_size_type
       FormatReader::getSizeZ() const
       {
         assertId(currentId, true);
-        return getCoreMetadata(getCoreIndex()).sizeZ;
+        return getCoreMetadata(getSeries(), getResolution()).sizeZ;
       }
 
       dimension_size_type
       FormatReader::getSizeT() const
       {
         assertId(currentId, true);
-        return getCoreMetadata(getCoreIndex()).sizeT;
+        return getCoreMetadata(getSeries(), getResolution()).sizeT;
       }
 
       dimension_size_type
@@ -526,7 +528,7 @@ namespace ome
       {
         assertId(currentId, true);
 
-        const std::vector<dimension_size_type>& c(getCoreMetadata(getCoreIndex()).sizeC);
+        const std::vector<dimension_size_type>& c(getCoreMetadata(getSeries(), getResolution()).sizeC);
 
         return std::accumulate(c.begin(), c.end(), dimension_size_type(0));
       }
@@ -535,51 +537,51 @@ namespace ome
       FormatReader::getPixelType() const
       {
         assertId(currentId, true);
-        return getCoreMetadata(getCoreIndex()).pixelType;
+        return getCoreMetadata(getSeries(), getResolution()).pixelType;
       }
 
       pixel_size_type
       FormatReader::getBitsPerPixel() const
       {
         assertId(currentId, true);
-        if (getCoreMetadata(getCoreIndex()).bitsPerPixel == 0) {
+        if (getCoreMetadata(getSeries(), getResolution()).bitsPerPixel == 0) {
           return bitsPerPixel(getPixelType());
           /**
            * @todo: Move this logic into a CoreMetadata accessor. Why
            * are we modifying coremetadata during an explicitly
            * nonmodifying operation??
            */
-          //   getCoreMetadata(getCoreIndex()).bitsPerPixel =
+          //   getCoreMetadata(getSeries(), getResolution()).bitsPerPixel =
           //   FormatTools.getBytesPerPixel(getPixelType()) * 8;
         }
-        return getCoreMetadata(getCoreIndex()).bitsPerPixel;
+        return getCoreMetadata(getSeries(), getResolution()).bitsPerPixel;
       }
 
       dimension_size_type
       FormatReader::getEffectiveSizeC() const
       {
-        return getCoreMetadata(getCoreIndex()).sizeC.size();
+        return getCoreMetadata(getSeries(), getResolution()).sizeC.size();
       }
 
       dimension_size_type
       FormatReader::getRGBChannelCount(dimension_size_type channel) const
       {
         assertId(currentId, true);
-        return getCoreMetadata(getCoreIndex()).sizeC.at(channel);
+        return getCoreMetadata(getSeries(), getResolution()).sizeC.at(channel);
       }
 
       bool
       FormatReader::isIndexed() const
       {
         assertId(currentId, true);
-        return getCoreMetadata(getCoreIndex()).indexed;
+        return getCoreMetadata(getSeries(), getResolution()).indexed;
       }
 
       bool
       FormatReader::isFalseColor() const
       {
         assertId(currentId, true);
-        return getCoreMetadata(getCoreIndex()).falseColor;
+        return getCoreMetadata(getSeries(), getResolution()).falseColor;
       }
 
       void
@@ -594,37 +596,37 @@ namespace ome
       Modulo&
       FormatReader::getModuloZ()
       {
-        return getCoreMetadata(getCoreIndex()).moduloZ;
+        return getCoreMetadata(getSeries(), getResolution()).moduloZ;
       }
 
       const Modulo&
       FormatReader::getModuloZ() const
       {
-        return getCoreMetadata(getCoreIndex()).moduloZ;
+        return getCoreMetadata(getSeries(), getResolution()).moduloZ;
       }
 
       Modulo&
       FormatReader::getModuloT()
       {
-        return getCoreMetadata(getCoreIndex()).moduloT;
+        return getCoreMetadata(getSeries(), getResolution()).moduloT;
       }
 
       const Modulo&
       FormatReader::getModuloT() const
       {
-        return getCoreMetadata(getCoreIndex()).moduloT;
+        return getCoreMetadata(getSeries(), getResolution()).moduloT;
       }
 
       Modulo&
       FormatReader::getModuloC()
       {
-        return getCoreMetadata(getCoreIndex()).moduloC;
+        return getCoreMetadata(getSeries(), getResolution()).moduloC;
       }
 
       const Modulo&
       FormatReader::getModuloC() const
       {
-        return getCoreMetadata(getCoreIndex()).moduloC;
+        return getCoreMetadata(getSeries(), getResolution()).moduloC;
       }
 
       std::array<dimension_size_type, 2>
@@ -633,8 +635,8 @@ namespace ome
         assertId(currentId, true);
 
         std::array<dimension_size_type, 2> ret;
-        ret[0] = getCoreMetadata(getCoreIndex()).thumbSizeX;
-        ret[1] = getCoreMetadata(getCoreIndex()).thumbSizeY;
+        ret[0] = getCoreMetadata(getSeries(), getResolution()).thumbSizeX;
+        ret[1] = getCoreMetadata(getSeries(), getResolution()).thumbSizeY;
 
         if (ret[0] == 0 || ret[1] == 0)
           {
@@ -687,28 +689,28 @@ namespace ome
       FormatReader::isLittleEndian() const
       {
         assertId(currentId, true);
-        return getCoreMetadata(getCoreIndex()).littleEndian;
+        return getCoreMetadata(getSeries(), getResolution()).littleEndian;
       }
 
       const std::string&
       FormatReader::getDimensionOrder() const
       {
         assertId(currentId, true);
-        return getCoreMetadata(getCoreIndex()).dimensionOrder;
+        return getCoreMetadata(getSeries(), getResolution()).dimensionOrder;
       }
 
       bool
       FormatReader::isOrderCertain() const
       {
         assertId(currentId, true);
-        return getCoreMetadata(getCoreIndex()).orderCertain;
+        return getCoreMetadata(getSeries(), getResolution()).orderCertain;
       }
 
       bool
       FormatReader::isThumbnailSeries() const
       {
         assertId(currentId, true);
-        return getCoreMetadata(getCoreIndex()).thumbnail;
+        return getCoreMetadata(getSeries(), getResolution()).thumbnail;
       }
 
       bool
@@ -721,7 +723,7 @@ namespace ome
       FormatReader::isInterleaved(dimension_size_type /* subC */) const
       {
         assertId(currentId, true);
-        return getCoreMetadata(getCoreIndex()).interleaved;
+        return getCoreMetadata(getSeries(), getResolution()).interleaved;
       }
 
       void
@@ -772,7 +774,7 @@ namespace ome
       FormatReader::getSeriesCount() const
       {
         assertId(currentId, true);
-        return coreIndexToSeries(core.size() - 1) + 1;
+        return core.size();
       }
 
       void
@@ -836,7 +838,7 @@ namespace ome
       FormatReader::isMetadataComplete() const
       {
         assertId(currentId, true);
-        return getCoreMetadata(getCoreIndex()).metadataComplete;
+        return getCoreMetadata(getSeries(), getResolution()).metadataComplete;
       }
 
       void
@@ -1033,10 +1035,10 @@ namespace ome
       FormatReader::getSeriesMetadata() const
       {
         assertId(currentId, true);
-        return getCoreMetadata(getCoreIndex()).seriesMetadata;
+        return getCoreMetadata(getSeries(), getResolution()).seriesMetadata;
       }
 
-      const std::vector<std::shared_ptr<::ome::files::CoreMetadata>>&
+      const CoreMetadataList&
       FormatReader::getCoreMetadataList() const
       {
         assertId(currentId, true);
@@ -1186,21 +1188,14 @@ namespace ome
         else
           {
             dimension_size_type idx = 0;
-            for (coremetadata_list_type::const_iterator i = core.begin();
-                 i != core.end();
+            for (auto i = core.cbegin();
+                 i != core.cend();
                  ++i, ++idx)
               {
                 if (series == idx)
                   break;
 
-                if (*i)
-                  index += (*i)->resolutionCount;
-                else
-                  {
-                    boost::format fmt("Invalid series (null core[%1%]): %2%");
-                    fmt % idx % series;
-                    throw std::logic_error(fmt.str());
-                  }
+                index += i->size();
 
                 if (index >= core.size())
                   {
@@ -1241,22 +1236,12 @@ namespace ome
             // Convert from non-flattened coreIndex to flattened series
             dimension_size_type idx = 0;
 
-            for (coremetadata_list_type::size_type i = 0; i < index;)
+            for (const auto& resolutions : core)
               {
-                const coremetadata_list_type::value_type& v(core.at(i));
-                if (v)
-                  {
-                    dimension_size_type nextSeries = i + v->resolutionCount;
-                    if (index < nextSeries)
-                      break;
-                    i = nextSeries;
-                  }
-                else
-                  {
-                    boost::format fmt("Invalid series (null core[%1%]): %2%");
-                    fmt % idx % series;
-                    throw std::logic_error(fmt.str());
-                  }
+                dimension_size_type nextSeries = idx + resolutions.size();
+                if (index < nextSeries)
+                  break;
+                idx = nextSeries;
                 ++series;
               }
           }
@@ -1268,7 +1253,7 @@ namespace ome
       {
         assertId(currentId, true);
 
-        return core.at(seriesToCoreIndex(getSeries()))->resolutionCount;
+        return core.at(getSeries()).size();
       }
 
       void

@@ -147,14 +147,6 @@ namespace ome
       /// Is this series is a lower-resolution copy of another series?
       bool thumbnail;
 
-      /**
-       *  Sub-resolution count.  The number of images following this
-       *  image which are sub-sampled lower resolution copies of this
-       *  image.  The count includes this image, so an image with two
-       *  following sub-resolution images will have a count of @c 3 .
-       */
-      dimension_size_type resolutionCount;
-
       /// Constructor.
       CoreMetadata();
 
@@ -234,8 +226,7 @@ namespace ome
          << "falseColor = " << core.falseColor << '\n'
          << "metadataComplete = " << core.metadataComplete << '\n'
          << "seriesMetadata = " << core.seriesMetadata.size() << " keys" << '\n'
-         << "thumbnail = " << core.thumbnail << '\n'
-         << "resolutionCount = " << core.resolutionCount << '\n';
+         << "thumbnail = " << core.thumbnail << '\n';
       return os;
     }
 

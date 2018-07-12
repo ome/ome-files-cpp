@@ -109,9 +109,6 @@ namespace ome
                            virtual public ::ome::files::FormatHandler
       {
       protected:
-        /// List type for storing CoreMetadata.
-        typedef std::vector<std::shared_ptr<::ome::files::CoreMetadata>> coremetadata_list_type;
-
         /// Reader properties specific to the derived file format.
         const ReaderProperties& readerProperties;
 
@@ -149,7 +146,7 @@ namespace ome
         mutable dimension_size_type plane;
 
         /// Core metadata values.
-        coremetadata_list_type core;
+        CoreMetadataList core;
 
         /**
          * The number of the current resolution.
@@ -315,34 +312,39 @@ namespace ome
         makeFilterMetadata();
 
         /**
-         * Get CoreMetadata by core index.
+         * Get CoreMetadata by series and resolution.
          *
-         * @param index the core index.
+         * @param series the series index.
+         * @param resolution the resolution index.
          * @returns the CoreMetadata.
-         * @throws std::range_error if the core index is invalid.
+         * @throws std::range_error if the series or resolution
+         * indexes are invalid.
          * @throws std::logic_error if the metadata is null.
          */
         const CoreMetadata&
-        getCoreMetadata(dimension_size_type index) const
+        getCoreMetadata(dimension_size_type series,
+                        dimension_size_type resolution) const
         {
-          coremetadata_list_type::value_type cm(core.at(index));
+          const auto& cm = core.at(series).at(resolution);
           if (!cm)
             throw std::logic_error("CoreMetadata null");
           return *cm;
         }
 
         /**
-         * Get CoreMetadata by core index.
+         * Get CoreMetadata by series and resolution.
          *
-         * @param index the core index.
+         * @param series the series index.
+         * @param resolution the resolution index.
          * @returns the CoreMetadata.
          * @throws std::range_error if the core index is invalid.
          * @throws std::logic_error if the metadata is null.
          */
         CoreMetadata&
-        getCoreMetadata(dimension_size_type index)
+        getCoreMetadata(dimension_size_type series,
+                        dimension_size_type resolution)
         {
-          coremetadata_list_type::value_type cm(core.at(index));
+          auto& cm = core.at(series).at(resolution);
           if (!cm)
             throw std::logic_error("CoreMetadata null");
           return *cm;
@@ -690,7 +692,7 @@ namespace ome
         getZCTModuloCoords(dimension_size_type index) const;
 
         // Documented in superclass.
-        const std::vector<std::shared_ptr<::ome::files::CoreMetadata>>&
+        const CoreMetadataList&
         getCoreMetadataList() const;
 
         // Documented in superclass.

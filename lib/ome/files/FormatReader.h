@@ -50,6 +50,7 @@
 #include <ome/compat/memory.h>
 
 #include <ome/files/CoreMetadata.h>
+#include <ome/files/CoreMetadataList.h>
 #include <ome/files/FileInfo.h>
 #include <ome/files/FormatHandler.h>
 #include <ome/files/MetadataConfigurable.h>
@@ -950,7 +951,7 @@ namespace ome
        * @returns a const reference to the core metadata.
        */
       virtual
-      const std::vector<std::shared_ptr<CoreMetadata>>&
+      const CoreMetadataList&
       getCoreMetadataList() const = 0;
 
       /**
