@@ -152,19 +152,23 @@ namespace ome
           std::vector<dimension_size_type> tileHeight;
           /// Per-plane data.
           std::vector<OMETIFFPlane> tiffPlanes;
+          /// SUBIFD index (set for sub-resolutions).
+          boost::optional<int> subResolutionOffset;
 
           OMETIFFMetadata():
             CoreMetadata(),
             tileWidth(),
             tileHeight(),
-            tiffPlanes()
+            tiffPlanes(),
+            subResolutionOffset()
           {}
 
           OMETIFFMetadata(const OMETIFFMetadata& copy):
             CoreMetadata(copy),
             tileWidth(copy.tileWidth),
             tileHeight(copy.tileHeight),
-            tiffPlanes(copy.tiffPlanes)
+            tiffPlanes(copy.tiffPlanes),
+            subResolutionOffset(copy.subResolutionOffset)
           {}
 
         };
@@ -499,7 +503,7 @@ namespace ome
         core.clear();
         core.resize(seriesCount);
         for (index_type i = 0; i < seriesCount; ++i)
-          core[0].emplace_back(std::make_unique<OMETIFFMetadata>());
+          core[i].emplace_back(std::make_unique<OMETIFFMetadata>());
 
         // UUID → file mapping and used files.
         findUsedFiles(*meta, *currentId, dir, currentUUID);
