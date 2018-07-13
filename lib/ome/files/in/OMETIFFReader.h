@@ -395,6 +395,14 @@ namespace ome
         void
         initCompanionFile();
 
+        /**
+         * Check if the metadata contains any plates.
+         *
+         * @param meta the metadata store to check.
+         */
+        void
+        checkSPW(ome::xml::meta::OMEXMLMetadata& meta);
+
       public:
         /**
          * Get a MetadataStore suitable for writing.
