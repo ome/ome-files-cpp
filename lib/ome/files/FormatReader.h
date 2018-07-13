@@ -90,8 +90,8 @@ namespace ome
        * Sentry for saving and restoring reader series state.
        *
        * For any FormatReader method or subclass method which needs to
-       * set and later restore the series/coreIndex/resolution as part
-       * of its operation, this class exists to manage the safe
+       * set and later restore the series/resolution/plane indexes as
+       * part of its operation, this class exists to manage the safe
        * restoration of the state.  Create an instance of this class
        * with the reader set to @c *this.  When the instance goes out
        * of scope, e.g. at the end of a block or method, or when an
@@ -103,8 +103,10 @@ namespace ome
       private:
         /// Reader for which the state will be saved and restored.
         const FormatReader& reader;
-        /// Saved core index.
-        dimension_size_type coreIndex;
+        /// Saved series index.
+        dimension_size_type series;
+        /// Saved resolution index.
+        dimension_size_type resolution;
         /// Saved plane index.
         dimension_size_type plane;
 
@@ -116,7 +118,8 @@ namespace ome
          */
         SaveSeries(const FormatReader& reader):
           reader(reader),
-          coreIndex(reader.getCoreIndex()),
+          series(reader.getSeries()),
+          resolution(reader.getResolution()),
           plane(reader.getPlane())
         {}
 
@@ -129,8 +132,10 @@ namespace ome
         {
           try
             {
-              if (coreIndex != reader.getCoreIndex())
-                reader.setCoreIndex(coreIndex);
+              if (series != reader.getSeries())
+                reader.setSeries(series);
+              if (resolution != reader.getResolution())
+                reader.setResolution(resolution);
               if (plane != reader.getPlane())
                 reader.setPlane(plane);
             }
@@ -1157,52 +1162,6 @@ namespace ome
       getOptimalTileHeight() const = 0;
 
       // Sub-resolution API methods
-
-      /**
-       * Get the first core index corresponding to the specified series.
-       *
-       * @param series the series to use.
-       * @returns the first for index for the series.
-       */
-      virtual
-      dimension_size_type
-      seriesToCoreIndex(dimension_size_type series) const = 0;
-
-      /**
-       * Get the series corresponding to the specified core index.
-       *
-       * @param index the core index to use.
-       * @returns the series for the index.
-       */
-      virtual
-      dimension_size_type
-      coreIndexToSeries(dimension_size_type index) const = 0;
-
-      /**
-       * Get the CoreMetadata index of the current resolution/series.
-       *
-       * @returns the index.
-       */
-      virtual
-      dimension_size_type
-      getCoreIndex() const = 0;
-
-      /**
-       * Set the current resolution/series (ignoring sub-resolutions).
-       *
-       * Equivalent to setSeries(), but with flattened resolutions always
-       * set to @c false.
-       *
-       * @param index the core index to set.
-       *
-       * @todo Remove use of stateful API which requires use of
-       * series switching in const methods.
-       *
-       * @throws std::logic_error if the index is invalid.
-       */
-      virtual
-      void
-      setCoreIndex(dimension_size_type index) const = 0;
 
       /**
        * Get the number of resolutions for the current series.

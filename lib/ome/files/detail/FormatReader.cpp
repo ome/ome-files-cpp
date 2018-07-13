@@ -83,11 +83,10 @@ namespace ome
         currentId(boost::none),
         in(),
         metadata(),
-        coreIndex(0),
         series(0),
+        resolution(0),
         plane(0),
         core(),
-        resolution(0),
         suffixNecessary(true),
         suffixSufficient(true),
         companionFiles(false),
@@ -147,8 +146,7 @@ namespace ome
               if (id == file) return;
           }
 
-        coreIndex = 0;
-        series = 0;
+        series = resolution = plane = 0;
         close();
         currentId = id;
         metadata.clear();
@@ -765,7 +763,7 @@ namespace ome
         if (!fileOnly)
           {
             currentId = boost::none;
-            coreIndex = series = resolution = plane = 0;
+            series = resolution = plane = 0;
             core.clear();
           }
       }
@@ -780,7 +778,12 @@ namespace ome
       void
       FormatReader::setSeries(dimension_size_type series) const
       {
-        this->coreIndex = seriesToCoreIndex(series);
+        if (series >= getSeriesCount())
+          {
+            boost::format fmt("Invalid series: %1%");
+            fmt % series;
+            throw std::logic_error(fmt.str());
+          }
         this->series = series;
         this->resolution = 0;
         this->plane = 0;
@@ -1170,85 +1173,6 @@ namespace ome
       }
 
       dimension_size_type
-      FormatReader::seriesToCoreIndex(dimension_size_type series) const
-      {
-        dimension_size_type index = 0;
-
-        if (series >= core.size())
-          {
-            boost::format fmt("Invalid series: %1%");
-            fmt % series;
-            throw std::logic_error(fmt.str());
-          }
-        if (this->series == series)
-          {
-            // Use corresponding coreIndex
-            index = coreIndex - resolution;
-          }
-        else
-          {
-            dimension_size_type idx = 0;
-            for (auto i = core.cbegin();
-                 i != core.cend();
-                 ++i, ++idx)
-              {
-                if (series == idx)
-                  break;
-
-                index += i->size();
-
-                if (index >= core.size())
-                  {
-                    boost::format fmt("Invalid series: %1%, coreIndex=%2%");
-                    fmt % series % index;
-                    throw std::logic_error(fmt.str());
-                  }
-              }
-            if (series != idx)
-              {
-                boost::format fmt("Invalid series: %1%");
-                fmt % series;
-                throw std::logic_error(fmt.str());
-              }
-          }
-
-        return index;
-      }
-
-      dimension_size_type
-      FormatReader::coreIndexToSeries(dimension_size_type index) const
-      {
-        dimension_size_type series = 0;
-
-        if (core.size() == 0)
-          {
-            boost::format fmt("Invalid index: %1%");
-            fmt % index;
-            throw std::logic_error(fmt.str());
-          }
-        if (coreIndex == index)
-          {
-            // Use corresponding series
-            series = this->series;
-          }
-        else
-          {
-            // Convert from non-flattened coreIndex to flattened series
-            dimension_size_type idx = 0;
-
-            for (const auto& resolutions : core)
-              {
-                dimension_size_type nextSeries = idx + resolutions.size();
-                if (index < nextSeries)
-                  break;
-                idx = nextSeries;
-                ++series;
-              }
-          }
-        return series;
-      }
-
-      dimension_size_type
       FormatReader::getResolutionCount() const
       {
         assertId(currentId, true);
@@ -1265,7 +1189,6 @@ namespace ome
             fmt % resolution;
             throw std::logic_error(fmt.str());
           }
-        this->coreIndex = seriesToCoreIndex(getSeries()) + resolution;
         // this->series unchanged.
         this->resolution = resolution;
         this->plane = 0;
@@ -1275,27 +1198,6 @@ namespace ome
       FormatReader::getResolution() const
       {
         return resolution;
-      }
-
-      dimension_size_type
-      FormatReader::getCoreIndex() const
-      {
-        return coreIndex;
-      }
-
-      void
-      FormatReader::setCoreIndex(dimension_size_type index) const
-      {
-        if (index >= core.size())
-          {
-            boost::format fmt("Invalid core index: %1%");
-            fmt % index;
-            throw std::logic_error(fmt.str());
-          }
-        this->series = coreIndexToSeries(index);
-        this->coreIndex = index;
-        this->resolution = index - seriesToCoreIndex(this->series);
-        this->plane = 0;
       }
 
       void

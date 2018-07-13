@@ -122,14 +122,6 @@ namespace ome
         ::ome::files::MetadataMap metadata;
 
         /**
-         * The number of the current series (flattened).
-         *
-         * @todo Remove use of stateful API which requires use of
-         * series switching in const methods.
-         */
-        mutable dimension_size_type coreIndex;
-
-        /**
          * The number of the current series (non-flattened).
          *
          * @todo Remove use of stateful API which requires use of
@@ -758,22 +750,6 @@ namespace ome
         // Documented in superclass.
         dimension_size_type
         getOptimalTileHeight() const;
-
-        // Documented in superclass.
-        dimension_size_type
-        seriesToCoreIndex(dimension_size_type series) const;
-
-        // Documented in superclass.
-        dimension_size_type
-        coreIndexToSeries(dimension_size_type index) const;
-
-        // Documented in superclass.
-        dimension_size_type
-        getCoreIndex() const;
-
-        // Documented in superclass.
-        void
-        setCoreIndex(dimension_size_type index) const;
 
         // Documented in superclass.
         dimension_size_type

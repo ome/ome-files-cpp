@@ -451,10 +451,6 @@ TEST_P(FormatReaderTest, DefaultSeries)
   EXPECT_THROW(r.getSeriesCount(), std::logic_error);
   EXPECT_THROW(r.setSeries(0), std::logic_error);
   EXPECT_EQ(0U, r.getSeries());
-  EXPECT_THROW(r.seriesToCoreIndex(0), std::logic_error);
-  EXPECT_THROW(r.coreIndexToSeries(0), std::logic_error);
-  EXPECT_EQ(0U, r.getCoreIndex());
-  EXPECT_THROW(r.setCoreIndex(0), std::logic_error);
   EXPECT_THROW(r.getResolutionCount(), std::logic_error);
   EXPECT_EQ(0U, r.getResolution());
   EXPECT_THROW(r.setResolution(0), std::logic_error);
@@ -525,10 +521,6 @@ TEST_P(FormatReaderTest, BasicSeries)
   EXPECT_EQ(4U, r.getSeriesCount());
   EXPECT_NO_THROW(r.setSeries(0));
   EXPECT_EQ(0U, r.getSeries());
-  EXPECT_EQ(0U, r.seriesToCoreIndex(0));
-  EXPECT_EQ(0U, r.coreIndexToSeries(0));
-  EXPECT_EQ(0U, r.getCoreIndex());
-  EXPECT_NO_THROW(r.setCoreIndex(0));
   EXPECT_EQ(1U, r.getResolutionCount());
   EXPECT_EQ(0U, r.getResolution());
   EXPECT_NO_THROW(r.setResolution(0));
@@ -622,10 +614,6 @@ TEST_P(FormatReaderTest, SubresolutionSeries)
   EXPECT_EQ(5U, r.getSeriesCount());
   EXPECT_NO_THROW(r.setSeries(0));
   EXPECT_EQ(0U, r.getSeries());
-  EXPECT_EQ(0U, r.seriesToCoreIndex(0));
-  EXPECT_EQ(0U, r.coreIndexToSeries(0));
-  EXPECT_EQ(0U, r.getCoreIndex());
-  EXPECT_NO_THROW(r.setCoreIndex(0));
   EXPECT_EQ(3U, r.getResolutionCount());
   EXPECT_EQ(0U, r.getResolution());
   EXPECT_NO_THROW(r.setResolution(0));
