@@ -426,18 +426,13 @@ namespace ome
       OMETIFFReader::initFile(const boost::filesystem::path& id)
       {
         detail::FormatReader::initFile(id);
+
         // Note: Use canonical currentId rather than non-canonical id after this point.
         path dir((*currentId).parent_path());
 
         if (checkSuffix(*currentId, companion_suffixes))
           {
-            // This is a companion file.  Read the metadata, get the
-            // TIFF for the TiffData for the first image, and then
-            // recurse with this file as the id.
-            std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> meta(createOMEXMLMetadata(*currentId));
-            path firstTIFF(path(meta->getUUIDFileName(0, 0)));
-            close(false); // To force clearing of currentId.
-            initFile(canonical(firstTIFF, dir));
+            initCompanionFile();
             return;
           }
 
@@ -1060,6 +1055,18 @@ namespace ome
             // The metadata store doesn't support getImageCount so we
             // can't meaningfully set anything.
           }
+      }
+
+      void
+      OMETIFFReader::initCompanionFile()
+      {
+        // This is a companion file.  Read the metadata, get the TIFF
+        // for the TiffData for the first image, and then recursively
+        // call initFile with this file as the id.
+        std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> meta(createOMEXMLMetadata(*currentId));
+        path firstTIFF(path(meta->getUUIDFileName(0, 0)));
+        close(false); // To force clearing of currentId.
+        initFile(canonical(firstTIFF, dir));
       }
 
       void
