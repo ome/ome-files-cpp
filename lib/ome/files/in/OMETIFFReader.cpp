@@ -1048,6 +1048,10 @@ namespace ome
             // The metadata store doesn't support getImageCount so we
             // can't meaningfully set anything.
           }
+
+        // Now all image series and TIFF files are discovered, attempt
+        // to add sub-resolutions.
+        addSubResolutions();
       }
 
       void
@@ -1384,6 +1388,36 @@ namespace ome
                   }
               }
           }
+      }
+
+      void
+      OMETIFFReader::addSubResolutions()
+      {
+        for (dimension_size_type s = 0; s < core.size(); ++s)
+          {
+            auto& c0 = dynamic_cast<OMETIFFMetadata&>(getCoreMetadata(s, 0));
+            const OMETIFFPlane& tiffplane(c0.tiffPlanes.at(0));
+            const std::shared_ptr<const TIFF> tiff(getTIFF(tiffplane.id));
+            if (!tiff)
+              continue;
+            auto ifd = tiff->getDirectoryByIndex(tiffplane.ifd);
+            std::vector<uint64_t> subifds;
+            try
+              {
+                ifd->getField(tiff::SUBIFD).get(subifds);
+                for (const auto& subifd_offset : subifds)
+                  {
+                    std::cerr << "IFD: " << subifd_offset << "\n";
+                    auto subifd = tiff->getDirectoryByIndex(subifd_offset);
+                  }
+              }
+            catch (const tiff::Exception&)
+              {
+                continue;
+              }
+
+          }
+        orderResolutions(core);
       }
 
       void

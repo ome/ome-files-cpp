@@ -383,6 +383,17 @@ namespace ome
         fixDimensions(ome::xml::meta::BaseMetadata::index_type series);
 
         /**
+         * Add additional sub-resolutions for each series.
+         *
+         * For each series, check if the first IFD of the series has a
+         * SUBIFDS tag.  If so, check the size and tilesize of each.
+         * It is assumed that any additional TIFF planes (IFDs) will
+         * follow the same layout.
+         */
+        void
+        addSubResolutions();
+
+        /**
          * Initialize the given companion file.
          *
          * Will call initFile() to process all referenced TIFF files.
