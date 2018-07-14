@@ -172,7 +172,7 @@ TEST_P(TIFFWriterTest, setId)
       {
         tiffreader.setSeries(i);
         const std::shared_ptr<CoreMetadata> ref = seriesList.at(i);
-        
+
         EXPECT_EQ(ref->sizeX, tiffreader.getSizeX());
         EXPECT_EQ(ref->sizeY, tiffreader.getSizeY());
         EXPECT_EQ(ref->sizeZ, tiffreader.getSizeZ());
