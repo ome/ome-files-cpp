@@ -8,6 +8,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -179,9 +180,13 @@ TEST_P(TIFFWriterTest, setId)
         EXPECT_EQ(ref->sizeT, tiffreader.getSizeT());
         EXPECT_EQ(ref->sizeC.size(), tiffreader.getEffectiveSizeC());
         if (params.tilewidth)
-          EXPECT_EQ(*params.tilewidth, tiffreader.getOptimalTileWidth(0));
+          {
+            EXPECT_EQ(*params.tilewidth, tiffreader.getOptimalTileWidth(0));
+          }
         if (params.tilelength)
-          EXPECT_EQ(*params.tilelength, tiffreader.getOptimalTileHeight(0));
+          {
+            EXPECT_EQ(*params.tilelength, tiffreader.getOptimalTileHeight(0));
+          }
         EXPECT_EQ(ome::xml::model::enums::PixelType::UINT8, tiffreader.getPixelType());
         EXPECT_EQ(8, tiffreader.getBitsPerPixel());
         EXPECT_EQ(3, tiffreader.getRGBChannelCount(0));
