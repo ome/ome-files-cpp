@@ -371,6 +371,19 @@ namespace ome
         fixImageCounts();
 
         /**
+         * Fix missing plane indexes.
+         *
+         * If any of the @c Plane element @c TheZ , @c TheT or @c TheC
+         * attributes are missing, add with a value of 0.  Missing
+         * Planes are not added, and existing @c TheZ , @c TheT, and
+         * @c TheC values are not changed.
+         *
+         * @param meta the metadata store to query.
+         */
+        void
+        fixMissingPlaneIndexes(ome::xml::meta::OMEXMLMetadata& meta);
+
+        /**
          * Fix invalid OMERO OME-TIFF metadata.
          *
          * OMERO has in the past written OME-TIFF with incorrect

@@ -944,50 +944,8 @@ namespace ome
         fixImageCounts();
 
         fillMetadata(*metadataStore, *this, false, false);
-        seriesCount = meta->getImageCount();
-        for (index_type series = 0; series < seriesCount; ++series)
-          {
-            index_type planeCount = meta->getPlaneCount(series);
-            for (index_type plane = 0; plane < planeCount; ++plane)
-              {
-                // Make sure that TheZ, TheT and TheC are all set on
-                // any existing Planes.  Missing Planes are not added,
-                // and existing TheZ, TheC, and TheT values are not
-                // changed.
-                try
-                  {
-                    meta->getPlaneTheZ(series, plane);
-                  }
-                catch (const std::exception&)
-                  {
-                    metadataStore->setPlaneTheZ(0, series, plane);
-                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
-                      << "Setting unset Plane TheZ value to 0";
-                  }
 
-                try
-                  {
-                    meta->getPlaneTheT(series, plane);
-                  }
-                catch (const std::exception&)
-                  {
-                    metadataStore->setPlaneTheT(0, series, plane);
-                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
-                      << "Setting unset Plane TheT value to 0";
-                  }
-
-                try
-                  {
-                    meta->getPlaneTheC(series, plane);
-                  }
-                catch (const std::exception&)
-                  {
-                    metadataStore->setPlaneTheC(0, series, plane);
-                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
-                      << "Setting unset Plane TheC value to 0";
-                  }
-              }
-          }
+        fixMissingPlaneIndexes(*meta);
 
         setAcquisitionDates(acquiredDates);
 
@@ -1354,6 +1312,55 @@ namespace ome
                 dimension_size_type subchannels = fullsize.sizeC.at(0);
                 fullsize.sizeC.clear();
                 fullsize.sizeC.push_back(subchannels);
+              }
+          }
+      }
+
+      void
+      OMETIFFReader::fixMissingPlaneIndexes(ome::xml::meta::OMEXMLMetadata& meta)
+      {
+        index_type seriesCount = meta.getImageCount();
+        for (index_type series = 0; series < seriesCount; ++series)
+          {
+            index_type planeCount = meta.getPlaneCount(series);
+            for (index_type plane = 0; plane < planeCount; ++plane)
+              {
+                // Make sure that TheZ, TheT and TheC are all set on
+                // any existing Planes.  Missing Planes are not added,
+                // and existing TheZ, TheC, and TheT values are not
+                // changed.
+                try
+                  {
+                    meta.getPlaneTheZ(series, plane);
+                  }
+                catch (const std::exception&)
+                  {
+                    metadataStore->setPlaneTheZ(0, series, plane);
+                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
+                      << "Setting unset Plane TheZ value to 0";
+                  }
+
+                try
+                  {
+                    meta.getPlaneTheT(series, plane);
+                  }
+                catch (const std::exception&)
+                  {
+                    metadataStore->setPlaneTheT(0, series, plane);
+                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
+                      << "Setting unset Plane TheT value to 0";
+                  }
+
+                try
+                  {
+                    meta.getPlaneTheC(series, plane);
+                  }
+                catch (const std::exception&)
+                  {
+                    metadataStore->setPlaneTheC(0, series, plane);
+                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
+                      << "Setting unset Plane TheC value to 0";
+                  }
               }
           }
       }
