@@ -365,6 +365,12 @@ namespace ome
                           ome::xml::model::primitives::NonNegativeInteger&                  firstC);
 
         /**
+         * Fix invalid image counts.
+         */
+        void
+        fixImageCounts();
+
+        /**
          * Fix invalid OMERO OME-TIFF metadata.
          *
          * OMERO has in the past written OME-TIFF with incorrect

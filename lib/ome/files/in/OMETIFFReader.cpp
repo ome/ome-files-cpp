@@ -940,16 +940,8 @@ namespace ome
             std::remove(secondary.begin(), secondary.end(), std::unique_ptr<OMETIFFMetadata>());
           }
 
-        if (getImageCount() == 1U)
-          {
-            auto& ms0 = getCoreMetadata(0, 0);
-            ms0.sizeZ = 1U;
-            // Only one channel, but may contain subchannels.
-            dimension_size_type subchannels = ms0.sizeC.at(0);
-            ms0.sizeC.clear();
-            ms0.sizeC.push_back(subchannels);
-            ms0.sizeT = 1U;
-          }
+        // Workaround for if image count mismatches the image dimensionality.
+        fixImageCounts();
 
         fillMetadata(*metadataStore, *this, false, false);
         seriesCount = meta->getImageCount();
@@ -1334,6 +1326,36 @@ namespace ome
           }
 
         return valid;
+      }
+
+      void
+      OMETIFFReader::fixImageCounts()
+      {
+        // Unknown why this would occur, because imageCount is
+        // computed from the metadata and so should not be possible to
+        // be inconsistent…
+        for (decltype(core.size()) series = 0; series < core.size(); ++series)
+          {
+            auto& fullsize = getCoreMetadata(series, 0);
+
+            if (fullsize.imageCount == 1U &&
+                (fullsize.sizeZ != 1U ||
+                 fullsize.sizeT != 1U ||
+                 fullsize.sizeC.size() != 1U))
+              {
+                boost::format fmt("Correcting image count mismatch for series %1%: Z=%2% T=%3% C=%4% → Z=1 T=1 C=1");
+                fmt % series % fullsize.sizeZ % fullsize.sizeT % fullsize.sizeC.size();
+
+                BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
+
+                fullsize.sizeZ = 1U;
+                fullsize.sizeT = 1U;
+                // Only one channel, but may contain subchannels.
+                dimension_size_type subchannels = fullsize.sizeC.at(0);
+                fullsize.sizeC.clear();
+                fullsize.sizeC.push_back(subchannels);
+              }
+          }
       }
 
       void
