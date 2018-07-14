@@ -407,6 +407,15 @@ namespace ome
         initCompanionFile();
 
         /**
+         * Read companion file into metadata store.
+         *
+         * @param binarymeta the binary-only metadata store to use.
+         * @returns a new metadata store.
+         */
+        std::shared_ptr<::ome::xml::meta::OMEXMLMetadata>
+        readCompanionFile(ome::xml::meta::OMEXMLMetadata& binarymeta);
+
+        /**
          * Check if the metadata contains any plates.
          *
          * @param meta the metadata store to check.

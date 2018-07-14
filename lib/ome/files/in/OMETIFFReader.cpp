@@ -444,18 +444,9 @@ namespace ome
         // metadata from it.
         std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> meta = cacheMetadata(*currentId);
 
-        // Is there an associated binary-only metadata file?
-        try
-          {
-            metadataFile = canonical(path(meta->getBinaryOnlyMetadataFile()), dir);
-            if (!metadataFile.empty() && boost::filesystem::exists(metadataFile))
-              meta = readMetadata(metadataFile);
-          }
-        catch (const std::exception&)
-          {
-            /// @todo Log.
-            metadataFile.clear();
-          }
+        std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> companionmeta = readCompanionFile(*meta);
+        if (companionmeta)
+          meta = companionmeta;
 
         checkSPW(*meta);
 
@@ -1065,6 +1056,28 @@ namespace ome
         path firstTIFF(path(meta->getUUIDFileName(0, 0)));
         close(false); // To force clearing of currentId.
         initFile(canonical(firstTIFF, dir));
+      }
+
+      std::shared_ptr<::ome::xml::meta::OMEXMLMetadata>
+      OMETIFFReader::readCompanionFile(ome::xml::meta::OMEXMLMetadata& binarymeta)
+      {
+        path dir((*currentId).parent_path());
+        std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> newmeta;
+
+        try
+          {
+            // Is there an associated binary-only metadata file?
+            metadataFile = canonical(path(binarymeta.getBinaryOnlyMetadataFile()), dir);
+            if (!metadataFile.empty() && boost::filesystem::exists(metadataFile))
+              newmeta = readMetadata(metadataFile);
+          }
+        catch (const std::exception&)
+          {
+            /// @todo Log.
+            metadataFile.clear();
+          }
+
+        return newmeta;
       }
 
       void OMETIFFReader::checkSPW(ome::xml::meta::OMEXMLMetadata& meta)
