@@ -292,6 +292,16 @@ namespace ome
                             std::vector<boost::optional<ome::xml::model::primitives::Timestamp>>& timestamps);
 
         /**
+         * Set acquisition dates for each image.
+         *
+         * If no date was specified for an image, a warning will be logged.
+         *
+         * @param timestamps the acquisition dates, indexed by image.
+         */
+        void
+        setAcquisitionDates(const std::vector<boost::optional<ome::xml::model::primitives::Timestamp>>& timestamps);
+
+        /**
          * Clean up OME-XML metadata.
          *
          * Remove invalid channels.

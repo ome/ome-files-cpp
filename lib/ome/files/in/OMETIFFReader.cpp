@@ -997,26 +997,7 @@ namespace ome
               }
           }
 
-        for (std::vector<boost::optional<Timestamp>>::const_iterator ts = acquiredDates.begin();
-             ts != acquiredDates.end();
-             ++ts)
-          {
-            index_type series = std::distance<std::vector<boost::optional<Timestamp>>::const_iterator>(acquiredDates.begin(), ts);
-            if (*ts)
-              {
-                try
-                  {
-                    metadataStore->setImageAcquisitionDate(**ts, series);
-                  }
-                catch (const std::exception& e)
-                  {
-                    boost::format fmt("Failed to set Image AcquisitionDate for series %1%: %2%");
-                    fmt % series % e.what();
-
-                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
-                  }
-              }
-          }
+        setAcquisitionDates(acquiredDates);
 
         // Set the metadata store Pixels.BigEndian attribute to match
         // the values we set in the core metadata
@@ -1198,6 +1179,31 @@ namespace ome
                 // null timestamp.
               }
             timestamps.push_back(ts);
+          }
+      }
+
+      void
+      OMETIFFReader::setAcquisitionDates(const std::vector<boost::optional<ome::xml::model::primitives::Timestamp>>& timestamps)
+      {
+        for (std::vector<boost::optional<Timestamp>>::const_iterator ts = timestamps.begin();
+             ts != timestamps.end();
+             ++ts)
+          {
+            index_type series = std::distance<std::vector<boost::optional<Timestamp>>::const_iterator>(timestamps.begin(), ts);
+            if (*ts)
+              {
+                try
+                  {
+                    metadataStore->setImageAcquisitionDate(**ts, series);
+                  }
+                catch (const std::exception& e)
+                  {
+                    boost::format fmt("Failed to set Image AcquisitionDate for series %1%: %2%");
+                    fmt % series % e.what();
+
+                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
+                  }
+              }
           }
       }
 
