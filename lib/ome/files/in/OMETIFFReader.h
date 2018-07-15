@@ -279,6 +279,14 @@ namespace ome
                       const boost::optional<std::string>&   currentUUID);
 
         /**
+         * Find and validate all TiffData elements.
+         *
+         * @param meta the metadata store to use.
+         */
+        void
+        findTiffData(const ome::xml::meta::OMEXMLMetadata& meta);
+
+        /**
          * Get acquisition dates for each image.
          *
          * If no date was specified for the image, the timestamp will
@@ -394,7 +402,7 @@ namespace ome
          * @param series the series to correct.
          */
         void
-        fixOMEROMetadata(ome::xml::meta::OMEXMLMetadata&          meta,
+        fixOMEROMetadata(const ome::xml::meta::OMEXMLMetadata&    meta,
                          ome::xml::meta::BaseMetadata::index_type series);
 
         /**

@@ -488,422 +488,7 @@ namespace ome
         findUsedFiles(*meta, *currentId, dir, currentUUID);
 
         // Process TiffData elements.
-        for (index_type series = 0; series < seriesCount; ++series)
-          {
-            auto& coreMeta = dynamic_cast<OMETIFFMetadata&>(getCoreMetadata(series, 0));
-
-            BOOST_LOG_SEV(logger, ome::logging::trivial::debug)
-              << "Image[" << series << "] {";
-            BOOST_LOG_SEV(logger, ome::logging::trivial::debug)
-              << "  id = " << meta->getImageID(series);
-
-            DimensionOrder order(meta->getPixelsDimensionOrder(series));
-
-            dimension_size_type channelCount = meta->getChannelCount(series);
-            if (meta->getChannelCount(series) > 0)
-              {
-                coreMeta.sizeC.clear();
-                for (dimension_size_type channel = 0; channel < channelCount; ++channel)
-                  {
-                    dimension_size_type samplesPerPixel = 1U;
-                    try
-                      {
-                        samplesPerPixel = static_cast<dimension_size_type>(meta->getChannelSamplesPerPixel(series, 0));
-                      }
-                    catch (const std::exception&)
-                      {
-                      }
-                    coreMeta.sizeC.push_back(samplesPerPixel);
-                  }
-                // At this stage, assume that the OME-XML
-                // channel/samples per pixel data is correct; we'll
-                // check this matches reality below.
-              }
-            else // No Channels specified
-              {
-                dimension_size_type channels = meta->getPixelsSizeC(series);
-                coreMeta.sizeC.clear();
-                for (dimension_size_type channel = 0; channel < channels; ++channel)
-                  coreMeta.sizeC.push_back(1U);
-              }
-
-            PositiveInteger effSizeC = coreMeta.sizeC.size();
-            PositiveInteger sizeT = meta->getPixelsSizeT(series);
-            PositiveInteger sizeZ = meta->getPixelsSizeZ(series);
-            PositiveInteger num = effSizeC * sizeT * sizeZ;
-
-            coreMeta.tiffPlanes.resize(num);
-            index_type tiffDataCount = meta->getTiffDataCount(series);
-            boost::optional<NonNegativeInteger> zIndexStart;
-            boost::optional<NonNegativeInteger> tIndexStart;
-            boost::optional<NonNegativeInteger> cIndexStart;
-
-            seriesIndexStart(*meta, series,
-                             zIndexStart, tIndexStart, cIndexStart);
-
-            for (index_type td = 0; td < tiffDataCount; ++td)
-              {
-                BOOST_LOG_SEV(logger, ome::logging::trivial::debug)
-                  << "  TiffData[" << td << "] {";
-
-                boost::optional<NonNegativeInteger> tdIFD;
-                NonNegativeInteger numPlanes = 0;
-                NonNegativeInteger firstZ = 0;
-                NonNegativeInteger firstT = 0;
-                NonNegativeInteger firstC = 0;
-
-                if (!getTiffDataValues(*meta, series, td,
-                                       tdIFD, numPlanes,
-                                       firstZ, firstT, firstC))
-                  break;
-
-                // Note: some writers index FirstC, FirstZ, and FirstT from 1.
-                // Subtract index start to correct for this.
-                if (cIndexStart && firstC >= *cIndexStart)
-                  firstC -= *cIndexStart;
-                if (zIndexStart && firstZ >= *zIndexStart)
-                  firstZ -= *zIndexStart;
-                if (tIndexStart && firstT >= *tIndexStart)
-                  firstT -= *tIndexStart;
-
-                if (firstZ >= static_cast<PositiveInteger::value_type>(sizeZ) ||
-                    firstC >= static_cast<PositiveInteger::value_type>(effSizeC) ||
-                    firstT >= static_cast<PositiveInteger::value_type>(sizeT))
-                  {
-                    boost::format fmt("Found invalid TiffData: Z=%1%, C=%2%, T=%3%");
-                    fmt % firstZ % firstC % firstT;
-                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
-
-                    break;
-                  }
-
-                dimension_size_type index = ome::files::getIndex(order,
-                                                                      sizeZ, effSizeC, sizeT,
-                                                                      num,
-                                                                      firstZ, firstC, firstT);
-
-                // get reader object for this filename.
-                boost::optional<path> filename;
-                boost::optional<std::string> uuid;
-                try
-                  {
-                    filename = path(meta->getUUIDFileName(series, td));
-                  }
-                catch (const std::exception&)
-                  {
-                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
-                      << "Ignoring null UUID object when retrieving filename";
-                  }
-                try
-                  {
-                    uuid = meta->getUUIDValue(series, td);
-                  }
-                catch (const std::exception&)
-                  {
-                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
-                      << "Ignoring null UUID object when retrieving value";
-                  }
-
-                if (!filename)
-                  {
-                    if (!uuid)
-                      {
-                        filename = *currentId;
-                      }
-                    else
-                      {
-                        std::map<std::string, path>::const_iterator i(files.find(*uuid));
-                        if (i != files.end())
-                          filename = i->second;
-                      }
-                  }
-                else
-                  {
-                    // All the other cases will already have a canonical path.
-                    if (fs::exists(dir / *filename))
-                      filename = canonical(dir / *filename, dir);
-                    else
-                      {
-                        invalid_file_map::const_iterator invalid = invalidFiles.find(*filename);
-                        if (invalid != invalidFiles.end())
-                          {
-                            filename = invalid->second;
-                          }
-                        else
-                          {
-                            boost::format fmt("UUID filename %1% not found; falling back to %2%");
-                            fmt % *filename % *currentId;
-                            BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
-
-                            invalidFiles.insert(invalid_file_map::value_type(*filename, *currentId));
-                            filename = *currentId;
-                          }
-                      }
-                  }
-
-                addTIFF(*filename);
-
-                bool exists = true;
-                if (!fs::exists(*filename))
-                  {
-                    // If an absolute filename, try using a relative
-                    // name.  Old versions of the Java OMETiffWriter
-                    // wrote an absolute path to UUID.FileName, which
-                    // causes problems if the file is moved to a
-                    // different directory.
-                    path relative(dir / (*filename).filename());
-                    if (fs::exists(relative))
-                      {
-                        filename = relative;
-                      }
-                    else
-                      {
-                        filename = *currentId;
-                        exists = usedFiles.size() == 1;
-                      }
-                  }
-                if (exists) // check it's really a valid TIFF
-                  exists = validTIFF(*filename);
-
-                // Fill plane index → IFD mapping
-                for (dimension_size_type q = 0;
-                     q < static_cast<dimension_size_type>(numPlanes);
-                     ++q)
-                  {
-                    dimension_size_type no = index + q;
-                    OMETIFFPlane& plane(coreMeta.tiffPlanes.at(no));
-                    plane.id = *filename;
-                    plane.ifd = static_cast<dimension_size_type>(*tdIFD) + q;
-                    plane.certain = true;
-                    plane.status = exists ? OMETIFFPlane::PRESENT : OMETIFFPlane::ABSENT;
-
-                    BOOST_LOG_SEV(logger, ome::logging::trivial::debug)
-                      << "    Plane[" << no
-                      << "]: file=" << plane.id.string()
-                      << ", IFD=" << plane.ifd;
-                  }
-                if (numPlanes == 0)
-                  {
-                    // Unknown number of planes (default value); fill down
-                    for (dimension_size_type no = index + 1;
-                         no < static_cast<dimension_size_type>(num);
-                         ++no)
-                      {
-                        OMETIFFPlane& plane(coreMeta.tiffPlanes.at(no));
-                        if (plane.certain)
-                          break;
-                        OMETIFFPlane& previousPlane(coreMeta.tiffPlanes.at(no - 1));
-                        plane.id = *filename;
-                        plane.ifd = previousPlane.ifd + 1;
-                        plane.status = exists ? OMETIFFPlane::PRESENT : OMETIFFPlane::ABSENT;
-
-                        BOOST_LOG_SEV(logger, ome::logging::trivial::debug)
-                          << "    Plane[" << no
-                          << "]: FILLED";
-                      }
-                  }
-                BOOST_LOG_SEV(logger, ome::logging::trivial::debug)
-                  << "  }";
-              }
-
-            // Clear any unset planes.
-            for (std::vector<OMETIFFPlane>::iterator plane = coreMeta.tiffPlanes.begin();
-                 plane != coreMeta.tiffPlanes.end();
-                 ++plane)
-              {
-                if (plane->status != OMETIFFPlane::UNKNOWN)
-                  continue;
-                plane->id.clear();
-                plane->ifd = 0;
-
-                BOOST_LOG_SEV(logger, ome::logging::trivial::debug)
-                  << "    Plane[" << plane - coreMeta.tiffPlanes.begin()
-                  << "]: CLEARED";
-              }
-
-            if (!core.at(series).at(0))
-              continue;
-
-            // Verify all planes are available.
-            for (dimension_size_type no = 0;
-                 no < static_cast<dimension_size_type>(num);
-                 ++no)
-              {
-                OMETIFFPlane& plane(coreMeta.tiffPlanes.at(no));
-
-                BOOST_LOG_SEV(logger, ome::logging::trivial::debug)
-                  << "  Verify Plane[" << no
-                  << "]: file=" << plane.id.string()
-                  << ", IFD=" << plane.ifd;
-
-                if (plane.id.empty())
-                  {
-                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
-                      << "Image ID: " << meta->getImageID(series)
-                      << " missing plane #" << no;
-
-                    // Fallback if broken.
-                    dimension_size_type nIFD = tiff->directoryCount();
-
-                    coreMeta.tiffPlanes.clear();
-                    coreMeta.tiffPlanes.resize(nIFD);
-                    for (dimension_size_type p = 0; p < nIFD; ++p)
-                      {
-                        OMETIFFPlane& plane(coreMeta.tiffPlanes.at(p));
-                        plane.id = *currentId;
-                        plane.ifd = p;
-                      }
-                    break;
-                  }
-              }
-
-            BOOST_LOG_SEV(logger, ome::logging::trivial::debug)
-              << "}";
-
-            // Fill CoreMetadata.
-            try
-              {
-                const OMETIFFPlane& plane(coreMeta.tiffPlanes.at(0));
-                const std::shared_ptr<const tiff::TIFF> ptiff(getTIFF(plane.id));
-                const std::shared_ptr<const tiff::IFD> pifd(ptiff->getDirectoryByIndex(plane.ifd));
-
-                uint32_t tiffWidth = pifd->getImageWidth();
-                uint32_t tiffHeight = pifd->getImageHeight();
-                ome::xml::model::enums::PixelType tiffPixelType = pifd->getPixelType();
-                tiff::PhotometricInterpretation photometric = pifd->getPhotometricInterpretation();
-
-                coreMeta.sizeX = meta->getPixelsSizeX(series);
-                coreMeta.sizeY = meta->getPixelsSizeY(series);
-                coreMeta.sizeZ = meta->getPixelsSizeZ(series);
-                coreMeta.sizeT = meta->getPixelsSizeT(series);
-                // coreMeta.sizeC already set
-                coreMeta.pixelType = meta->getPixelsType(series);
-                coreMeta.imageCount = num;
-                coreMeta.dimensionOrder = meta->getPixelsDimensionOrder(series);
-                coreMeta.orderCertain = true;
-                // libtiff converts to the native endianess transparently
-#ifdef BOOST_BIG_ENDIAN
-                coreMeta.littleEndian = false;
-#else // Little endian
-                coreMeta.littleEndian = true;
-#endif
-
-                // This doesn't match the reality, but since subchannels are
-                // addressed as planes this is needed.
-                coreMeta.interleaved = (pifd->getPlanarConfiguration() == tiff::CONTIG);
-
-                coreMeta.indexed = false;
-                if (photometric == tiff::PALETTE)
-                  {
-                    try
-                      {
-                        std::array<std::vector<uint16_t>, 3> cmap;
-                        pifd->getField(ome::files::tiff::COLORMAP).get(cmap);
-                        coreMeta.indexed = true;
-                      }
-                    catch (const tiff::Exception&)
-                      {
-                      }
-                  }
-                coreMeta.metadataComplete = true;
-                coreMeta.bitsPerPixel = bitsPerPixel(coreMeta.pixelType);
-                try
-                  {
-                    pixel_size_type bpp =
-                      static_cast<pixel_size_type>(meta->getPixelsSignificantBits(series));
-                    if (bpp <= coreMeta.bitsPerPixel)
-                      {
-                        coreMeta.bitsPerPixel = bpp;
-                      }
-                    else
-                      {
-                        boost::format fmt("BitsPerPixel out of range: OME=%1%, MAX=%2%");
-                        fmt % bpp % coreMeta.bitsPerPixel;
-
-                        BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
-                      }
-                  }
-                catch (const std::exception&)
-                  {
-                  }
-
-                // Check channel sizes and correct if wrong.
-                for (dimension_size_type channel = 0; channel < coreMeta.sizeC.size(); ++channel)
-                  {
-                    dimension_size_type planeIndex =
-                      ome::files::getIndex(coreMeta.dimensionOrder,
-                                                coreMeta.sizeZ,
-                                                coreMeta.sizeC.size(),
-                                                coreMeta.sizeT,
-                                                coreMeta.imageCount,
-                                                0,
-                                                channel,
-                                                0);
-
-                    const OMETIFFPlane& plane(coreMeta.tiffPlanes.at(planeIndex));
-                    const std::shared_ptr<const tiff::TIFF> ctiff(getTIFF(plane.id));
-                    const std::shared_ptr<const tiff::IFD> cifd(ctiff->getDirectoryByIndex(plane.ifd));
-                    const tiff::TileInfo tinfo(cifd->getTileInfo());
-                    const dimension_size_type tiffSamples = cifd->getSamplesPerPixel();
-
-                    if (coreMeta.sizeC.at(channel) != tiffSamples)
-                      {
-                        boost::format fmt("SamplesPerPixel mismatch: OME=%1%, TIFF=%2%");
-                        fmt % coreMeta.sizeC.at(channel) % tiffSamples;
-                        BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
-
-                        coreMeta.sizeC.at(channel) = tiffSamples;
-                      }
-
-                    coreMeta.tileWidth.push_back(tinfo.tileWidth());
-                    coreMeta.tileHeight.push_back(tinfo.tileHeight());
-                  }
-
-                if (coreMeta.sizeX != tiffWidth)
-                  {
-                    boost::format fmt("SizeX mismatch: OME=%1%, TIFF=%2%");
-                    fmt % coreMeta.sizeX % tiffWidth;
-
-                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
-                  }
-                if (coreMeta.sizeY != tiffHeight)
-                  {
-                    boost::format fmt("SizeY mismatch: OME=%1%, TIFF=%2%");
-                    fmt % coreMeta.sizeY % tiffHeight;
-
-                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
-                  }
-                if (std::accumulate(coreMeta.sizeC.begin(), coreMeta.sizeC.end(), dimension_size_type(0)) != static_cast<dimension_size_type>(meta->getPixelsSizeC(series)))
-                  {
-                    boost::format fmt("SizeC mismatch: Channels=%1%, Pixels=%2%");
-                    fmt % std::accumulate(coreMeta.sizeC.begin(), coreMeta.sizeC.end(), dimension_size_type(0));
-                    fmt % meta->getPixelsSizeC(series);
-
-                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
-                  }
-                if (coreMeta.pixelType != tiffPixelType)
-                  {
-                    boost::format fmt("PixelType mismatch: OME=%1%, TIFF=%2%");
-                    fmt % coreMeta.pixelType % tiffPixelType;
-
-                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
-                  }
-                if (meta->getPixelsBinDataCount(series) > 1U)
-                  {
-                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
-                      << "Ignoring invalid BinData elements in OME-TIFF Pixels element";
-                  }
-
-                fixOMEROMetadata(*meta, series);
-                fixDimensions(series);
-              }
-            catch (const std::exception& e)
-              {
-                boost::format fmt("Incomplete Pixels metadata: %1%");
-                fmt % e.what();
-                throw FormatException(fmt.str());
-              }
-          }
+        findTiffData(*meta);
 
         for (dimension_size_type i = 0;
              i < core.size();
@@ -1111,6 +696,431 @@ namespace ome
                          std::inserter(fileSet, fileSet.begin()), get_file());
           usedFiles.assign(fileSet.begin(), fileSet.end());
         }
+      }
+
+      void
+      OMETIFFReader::findTiffData(const ome::xml::meta::OMEXMLMetadata& meta)
+      {
+        path dir((*currentId).parent_path());
+        index_type seriesCount = meta.getImageCount();
+
+        for (index_type series = 0; series < seriesCount; ++series)
+          {
+            auto& coreMeta = dynamic_cast<OMETIFFMetadata&>(getCoreMetadata(series, 0));
+
+            BOOST_LOG_SEV(logger, ome::logging::trivial::debug)
+              << "Image[" << series << "] {";
+            BOOST_LOG_SEV(logger, ome::logging::trivial::debug)
+              << "  id = " << meta.getImageID(series);
+
+            DimensionOrder order(meta.getPixelsDimensionOrder(series));
+
+            dimension_size_type channelCount = meta.getChannelCount(series);
+            if (meta.getChannelCount(series) > 0)
+              {
+                coreMeta.sizeC.clear();
+                for (dimension_size_type channel = 0; channel < channelCount; ++channel)
+                  {
+                    dimension_size_type samplesPerPixel = 1U;
+                    try
+                      {
+                        samplesPerPixel = static_cast<dimension_size_type>(meta.getChannelSamplesPerPixel(series, 0));
+                      }
+                    catch (const std::exception&)
+                      {
+                      }
+                    coreMeta.sizeC.push_back(samplesPerPixel);
+                  }
+                // At this stage, assume that the OME-XML
+                // channel/samples per pixel data is correct; we'll
+                // check this matches reality below.
+              }
+            else // No Channels specified
+              {
+                dimension_size_type channels = meta.getPixelsSizeC(series);
+                coreMeta.sizeC.clear();
+                for (dimension_size_type channel = 0; channel < channels; ++channel)
+                  coreMeta.sizeC.push_back(1U);
+              }
+
+            PositiveInteger effSizeC = coreMeta.sizeC.size();
+            PositiveInteger sizeT = meta.getPixelsSizeT(series);
+            PositiveInteger sizeZ = meta.getPixelsSizeZ(series);
+            PositiveInteger num = effSizeC * sizeT * sizeZ;
+
+            coreMeta.tiffPlanes.resize(num);
+            index_type tiffDataCount = meta.getTiffDataCount(series);
+            boost::optional<NonNegativeInteger> zIndexStart;
+            boost::optional<NonNegativeInteger> tIndexStart;
+            boost::optional<NonNegativeInteger> cIndexStart;
+
+            seriesIndexStart(meta, series,
+                             zIndexStart, tIndexStart, cIndexStart);
+
+            for (index_type td = 0; td < tiffDataCount; ++td)
+              {
+                BOOST_LOG_SEV(logger, ome::logging::trivial::debug)
+                  << "  TiffData[" << td << "] {";
+
+                boost::optional<NonNegativeInteger> tdIFD;
+                NonNegativeInteger numPlanes = 0;
+                NonNegativeInteger firstZ = 0;
+                NonNegativeInteger firstT = 0;
+                NonNegativeInteger firstC = 0;
+
+                if (!getTiffDataValues(meta, series, td,
+                                       tdIFD, numPlanes,
+                                       firstZ, firstT, firstC))
+                  break;
+
+                // Note: some writers index FirstC, FirstZ, and FirstT from 1.
+                // Subtract index start to correct for this.
+                if (cIndexStart && firstC >= *cIndexStart)
+                  firstC -= *cIndexStart;
+                if (zIndexStart && firstZ >= *zIndexStart)
+                  firstZ -= *zIndexStart;
+                if (tIndexStart && firstT >= *tIndexStart)
+                  firstT -= *tIndexStart;
+
+                if (firstZ >= static_cast<PositiveInteger::value_type>(sizeZ) ||
+                    firstC >= static_cast<PositiveInteger::value_type>(effSizeC) ||
+                    firstT >= static_cast<PositiveInteger::value_type>(sizeT))
+                  {
+                    boost::format fmt("Found invalid TiffData: Z=%1%, C=%2%, T=%3%");
+                    fmt % firstZ % firstC % firstT;
+                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
+
+                    break;
+                  }
+
+                dimension_size_type index = ome::files::getIndex(order,
+                                                                 sizeZ, effSizeC, sizeT,
+                                                                 num,
+                                                                 firstZ, firstC, firstT);
+
+                // get reader object for this filename.
+                boost::optional<path> filename;
+                boost::optional<std::string> uuid;
+                try
+                  {
+                    filename = path(meta.getUUIDFileName(series, td));
+                  }
+                catch (const std::exception&)
+                  {
+                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
+                      << "Ignoring null UUID object when retrieving filename";
+                  }
+                try
+                  {
+                    uuid = meta.getUUIDValue(series, td);
+                  }
+                catch (const std::exception&)
+                  {
+                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
+                      << "Ignoring null UUID object when retrieving value";
+                  }
+
+                if (!filename)
+                  {
+                    if (!uuid)
+                      {
+                        filename = *currentId;
+                      }
+                    else
+                      {
+                        std::map<std::string, path>::const_iterator i(files.find(*uuid));
+                        if (i != files.end())
+                          filename = i->second;
+                      }
+                  }
+                else
+                  {
+                    // All the other cases will already have a canonical path.
+                    if (fs::exists(dir / *filename))
+                      filename = canonical(dir / *filename, dir);
+                    else
+                      {
+                        invalid_file_map::const_iterator invalid = invalidFiles.find(*filename);
+                        if (invalid != invalidFiles.end())
+                          {
+                            filename = invalid->second;
+                          }
+                        else
+                          {
+                            boost::format fmt("UUID filename %1% not found; falling back to %2%");
+                            fmt % *filename % *currentId;
+                            BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
+
+                            invalidFiles.insert(invalid_file_map::value_type(*filename, *currentId));
+                            filename = *currentId;
+                          }
+                      }
+                  }
+
+                addTIFF(*filename);
+
+                bool exists = true;
+                if (!fs::exists(*filename))
+                  {
+                    // If an absolute filename, try using a relative
+                    // name.  Old versions of the Java OMETiffWriter
+                    // wrote an absolute path to UUID.FileName, which
+                    // causes problems if the file is moved to a
+                    // different directory.
+                    path relative(dir / (*filename).filename());
+                    if (fs::exists(relative))
+                      {
+                        filename = relative;
+                      }
+                    else
+                      {
+                        filename = *currentId;
+                        exists = usedFiles.size() == 1;
+                      }
+                  }
+                if (exists) // check it's really a valid TIFF
+                  exists = validTIFF(*filename);
+
+                // Fill plane index → IFD mapping
+                for (dimension_size_type q = 0;
+                     q < static_cast<dimension_size_type>(numPlanes);
+                     ++q)
+                  {
+                    dimension_size_type no = index + q;
+                    OMETIFFPlane& plane(coreMeta.tiffPlanes.at(no));
+                    plane.id = *filename;
+                    plane.ifd = static_cast<dimension_size_type>(*tdIFD) + q;
+                    plane.certain = true;
+                    plane.status = exists ? OMETIFFPlane::PRESENT : OMETIFFPlane::ABSENT;
+
+                    BOOST_LOG_SEV(logger, ome::logging::trivial::debug)
+                      << "    Plane[" << no
+                      << "]: file=" << plane.id.string()
+                      << ", IFD=" << plane.ifd;
+                  }
+                if (numPlanes == 0)
+                  {
+                    // Unknown number of planes (default value); fill down
+                    for (dimension_size_type no = index + 1;
+                         no < static_cast<dimension_size_type>(num);
+                         ++no)
+                      {
+                        OMETIFFPlane& plane(coreMeta.tiffPlanes.at(no));
+                        if (plane.certain)
+                          break;
+                        OMETIFFPlane& previousPlane(coreMeta.tiffPlanes.at(no - 1));
+                        plane.id = *filename;
+                        plane.ifd = previousPlane.ifd + 1;
+                        plane.status = exists ? OMETIFFPlane::PRESENT : OMETIFFPlane::ABSENT;
+
+                        BOOST_LOG_SEV(logger, ome::logging::trivial::debug)
+                          << "    Plane[" << no
+                          << "]: FILLED";
+                      }
+                  }
+                BOOST_LOG_SEV(logger, ome::logging::trivial::debug)
+                  << "  }";
+              }
+
+            // Clear any unset planes.
+            for (std::vector<OMETIFFPlane>::iterator plane = coreMeta.tiffPlanes.begin();
+                 plane != coreMeta.tiffPlanes.end();
+                 ++plane)
+              {
+                if (plane->status != OMETIFFPlane::UNKNOWN)
+                  continue;
+                plane->id.clear();
+                plane->ifd = 0;
+
+                BOOST_LOG_SEV(logger, ome::logging::trivial::debug)
+                  << "    Plane[" << plane - coreMeta.tiffPlanes.begin()
+                  << "]: CLEARED";
+              }
+
+            if (!core.at(series).at(0))
+              continue;
+
+            // Verify all planes are available.
+            for (dimension_size_type no = 0;
+                 no < static_cast<dimension_size_type>(num);
+                 ++no)
+              {
+                OMETIFFPlane& plane(coreMeta.tiffPlanes.at(no));
+
+                BOOST_LOG_SEV(logger, ome::logging::trivial::debug)
+                  << "  Verify Plane[" << no
+                  << "]: file=" << plane.id.string()
+                  << ", IFD=" << plane.ifd;
+
+                if (plane.id.empty())
+                  {
+                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
+                      << "Image ID: " << meta.getImageID(series)
+                      << " missing plane #" << no;
+
+                    // Fallback if broken.
+                    const std::shared_ptr<const TIFF> tiff(getTIFF(*currentId));
+                    dimension_size_type nIFD = tiff->directoryCount();
+
+                    coreMeta.tiffPlanes.clear();
+                    coreMeta.tiffPlanes.resize(nIFD);
+                    for (dimension_size_type p = 0; p < nIFD; ++p)
+                      {
+                        OMETIFFPlane& plane(coreMeta.tiffPlanes.at(p));
+                        plane.id = *currentId;
+                        plane.ifd = p;
+                      }
+                    break;
+                  }
+              }
+
+            BOOST_LOG_SEV(logger, ome::logging::trivial::debug)
+              << "}";
+
+            // Fill CoreMetadata.
+            try
+              {
+                const OMETIFFPlane& plane(coreMeta.tiffPlanes.at(0));
+                const std::shared_ptr<const tiff::TIFF> ptiff(getTIFF(plane.id));
+                const std::shared_ptr<const tiff::IFD> pifd(ptiff->getDirectoryByIndex(plane.ifd));
+
+                uint32_t tiffWidth = pifd->getImageWidth();
+                uint32_t tiffHeight = pifd->getImageHeight();
+                ome::xml::model::enums::PixelType tiffPixelType = pifd->getPixelType();
+                tiff::PhotometricInterpretation photometric = pifd->getPhotometricInterpretation();
+
+                coreMeta.sizeX = meta.getPixelsSizeX(series);
+                coreMeta.sizeY = meta.getPixelsSizeY(series);
+                coreMeta.sizeZ = meta.getPixelsSizeZ(series);
+                coreMeta.sizeT = meta.getPixelsSizeT(series);
+                // coreMeta.sizeC already set
+                coreMeta.pixelType = meta.getPixelsType(series);
+                coreMeta.imageCount = num;
+                coreMeta.dimensionOrder = meta.getPixelsDimensionOrder(series);
+                coreMeta.orderCertain = true;
+                // libtiff converts to the native endianess transparently
+#ifdef BOOST_BIG_ENDIAN
+                coreMeta.littleEndian = false;
+#else // Little endian
+                coreMeta.littleEndian = true;
+#endif
+
+                // This doesn't match the reality, but since subchannels are
+                // addressed as planes this is needed.
+                coreMeta.interleaved = (pifd->getPlanarConfiguration() == tiff::CONTIG);
+
+                coreMeta.indexed = false;
+                if (photometric == tiff::PALETTE)
+                  {
+                    try
+                      {
+                        std::array<std::vector<uint16_t>, 3> cmap;
+                        pifd->getField(ome::files::tiff::COLORMAP).get(cmap);
+                        coreMeta.indexed = true;
+                      }
+                    catch (const tiff::Exception&)
+                      {
+                      }
+                  }
+                coreMeta.metadataComplete = true;
+                coreMeta.bitsPerPixel = bitsPerPixel(coreMeta.pixelType);
+                try
+                  {
+                    pixel_size_type bpp =
+                      static_cast<pixel_size_type>(meta.getPixelsSignificantBits(series));
+                    if (bpp <= coreMeta.bitsPerPixel)
+                      {
+                        coreMeta.bitsPerPixel = bpp;
+                      }
+                    else
+                      {
+                        boost::format fmt("BitsPerPixel out of range: OME=%1%, MAX=%2%");
+                        fmt % bpp % coreMeta.bitsPerPixel;
+
+                        BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
+                      }
+                  }
+                catch (const std::exception&)
+                  {
+                  }
+
+                // Check channel sizes and correct if wrong.
+                for (dimension_size_type channel = 0; channel < coreMeta.sizeC.size(); ++channel)
+                  {
+                    dimension_size_type planeIndex =
+                      ome::files::getIndex(coreMeta.dimensionOrder,
+                                           coreMeta.sizeZ,
+                                           coreMeta.sizeC.size(),
+                                           coreMeta.sizeT,
+                                           coreMeta.imageCount,
+                                           0,
+                                           channel,
+                                           0);
+
+                    const OMETIFFPlane& plane(coreMeta.tiffPlanes.at(planeIndex));
+                    const std::shared_ptr<const tiff::TIFF> ctiff(getTIFF(plane.id));
+                    const std::shared_ptr<const tiff::IFD> cifd(ctiff->getDirectoryByIndex(plane.ifd));
+                    const tiff::TileInfo tinfo(cifd->getTileInfo());
+                    const dimension_size_type tiffSamples = cifd->getSamplesPerPixel();
+
+                    if (coreMeta.sizeC.at(channel) != tiffSamples)
+                      {
+                        boost::format fmt("SamplesPerPixel mismatch: OME=%1%, TIFF=%2%");
+                        fmt % coreMeta.sizeC.at(channel) % tiffSamples;
+                        BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
+
+                        coreMeta.sizeC.at(channel) = tiffSamples;
+                      }
+
+                    coreMeta.tileWidth.push_back(tinfo.tileWidth());
+                    coreMeta.tileHeight.push_back(tinfo.tileHeight());
+                  }
+
+                if (coreMeta.sizeX != tiffWidth)
+                  {
+                    boost::format fmt("SizeX mismatch: OME=%1%, TIFF=%2%");
+                    fmt % coreMeta.sizeX % tiffWidth;
+
+                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
+                  }
+                if (coreMeta.sizeY != tiffHeight)
+                  {
+                    boost::format fmt("SizeY mismatch: OME=%1%, TIFF=%2%");
+                    fmt % coreMeta.sizeY % tiffHeight;
+
+                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
+                  }
+                if (std::accumulate(coreMeta.sizeC.begin(), coreMeta.sizeC.end(), dimension_size_type(0)) != static_cast<dimension_size_type>(meta.getPixelsSizeC(series)))
+                  {
+                    boost::format fmt("SizeC mismatch: Channels=%1%, Pixels=%2%");
+                    fmt % std::accumulate(coreMeta.sizeC.begin(), coreMeta.sizeC.end(), dimension_size_type(0));
+                    fmt % meta.getPixelsSizeC(series);
+
+                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
+                  }
+                if (coreMeta.pixelType != tiffPixelType)
+                  {
+                    boost::format fmt("PixelType mismatch: OME=%1%, TIFF=%2%");
+                    fmt % coreMeta.pixelType % tiffPixelType;
+
+                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
+                  }
+                if (meta.getPixelsBinDataCount(series) > 1U)
+                  {
+                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
+                      << "Ignoring invalid BinData elements in OME-TIFF Pixels element";
+                  }
+
+                fixOMEROMetadata(meta, series);
+                fixDimensions(series);
+              }
+            catch (const std::exception& e)
+              {
+                boost::format fmt("Incomplete Pixels metadata: %1%");
+                fmt % e.what();
+                throw FormatException(fmt.str());
+              }
+          }
       }
 
       void
@@ -1366,7 +1376,7 @@ namespace ome
       }
 
       void
-      OMETIFFReader::fixOMEROMetadata(ome::xml::meta::OMEXMLMetadata&          meta,
+      OMETIFFReader::fixOMEROMetadata(const ome::xml::meta::OMEXMLMetadata&    meta,
                                       ome::xml::meta::BaseMetadata::index_type series)
       {
         // Hackish workaround for files exported by OMERO
