@@ -287,6 +287,17 @@ namespace ome
         findTiffData(const ome::xml::meta::OMEXMLMetadata& meta);
 
         /**
+         * Check validity of channel samples.
+         *
+         * Add channel sample counts to @c CoreMetadata.  If missing,
+         * assume n channels of 1 sample each.
+         *
+         * @param meta the metadata store to query.
+         */
+        void
+        checkChannelSamplesPerPixel(const ome::xml::meta::OMEXMLMetadata& meta);
+
+        /**
          * Find all Modulo annotations.
          *
          * @param meta the metadata store to use.

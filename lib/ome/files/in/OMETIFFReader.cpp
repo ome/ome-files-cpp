@@ -487,6 +487,9 @@ namespace ome
         // UUID → file mapping and used files.
         findUsedFiles(*meta, *currentId, dir, currentUUID);
 
+        // Check that the Channel elements are present and valid.
+        checkChannelSamplesPerPixel(*meta);
+
         // Process TiffData elements.
         findTiffData(*meta);
 
@@ -688,38 +691,6 @@ namespace ome
               << "  id = " << meta.getImageID(series);
 
             DimensionOrder order(meta.getPixelsDimensionOrder(series));
-
-            dimension_size_type channelCount = meta.getChannelCount(series);
-            if (meta.getChannelCount(series) > 0)
-              {
-                coreMeta.sizeC.clear();
-                for (dimension_size_type channel = 0; channel < channelCount; ++channel)
-                  {
-                    dimension_size_type samplesPerPixel = 1U;
-                    try
-                      {
-                        samplesPerPixel = static_cast<dimension_size_type>(meta.getChannelSamplesPerPixel(series, 0));
-                      }
-                    catch (const std::exception&)
-                      {
-                      }
-                    coreMeta.sizeC.push_back(samplesPerPixel);
-                  }
-                // At this stage, assume that the OME-XML
-                // channel/samples per pixel data is correct; we'll
-                // check this matches reality below.
-              }
-            else // No Channels specified
-              {
-                dimension_size_type channels = meta.getPixelsSizeC(series);
-                coreMeta.sizeC.clear();
-                for (dimension_size_type channel = 0; channel < channels; ++channel)
-                  coreMeta.sizeC.push_back(1U);
-
-                boost::format fmt("Channel element(s) are missing for series %1%: Falling back to %2% channel(s) of 1 sample each");
-                fmt % series % channels;
-                BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
-              }
 
             PositiveInteger effSizeC = coreMeta.sizeC.size();
             PositiveInteger sizeT = meta.getPixelsSizeT(series);
@@ -1097,6 +1068,48 @@ namespace ome
                 boost::format fmt("Incomplete Pixels metadata: %1%");
                 fmt % e.what();
                 throw FormatException(fmt.str());
+              }
+          }
+      }
+
+      void
+      OMETIFFReader::checkChannelSamplesPerPixel(const ome::xml::meta::OMEXMLMetadata& meta)
+      {
+        index_type seriesCount = meta.getImageCount();
+
+        for (index_type series = 0; series < seriesCount; ++series)
+          {
+            auto& coreMeta = dynamic_cast<OMETIFFMetadata&>(getCoreMetadata(series, 0));
+            dimension_size_type channelCount = meta.getChannelCount(series);
+            if (meta.getChannelCount(series) > 0)
+              {
+                coreMeta.sizeC.clear();
+                for (dimension_size_type channel = 0; channel < channelCount; ++channel)
+                  {
+                    dimension_size_type samplesPerPixel = 1U;
+                    try
+                      {
+                        samplesPerPixel = static_cast<dimension_size_type>(meta.getChannelSamplesPerPixel(series, 0));
+                      }
+                    catch (const std::exception&)
+                      {
+                      }
+                    coreMeta.sizeC.push_back(samplesPerPixel);
+                  }
+                // At this stage, assume that the OME-XML
+                // channel/samples per pixel data is correct; we'll
+                // check this matches later on.
+              }
+            else // No Channels specified
+              {
+                dimension_size_type channels = meta.getPixelsSizeC(series);
+                coreMeta.sizeC.clear();
+                for (dimension_size_type channel = 0; channel < channels; ++channel)
+                  coreMeta.sizeC.push_back(1U);
+
+                boost::format fmt("Channel element(s) are missing for series %1%: Falling back to %2% channel(s) of 1 sample each");
+                fmt % series % channels;
+                BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
               }
           }
       }
