@@ -287,6 +287,14 @@ namespace ome
         findTiffData(const ome::xml::meta::OMEXMLMetadata& meta);
 
         /**
+         * Find all Modulo annotations.
+         *
+         * @param meta the metadata store to use.
+         */
+        void
+        findModulo(const ome::xml::meta::OMEXMLMetadata& meta);
+
+        /**
          * Get acquisition dates for each image.
          *
          * If no date was specified for the image, the timestamp will

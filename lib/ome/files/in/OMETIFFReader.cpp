@@ -490,34 +490,8 @@ namespace ome
         // Process TiffData elements.
         findTiffData(*meta);
 
-        for (dimension_size_type i = 0;
-             i < core.size();
-             ++i)
-          {
-            auto& coreMeta = dynamic_cast<OMETIFFMetadata&>(getCoreMetadata(i, 0));
-
-            try
-              {
-                coreMeta.moduloZ = getModuloAlongZ(*meta, i);
-              }
-            catch (const std::exception&)
-              {
-              }
-            try
-              {
-                coreMeta.moduloT = getModuloAlongT(*meta, i);
-              }
-            catch (const std::exception&)
-              {
-              }
-            try
-              {
-                coreMeta.moduloC = getModuloAlongC(*meta, i);
-              }
-            catch (const std::exception&)
-              {
-              }
-          }
+        // Process Modulo annotations.
+        findModulo(*meta);
 
         // Remove null CoreMetadata entries.
         for (auto& secondary : core)
@@ -1119,6 +1093,38 @@ namespace ome
                 boost::format fmt("Incomplete Pixels metadata: %1%");
                 fmt % e.what();
                 throw FormatException(fmt.str());
+              }
+          }
+      }
+
+      void
+      OMETIFFReader::findModulo(const ome::xml::meta::OMEXMLMetadata& meta)
+      {
+        index_type seriesCount = meta.getImageCount();
+        for (index_type series = 0; series < seriesCount; ++series)
+          {
+            auto& coreMeta = dynamic_cast<OMETIFFMetadata&>(getCoreMetadata(series, 0));
+
+            try
+              {
+                coreMeta.moduloZ = getModuloAlongZ(meta, series);
+              }
+            catch (const std::exception&)
+              {
+              }
+            try
+              {
+                coreMeta.moduloT = getModuloAlongT(meta, series);
+              }
+            catch (const std::exception&)
+              {
+              }
+            try
+              {
+                coreMeta.moduloC = getModuloAlongC(meta, series);
+              }
+            catch (const std::exception&)
+              {
               }
           }
       }
