@@ -1234,6 +1234,27 @@ namespace ome
             else
               tIndexStart = std::min(*tIndexStart, firstT);
           }
+        if (zIndexStart && *zIndexStart)
+          {
+            boost::format fmt("Series %1% has non-zero z index start: %2%");
+            fmt % series % *zIndexStart;
+
+            BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
+          }
+        if (tIndexStart && *tIndexStart)
+          {
+            boost::format fmt("Series %1% has non-zero t index start: %2%");
+            fmt % series % *tIndexStart;
+
+            BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
+          }
+        if (cIndexStart && *cIndexStart)
+          {
+            boost::format fmt("Series %1% has non-zero c index start: %2%");
+            fmt % series % *cIndexStart;
+
+            BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
+          }
       }
 
       bool
