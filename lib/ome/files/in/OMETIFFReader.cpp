@@ -1289,8 +1289,13 @@ namespace ome
 
         if (numPlanes == 0)
           {
-            core.at(0).at(0) = std::make_unique<OMETIFFMetadata>();
+            core.at(series).at(0) = nullptr;
             valid = false;
+
+            boost::format fmt("Image series %1%, TiffData %2% has zero or missing plane count: Removing invalid image series");
+            fmt % series % tiffData;
+
+            BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
           }
 
         if (!tdIFD)
