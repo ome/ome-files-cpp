@@ -715,6 +715,10 @@ namespace ome
                 coreMeta.sizeC.clear();
                 for (dimension_size_type channel = 0; channel < channels; ++channel)
                   coreMeta.sizeC.push_back(1U);
+
+                boost::format fmt("Channel element(s) are missing for series %1%: Falling back to %2% channel(s) of 1 sample each");
+                fmt % series % channels;
+                BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
               }
 
             PositiveInteger effSizeC = coreMeta.sizeC.size();
