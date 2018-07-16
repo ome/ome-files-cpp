@@ -927,148 +927,7 @@ namespace ome
               << "}";
 
             // Fill CoreMetadata.
-            try
-              {
-                const OMETIFFPlane& plane(coreMeta.tiffPlanes.at(0));
-                const std::shared_ptr<const tiff::TIFF> ptiff(getTIFF(plane.id));
-                const std::shared_ptr<const tiff::IFD> pifd(ptiff->getDirectoryByIndex(plane.ifd));
-
-                uint32_t tiffWidth = pifd->getImageWidth();
-                uint32_t tiffHeight = pifd->getImageHeight();
-                ome::xml::model::enums::PixelType tiffPixelType = pifd->getPixelType();
-                tiff::PhotometricInterpretation photometric = pifd->getPhotometricInterpretation();
-
-                coreMeta.sizeX = meta.getPixelsSizeX(series);
-                coreMeta.sizeY = meta.getPixelsSizeY(series);
-                coreMeta.sizeZ = meta.getPixelsSizeZ(series);
-                coreMeta.sizeT = meta.getPixelsSizeT(series);
-                // coreMeta.sizeC already set
-                coreMeta.pixelType = meta.getPixelsType(series);
-                coreMeta.imageCount = num;
-                coreMeta.dimensionOrder = meta.getPixelsDimensionOrder(series);
-                coreMeta.orderCertain = true;
-                // libtiff converts to the native endianess transparently
-#ifdef BOOST_BIG_ENDIAN
-                coreMeta.littleEndian = false;
-#else // Little endian
-                coreMeta.littleEndian = true;
-#endif
-
-                // This doesn't match the reality, but since subchannels are
-                // addressed as planes this is needed.
-                coreMeta.interleaved = (pifd->getPlanarConfiguration() == tiff::CONTIG);
-
-                coreMeta.indexed = false;
-                if (photometric == tiff::PALETTE)
-                  {
-                    try
-                      {
-                        std::array<std::vector<uint16_t>, 3> cmap;
-                        pifd->getField(ome::files::tiff::COLORMAP).get(cmap);
-                        coreMeta.indexed = true;
-                      }
-                    catch (const tiff::Exception&)
-                      {
-                      }
-                  }
-                coreMeta.metadataComplete = true;
-                coreMeta.bitsPerPixel = bitsPerPixel(coreMeta.pixelType);
-                try
-                  {
-                    pixel_size_type bpp =
-                      static_cast<pixel_size_type>(meta.getPixelsSignificantBits(series));
-                    if (bpp <= coreMeta.bitsPerPixel)
-                      {
-                        coreMeta.bitsPerPixel = bpp;
-                      }
-                    else
-                      {
-                        boost::format fmt("BitsPerPixel out of range: OME=%1%, MAX=%2%");
-                        fmt % bpp % coreMeta.bitsPerPixel;
-
-                        BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
-                      }
-                  }
-                catch (const std::exception&)
-                  {
-                  }
-
-                // Check channel sizes and correct if wrong.
-                for (dimension_size_type channel = 0; channel < coreMeta.sizeC.size(); ++channel)
-                  {
-                    dimension_size_type planeIndex =
-                      ome::files::getIndex(coreMeta.dimensionOrder,
-                                           coreMeta.sizeZ,
-                                           coreMeta.sizeC.size(),
-                                           coreMeta.sizeT,
-                                           coreMeta.imageCount,
-                                           0,
-                                           channel,
-                                           0);
-
-                    const OMETIFFPlane& plane(coreMeta.tiffPlanes.at(planeIndex));
-                    const std::shared_ptr<const tiff::TIFF> ctiff(getTIFF(plane.id));
-                    const std::shared_ptr<const tiff::IFD> cifd(ctiff->getDirectoryByIndex(plane.ifd));
-                    const tiff::TileInfo tinfo(cifd->getTileInfo());
-                    const dimension_size_type tiffSamples = cifd->getSamplesPerPixel();
-
-                    if (coreMeta.sizeC.at(channel) != tiffSamples)
-                      {
-                        boost::format fmt("SamplesPerPixel mismatch: OME=%1%, TIFF=%2%");
-                        fmt % coreMeta.sizeC.at(channel) % tiffSamples;
-                        BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
-
-                        coreMeta.sizeC.at(channel) = tiffSamples;
-                      }
-
-                    coreMeta.tileWidth.push_back(tinfo.tileWidth());
-                    coreMeta.tileHeight.push_back(tinfo.tileHeight());
-                  }
-
-                if (coreMeta.sizeX != tiffWidth)
-                  {
-                    boost::format fmt("SizeX mismatch: OME=%1%, TIFF=%2%");
-                    fmt % coreMeta.sizeX % tiffWidth;
-
-                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
-                  }
-                if (coreMeta.sizeY != tiffHeight)
-                  {
-                    boost::format fmt("SizeY mismatch: OME=%1%, TIFF=%2%");
-                    fmt % coreMeta.sizeY % tiffHeight;
-
-                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
-                  }
-                if (std::accumulate(coreMeta.sizeC.begin(), coreMeta.sizeC.end(), dimension_size_type(0)) != static_cast<dimension_size_type>(meta.getPixelsSizeC(series)))
-                  {
-                    boost::format fmt("SizeC mismatch: Channels=%1%, Pixels=%2%");
-                    fmt % std::accumulate(coreMeta.sizeC.begin(), coreMeta.sizeC.end(), dimension_size_type(0));
-                    fmt % meta.getPixelsSizeC(series);
-
-                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
-                  }
-                if (coreMeta.pixelType != tiffPixelType)
-                  {
-                    boost::format fmt("PixelType mismatch: OME=%1%, TIFF=%2%");
-                    fmt % coreMeta.pixelType % tiffPixelType;
-
-                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
-                  }
-                if (meta.getPixelsBinDataCount(series) > 1U)
-                  {
-                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
-                      << "Ignoring invalid BinData elements in OME-TIFF Pixels element";
-                  }
-
-                fixOMEROMetadata(meta, series);
-                fixDimensions(series);
-              }
-            catch (const std::exception& e)
-              {
-                boost::format fmt("Incomplete Pixels metadata: %1%");
-                fmt % e.what();
-                throw FormatException(fmt.str());
-              }
+            fillCoreMetadata(meta, series, num);
           }
       }
 
@@ -1111,6 +970,156 @@ namespace ome
                 fmt % series % channels;
                 BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
               }
+          }
+      }
+
+      void
+      OMETIFFReader::fillCoreMetadata(const ome::xml::meta::OMEXMLMetadata&    meta,
+                                      ome::xml::meta::BaseMetadata::index_type series,
+                                      dimension_size_type                      imageCount)
+      {
+        auto& coreMeta = dynamic_cast<OMETIFFMetadata&>(getCoreMetadata(series, 0));
+        try
+          {
+            const OMETIFFPlane& plane(coreMeta.tiffPlanes.at(0));
+            const std::shared_ptr<const tiff::TIFF> ptiff(getTIFF(plane.id));
+            const std::shared_ptr<const tiff::IFD> pifd(ptiff->getDirectoryByIndex(plane.ifd));
+
+            uint32_t tiffWidth = pifd->getImageWidth();
+            uint32_t tiffHeight = pifd->getImageHeight();
+            ome::xml::model::enums::PixelType tiffPixelType = pifd->getPixelType();
+            tiff::PhotometricInterpretation photometric = pifd->getPhotometricInterpretation();
+
+            coreMeta.sizeX = meta.getPixelsSizeX(series);
+            coreMeta.sizeY = meta.getPixelsSizeY(series);
+            coreMeta.sizeZ = meta.getPixelsSizeZ(series);
+            coreMeta.sizeT = meta.getPixelsSizeT(series);
+            // coreMeta.sizeC already set
+            coreMeta.pixelType = meta.getPixelsType(series);
+            coreMeta.imageCount = imageCount;
+            coreMeta.dimensionOrder = meta.getPixelsDimensionOrder(series);
+            coreMeta.orderCertain = true;
+            // libtiff converts to the native endianess transparently
+#ifdef BOOST_BIG_ENDIAN
+            coreMeta.littleEndian = false;
+#else // Little endian
+            coreMeta.littleEndian = true;
+#endif
+
+            // This doesn't match the reality, but since subchannels are
+            // addressed as planes this is needed.
+            coreMeta.interleaved = (pifd->getPlanarConfiguration() == tiff::CONTIG);
+
+            coreMeta.indexed = false;
+            if (photometric == tiff::PALETTE)
+              {
+                try
+                  {
+                    std::array<std::vector<uint16_t>, 3> cmap;
+                    pifd->getField(ome::files::tiff::COLORMAP).get(cmap);
+                    coreMeta.indexed = true;
+                  }
+                catch (const tiff::Exception&)
+                  {
+                  }
+              }
+            coreMeta.metadataComplete = true;
+            coreMeta.bitsPerPixel = bitsPerPixel(coreMeta.pixelType);
+            try
+              {
+                pixel_size_type bpp =
+                  static_cast<pixel_size_type>(meta.getPixelsSignificantBits(series));
+                if (bpp <= coreMeta.bitsPerPixel)
+                  {
+                    coreMeta.bitsPerPixel = bpp;
+                  }
+                else
+                  {
+                    boost::format fmt("BitsPerPixel out of range: OME=%1%, MAX=%2%");
+                    fmt % bpp % coreMeta.bitsPerPixel;
+
+                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
+                  }
+              }
+            catch (const std::exception&)
+              {
+              }
+
+            // Check channel sizes and correct if wrong.
+            for (dimension_size_type channel = 0; channel < coreMeta.sizeC.size(); ++channel)
+              {
+                dimension_size_type planeIndex =
+                  ome::files::getIndex(coreMeta.dimensionOrder,
+                                       coreMeta.sizeZ,
+                                       coreMeta.sizeC.size(),
+                                       coreMeta.sizeT,
+                                       coreMeta.imageCount,
+                                       0,
+                                       channel,
+                                       0);
+
+                const OMETIFFPlane& plane(coreMeta.tiffPlanes.at(planeIndex));
+                const std::shared_ptr<const tiff::TIFF> ctiff(getTIFF(plane.id));
+                const std::shared_ptr<const tiff::IFD> cifd(ctiff->getDirectoryByIndex(plane.ifd));
+                const tiff::TileInfo tinfo(cifd->getTileInfo());
+                const dimension_size_type tiffSamples = cifd->getSamplesPerPixel();
+
+                if (coreMeta.sizeC.at(channel) != tiffSamples)
+                  {
+                    boost::format fmt("SamplesPerPixel mismatch: OME=%1%, TIFF=%2%");
+                    fmt % coreMeta.sizeC.at(channel) % tiffSamples;
+                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
+
+                    coreMeta.sizeC.at(channel) = tiffSamples;
+                  }
+
+                coreMeta.tileWidth.push_back(tinfo.tileWidth());
+                coreMeta.tileHeight.push_back(tinfo.tileHeight());
+              }
+
+            if (coreMeta.sizeX != tiffWidth)
+              {
+                boost::format fmt("SizeX mismatch: OME=%1%, TIFF=%2%");
+                fmt % coreMeta.sizeX % tiffWidth;
+
+                BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
+              }
+            if (coreMeta.sizeY != tiffHeight)
+              {
+                boost::format fmt("SizeY mismatch: OME=%1%, TIFF=%2%");
+                fmt % coreMeta.sizeY % tiffHeight;
+
+                BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
+              }
+            if (std::accumulate(coreMeta.sizeC.begin(), coreMeta.sizeC.end(), dimension_size_type(0)) != static_cast<dimension_size_type>(meta.getPixelsSizeC(series)))
+              {
+                boost::format fmt("SizeC mismatch: Channels=%1%, Pixels=%2%");
+                fmt % std::accumulate(coreMeta.sizeC.begin(), coreMeta.sizeC.end(), dimension_size_type(0));
+                fmt % meta.getPixelsSizeC(series);
+
+                BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
+              }
+            if (coreMeta.pixelType != tiffPixelType)
+              {
+                boost::format fmt("PixelType mismatch: OME=%1%, TIFF=%2%");
+                fmt % coreMeta.pixelType % tiffPixelType;
+
+                BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
+              }
+            if (meta.getPixelsBinDataCount(series) > 1U)
+              {
+                BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
+                  << "Ignoring invalid BinData elements in OME-TIFF Pixels element";
+              }
+
+            fixOMEROMetadata(meta, series);
+            fixDimensions(series);
+          }
+        catch (const std::exception& e)
+          {
+            boost::format fmt("Incomplete Pixels metadata: %1%");
+            fmt % e.what();
+            throw FormatException(fmt.str());
           }
       }
 

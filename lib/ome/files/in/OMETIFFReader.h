@@ -298,6 +298,17 @@ namespace ome
         checkChannelSamplesPerPixel(const ome::xml::meta::OMEXMLMetadata& meta);
 
         /**
+         * Fill CoreMetadata from OMEXMLMetadata
+         *
+         * @param meta the metadata store to query.
+         * @param series the series to check.
+         */
+        void
+        fillCoreMetadata(const ome::xml::meta::OMEXMLMetadata&    meta,
+                         ome::xml::meta::BaseMetadata::index_type series,
+                         dimension_size_type                      imageCount);
+
+        /**
          * Find all Modulo annotations.
          *
          * @param meta the metadata store to use.
