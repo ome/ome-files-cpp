@@ -287,6 +287,18 @@ namespace ome
         findTiffData(const ome::xml::meta::OMEXMLMetadata& meta);
 
         /**
+         * Get filename for a specific TiffData element.
+         *
+         * @param meta the metadata store to query.
+         * @param series the series to check.
+         * @param tiffDataIndex the TIFF data index to check.
+         */
+        boost::filesystem::path
+        getTiffDataFilename(const ome::xml::meta::OMEXMLMetadata&    meta,
+                            ome::xml::meta::BaseMetadata::index_type series,
+                            ome::xml::meta::BaseMetadata::index_type tiffDataIndex);
+
+        /**
          * Check validity of channel samples.
          *
          * Add channel sample counts to @c CoreMetadata.  If missing,

@@ -748,75 +748,19 @@ namespace ome
                                                                  firstZ, firstC, firstT);
 
                 // get reader object for this filename.
-                boost::optional<path> filename;
-                boost::optional<std::string> uuid;
-                try
-                  {
-                    filename = path(meta.getUUIDFileName(series, td));
-                  }
-                catch (const std::exception&)
-                  {
-                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
-                      << "Ignoring null UUID object when retrieving filename";
-                  }
-                try
-                  {
-                    uuid = meta.getUUIDValue(series, td);
-                  }
-                catch (const std::exception&)
-                  {
-                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
-                      << "Ignoring null UUID object when retrieving value";
-                  }
+                path filename = getTiffDataFilename(meta, series, td);
 
-                if (!filename)
-                  {
-                    if (!uuid)
-                      {
-                        filename = *currentId;
-                      }
-                    else
-                      {
-                        std::map<std::string, path>::const_iterator i(files.find(*uuid));
-                        if (i != files.end())
-                          filename = i->second;
-                      }
-                  }
-                else
-                  {
-                    // All the other cases will already have a canonical path.
-                    if (fs::exists(dir / *filename))
-                      filename = canonical(dir / *filename, dir);
-                    else
-                      {
-                        invalid_file_map::const_iterator invalid = invalidFiles.find(*filename);
-                        if (invalid != invalidFiles.end())
-                          {
-                            filename = invalid->second;
-                          }
-                        else
-                          {
-                            boost::format fmt("UUID filename %1% not found; falling back to %2%");
-                            fmt % *filename % *currentId;
-                            BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
-
-                            invalidFiles.insert(invalid_file_map::value_type(*filename, *currentId));
-                            filename = *currentId;
-                          }
-                      }
-                  }
-
-                addTIFF(*filename);
+                addTIFF(filename);
 
                 bool exists = true;
-                if (!fs::exists(*filename))
+                if (!fs::exists(filename))
                   {
                     // If an absolute filename, try using a relative
                     // name.  Old versions of the Java OMETiffWriter
                     // wrote an absolute path to UUID.FileName, which
                     // causes problems if the file is moved to a
                     // different directory.
-                    path relative(dir / (*filename).filename());
+                    path relative(dir / filename.filename());
                     if (fs::exists(relative))
                       {
                         filename = relative;
@@ -828,7 +772,7 @@ namespace ome
                       }
                   }
                 if (exists) // check it's really a valid TIFF
-                  exists = validTIFF(*filename);
+                  exists = validTIFF(filename);
 
                 // Fill plane index → IFD mapping
                 for (dimension_size_type q = 0;
@@ -837,7 +781,7 @@ namespace ome
                   {
                     dimension_size_type no = index + q;
                     OMETIFFPlane& plane(coreMeta.tiffPlanes.at(no));
-                    plane.id = *filename;
+                    plane.id = filename;
                     plane.ifd = static_cast<dimension_size_type>(*tdIFD) + q;
                     plane.certain = true;
                     plane.status = exists ? OMETIFFPlane::PRESENT : OMETIFFPlane::ABSENT;
@@ -858,7 +802,7 @@ namespace ome
                         if (plane.certain)
                           break;
                         OMETIFFPlane& previousPlane(coreMeta.tiffPlanes.at(no - 1));
-                        plane.id = *filename;
+                        plane.id = filename;
                         plane.ifd = previousPlane.ifd + 1;
                         plane.status = exists ? OMETIFFPlane::PRESENT : OMETIFFPlane::ABSENT;
 
@@ -930,6 +874,84 @@ namespace ome
             fillCoreMetadata(meta, series, num);
           }
       }
+
+      boost::filesystem::path
+      OMETIFFReader::getTiffDataFilename(const ome::xml::meta::OMEXMLMetadata&    meta,
+                                         ome::xml::meta::BaseMetadata::index_type series,
+                                         ome::xml::meta::BaseMetadata::index_type tiffDataIndex)
+      {
+        path dir((*currentId).parent_path());
+
+        boost::optional<path> filename;
+        boost::optional<std::string> uuid;
+
+        try
+          {
+            filename = path(meta.getUUIDFileName(series, tiffDataIndex));
+          }
+        catch (const std::exception&)
+          {
+            BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
+              << "Ignoring null UUID object when retrieving filename";
+          }
+        try
+          {
+            uuid = meta.getUUIDValue(series, tiffDataIndex);
+          }
+        catch (const std::exception&)
+          {
+            BOOST_LOG_SEV(logger, ome::logging::trivial::warning)
+              << "Ignoring null UUID object when retrieving value";
+          }
+
+        if (!filename)
+          {
+            if (!uuid)
+              {
+                filename = *currentId;
+              }
+            else
+              {
+                std::map<std::string, path>::const_iterator i(files.find(*uuid));
+                if (i != files.end())
+                  filename = i->second;
+                else
+                  {
+                    boost::format fmt("UUID filename %1% not found; falling back to %2%");
+                    fmt % *uuid % *currentId;
+                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
+
+                    filename = *currentId;
+                  }
+              }
+          }
+        else
+          {
+            // All the other cases will already have a canonical path.
+            if (fs::exists(dir / *filename))
+              filename = canonical(dir / *filename, dir);
+            else
+              {
+                invalid_file_map::const_iterator invalid = invalidFiles.find(*filename);
+                if (invalid != invalidFiles.end())
+                  {
+                    filename = invalid->second;
+                  }
+                else
+                  {
+                    boost::format fmt("UUID filename %1% not found; falling back to %2%");
+                    fmt % *filename % *currentId;
+                    BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
+
+                    invalidFiles.insert(invalid_file_map::value_type(*filename, *currentId));
+                    filename = *currentId;
+                  }
+              }
+          }
+
+        return *filename;
+      }
+
 
       void
       OMETIFFReader::checkChannelSamplesPerPixel(const ome::xml::meta::OMEXMLMetadata& meta)
