@@ -155,7 +155,7 @@ namespace ome
          * @returns the IFD index.
          * @throws FormatException if out of range.
          */
-        const std::shared_ptr<const tiff::IFD>
+        std::shared_ptr<const tiff::IFD>
         ifdAtIndex(dimension_size_type plane) const;
 
         /**
@@ -177,7 +177,7 @@ namespace ome
          * @returns the open TIFF.
          * @throws FormatException if invalid.
          */
-        const std::shared_ptr<const ome::files::tiff::TIFF>
+        std::shared_ptr<const ome::files::tiff::TIFF>
         getTIFF(const boost::filesystem::path& tiff) const;
 
         /**
@@ -310,15 +310,16 @@ namespace ome
         checkChannelSamplesPerPixel(const ome::xml::meta::OMEXMLMetadata& meta);
 
         /**
-         * Fill CoreMetadata from OMEXMLMetadata
+         * Fill CoreMetadata from OMEXMLMetadata and TIFF metadata
          *
          * @param meta the metadata store to query.
          * @param series the series to check.
+         * @param resolution the resolution to check.
          */
         void
         fillCoreMetadata(const ome::xml::meta::OMEXMLMetadata&    meta,
                          ome::xml::meta::BaseMetadata::index_type series,
-                         dimension_size_type                      imageCount);
+                         ome::xml::meta::BaseMetadata::index_type resolution);
 
         /**
          * Find all Modulo annotations.
@@ -468,9 +469,11 @@ namespace ome
          * SUBIFDS tag.  If so, check the size and tilesize of each.
          * It is assumed that any additional TIFF planes (IFDs) will
          * follow the same layout.
+         *
+         * @param meta the metadata store to query.
          */
         void
-        addSubResolutions();
+        addSubResolutions(const ome::xml::meta::OMEXMLMetadata& meta);
 
         /**
          * Initialize the given companion file.

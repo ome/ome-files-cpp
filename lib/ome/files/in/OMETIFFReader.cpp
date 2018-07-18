@@ -173,6 +173,22 @@ namespace ome
 
         };
 
+        // Compare if full-resolution and sub-resolution metadata is
+        // sufficiently similar to permit use.
+        bool
+        compareResolution(const CoreMetadata& full,
+                          const CoreMetadata& sub)
+        {
+          return (full.sizeX >= sub.sizeX &&
+                  full.sizeY >= sub.sizeY &&
+                  full.sizeZ == sub.sizeZ && // Note: change to >= if z reductions are ever supported
+                  full.sizeT == sub.sizeT &&
+                  full.sizeC == sub.sizeC &&
+                  full.pixelType == sub.pixelType &&
+                  full.indexed == sub.indexed &&
+                  full.interleaved == sub.interleaved);
+        }
+
       }
 
       OMETIFFReader::OMETIFFReader():
@@ -329,17 +345,17 @@ namespace ome
         return valid;
       }
 
-      const std::shared_ptr<const tiff::IFD>
+      std::shared_ptr<const tiff::IFD>
       OMETIFFReader::ifdAtIndex(dimension_size_type plane) const
       {
         std::shared_ptr<const IFD> ifd;
 
-        const OMETIFFMetadata& ometa(dynamic_cast<const OMETIFFMetadata&>(getCoreMetadata(getSeries(), getResolution())));
+        const OMETIFFMetadata& ometa(dynamic_cast<const OMETIFFMetadata&>(getCoreMetadata(getSeries(), 0U)));
 
         if (plane < ometa.tiffPlanes.size())
           {
             const OMETIFFPlane& tiffplane(ometa.tiffPlanes.at(plane));
-            const std::shared_ptr<const TIFF> tiff(getTIFF(tiffplane.id));
+            std::shared_ptr<const TIFF> tiff(getTIFF(tiffplane.id));
             if (tiff)
               ifd = std::shared_ptr<const IFD>(tiff->getDirectoryByIndex(tiffplane.ifd));
           }
@@ -373,7 +389,7 @@ namespace ome
             if (!metadataFile.empty())
               fileSet.insert(metadataFile);
 
-            const OMETIFFMetadata& ometa(dynamic_cast<const OMETIFFMetadata&>(getCoreMetadata(getSeries(), getResolution())));
+            const OMETIFFMetadata& ometa(dynamic_cast<const OMETIFFMetadata&>(getCoreMetadata(getSeries(), 0U)));
 
             for(const auto& plane : ometa.tiffPlanes)
               {
@@ -438,7 +454,7 @@ namespace ome
 
         // Cache and use this TIFF.
         addTIFF(*currentId);
-        const std::shared_ptr<const TIFF> tiff(getTIFF(*currentId));
+        std::shared_ptr<const TIFF> tiff(getTIFF(*currentId));
 
         // Get the OME-XML from the first TIFF, and create OME-XML
         // metadata from it.
@@ -535,7 +551,7 @@ namespace ome
 
         // Now all image series and TIFF files are discovered, attempt
         // to add sub-resolutions.
-        addSubResolutions();
+        addSubResolutions(*meta);
       }
 
       void
@@ -852,7 +868,7 @@ namespace ome
                       << " missing plane #" << no;
 
                     // Fallback if broken.
-                    const std::shared_ptr<const TIFF> tiff(getTIFF(*currentId));
+                    std::shared_ptr<const TIFF> tiff(getTIFF(*currentId));
                     dimension_size_type nIFD = tiff->directoryCount();
 
                     coreMeta.tiffPlanes.clear();
@@ -870,8 +886,8 @@ namespace ome
             BOOST_LOG_SEV(logger, ome::logging::trivial::debug)
               << "}";
 
-            // Fill CoreMetadata.
-            fillCoreMetadata(meta, series, num);
+            // Fill CoreMetadata for full-resolution image.
+            fillCoreMetadata(meta, series, 0U);
           }
       }
 
@@ -958,11 +974,11 @@ namespace ome
       {
         index_type seriesCount = meta.getImageCount();
 
-        for (index_type series = 0; series < seriesCount; ++series)
+        for (index_type s = 0; s < seriesCount; ++s)
           {
-            auto& coreMeta = dynamic_cast<OMETIFFMetadata&>(getCoreMetadata(series, 0));
-            dimension_size_type channelCount = meta.getChannelCount(series);
-            if (meta.getChannelCount(series) > 0)
+            auto& coreMeta = dynamic_cast<OMETIFFMetadata&>(getCoreMetadata(s, 0));
+            dimension_size_type channelCount = meta.getChannelCount(s);
+            if (meta.getChannelCount(s) > 0)
               {
                 coreMeta.sizeC.clear();
                 for (dimension_size_type channel = 0; channel < channelCount; ++channel)
@@ -970,7 +986,7 @@ namespace ome
                     dimension_size_type samplesPerPixel = 1U;
                     try
                       {
-                        samplesPerPixel = static_cast<dimension_size_type>(meta.getChannelSamplesPerPixel(series, 0));
+                        samplesPerPixel = static_cast<dimension_size_type>(meta.getChannelSamplesPerPixel(s, 0));
                       }
                     catch (const std::exception&)
                       {
@@ -983,13 +999,13 @@ namespace ome
               }
             else // No Channels specified
               {
-                dimension_size_type channels = meta.getPixelsSizeC(series);
+                dimension_size_type channels = meta.getPixelsSizeC(s);
                 coreMeta.sizeC.clear();
                 for (dimension_size_type channel = 0; channel < channels; ++channel)
                   coreMeta.sizeC.push_back(1U);
 
                 boost::format fmt("Channel element(s) are missing for series %1%: Falling back to %2% channel(s) of 1 sample each");
-                fmt % series % channels;
+                fmt % s % channels;
                 BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
               }
           }
@@ -998,27 +1014,65 @@ namespace ome
       void
       OMETIFFReader::fillCoreMetadata(const ome::xml::meta::OMEXMLMetadata&    meta,
                                       ome::xml::meta::BaseMetadata::index_type series,
-                                      dimension_size_type                      imageCount)
+                                      ome::xml::meta::BaseMetadata::index_type resolution)
       {
-        auto& coreMeta = dynamic_cast<OMETIFFMetadata&>(getCoreMetadata(series, 0));
+        auto& coreFullResolutionMeta = dynamic_cast<OMETIFFMetadata&>
+          (getCoreMetadata(series, 0));
+        auto& coreMeta = dynamic_cast<OMETIFFMetadata&>(getCoreMetadata(series, resolution));
+
         try
           {
-            const OMETIFFPlane& plane(coreMeta.tiffPlanes.at(0));
-            const std::shared_ptr<const tiff::TIFF> ptiff(getTIFF(plane.id));
-            const std::shared_ptr<const tiff::IFD> pifd(ptiff->getDirectoryByIndex(plane.ifd));
+            const OMETIFFPlane& plane(coreFullResolutionMeta.tiffPlanes.at(0));
+            std::shared_ptr<const tiff::TIFF> ptiff(getTIFF(plane.id));
+            std::shared_ptr<const tiff::IFD> pifd(ptiff->getDirectoryByIndex(plane.ifd));
+
+            if(!resolution)
+              {
+                assert (!coreMeta.subResolutionOffset);
+              }
+            else
+              {
+                assert (coreMeta.subResolutionOffset);
+              }
+
+            if (resolution)
+              {
+                if (!coreMeta.subResolutionOffset)
+                  {
+                    boost::format fmt("Sub-resolution offset missing for series %1%, resolution %2%");
+                    fmt % series % resolution;
+                    throw FormatException(fmt.str());
+                  }
+                std::vector<uint64_t> subifds;
+                pifd->getField(tiff::SUBIFD).get(subifds);
+                pifd = ptiff->getDirectoryByOffset(subifds.at(resolution - 1U));
+              }
 
             uint32_t tiffWidth = pifd->getImageWidth();
             uint32_t tiffHeight = pifd->getImageHeight();
             ome::xml::model::enums::PixelType tiffPixelType = pifd->getPixelType();
             tiff::PhotometricInterpretation photometric = pifd->getPhotometricInterpretation();
 
-            coreMeta.sizeX = meta.getPixelsSizeX(series);
-            coreMeta.sizeY = meta.getPixelsSizeY(series);
+            auto metaSizeX = meta.getPixelsSizeX(series);
+            auto metaSizeY = meta.getPixelsSizeY(series);
+
+            if (resolution == 0 &&
+                (metaSizeX != ome::xml::model::primitives::PositiveInteger(tiffWidth) ||
+                 metaSizeY != ome::xml::model::primitives::PositiveInteger(tiffHeight)))
+              {
+                boost::format fmt("Size mismatch: OME=%1%×%2%, TIFF=%3%×%4%");
+                fmt % metaSizeX % metaSizeY % tiffWidth % tiffHeight;
+                BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
+              }
+
+            coreMeta.sizeX = tiffWidth;
+            coreMeta.sizeY = tiffHeight;
+
             coreMeta.sizeZ = meta.getPixelsSizeZ(series);
             coreMeta.sizeT = meta.getPixelsSizeT(series);
             // coreMeta.sizeC already set
             coreMeta.pixelType = meta.getPixelsType(series);
-            coreMeta.imageCount = imageCount;
+            coreMeta.imageCount = coreMeta.sizeZ * coreMeta.sizeT * coreMeta.sizeC.size();
             coreMeta.dimensionOrder = meta.getPixelsDimensionOrder(series);
             coreMeta.orderCertain = true;
             // libtiff converts to the native endianess transparently
@@ -1080,9 +1134,9 @@ namespace ome
                                        channel,
                                        0);
 
-                const OMETIFFPlane& plane(coreMeta.tiffPlanes.at(planeIndex));
-                const std::shared_ptr<const tiff::TIFF> ctiff(getTIFF(plane.id));
-                const std::shared_ptr<const tiff::IFD> cifd(ctiff->getDirectoryByIndex(plane.ifd));
+                const OMETIFFPlane& plane(coreFullResolutionMeta.tiffPlanes.at(planeIndex));
+                std::shared_ptr<const tiff::TIFF> ctiff(getTIFF(plane.id));
+                std::shared_ptr<const tiff::IFD> cifd(ctiff->getDirectoryByIndex(plane.ifd));
                 const tiff::TileInfo tinfo(cifd->getTileInfo());
                 const dimension_size_type tiffSamples = cifd->getSamplesPerPixel();
 
@@ -1134,8 +1188,11 @@ namespace ome
                   << "Ignoring invalid BinData elements in OME-TIFF Pixels element";
               }
 
-            fixOMEROMetadata(meta, series);
-            fixDimensions(series);
+            if (resolution == 0)
+              {
+                fixOMEROMetadata(meta, series);
+                fixDimensions(series);
+              }
           }
         catch (const std::exception& e)
           {
@@ -1529,31 +1586,66 @@ namespace ome
       }
 
       void
-      OMETIFFReader::addSubResolutions()
+      OMETIFFReader::addSubResolutions(const ome::xml::meta::OMEXMLMetadata& meta)
       {
         for (dimension_size_type s = 0; s < core.size(); ++s)
           {
             auto& c0 = dynamic_cast<OMETIFFMetadata&>(getCoreMetadata(s, 0));
             const OMETIFFPlane& tiffplane(c0.tiffPlanes.at(0));
-            const std::shared_ptr<const TIFF> tiff(getTIFF(tiffplane.id));
+            std::shared_ptr<const TIFF> tiff(getTIFF(tiffplane.id));
             if (!tiff)
               continue;
             auto ifd = tiff->getDirectoryByIndex(tiffplane.ifd);
             std::vector<uint64_t> subifds;
             try
               {
-                ifd->getField(tiff::SUBIFD).get(subifds);
-                for (const auto& subifd_offset : subifds)
+                try
                   {
-                    std::cerr << "IFD: " << subifd_offset << "\n";
-                    auto subifd = tiff->getDirectoryByIndex(subifd_offset);
+                    ifd->getField(tiff::SUBIFD).get(subifds);
+                  }
+                catch (const ome::files::tiff::Exception&)
+                  {
+                    // No sub-resolutions exist
+                    continue;
+                  }
+
+                // Resize core metadata to include full image and all sub-resolutions.
+                core.at(s).resize(1U + subifds.size());
+                for (index_type i = 1; i < core.at(s).size(); ++i)
+                  {
+                    core.at(s).at(i) = std::make_unique<OMETIFFMetadata>();
+                  }
+
+                for (dimension_size_type r = 0; r < subifds.size(); ++r)
+                  {
+                    auto& cr = dynamic_cast<OMETIFFMetadata&>(getCoreMetadata(s, 1U + r));
+                    cr.subResolutionOffset = r;
+                    // checkChannelSamplesPerPixel not used for
+                    // sub-resolutions; could be refactored into
+                    // fillCoreMetadata to work for all resolution
+                    // levels.
+                    cr.sizeC = c0.sizeC;
+                    // Fill CoreMetadata for full-resolution image.
+                    fillCoreMetadata(meta, s, 1U + r);
+
+                    if (!compareResolution(*(core.at(s).at(0)), *(core.at(s).at(1U + r))))
+                      {
+                        boost::format fmt("Sub-resolution core metadata mismatch with full resolution core metadata: series %1%, resolution %2%");
+                        fmt % s % (1U + r);
+                        throw FormatException(fmt.str());
+                      }
                   }
               }
-            catch (const tiff::Exception&)
+            catch (const std::exception& e)
               {
+                // Something was wrong with the sub-resolution images; discard them.
+                boost::format fmt("Failed to get sub-resolutions for series %1%: %2%");
+                fmt % s % e.what();
+
+                BOOST_LOG_SEV(logger, ome::logging::trivial::warning) << fmt.str();
+
                 continue;
               }
-
           }
         orderResolutions(core);
       }
@@ -1566,7 +1658,7 @@ namespace ome
 
         setPlane(plane);
 
-        const std::shared_ptr<const IFD>& ifd(ifdAtIndex(plane));
+        std::shared_ptr<const IFD> ifd(ifdAtIndex(plane));
 
         try
           {
@@ -1590,7 +1682,24 @@ namespace ome
       {
         assertId(currentId, true);
 
-        const std::shared_ptr<const IFD>& ifd(ifdAtIndex(plane));
+        std::shared_ptr<const IFD> ifd(ifdAtIndex(plane));
+
+        if (resolution)
+          {
+            const OMETIFFMetadata& ometa(dynamic_cast<const OMETIFFMetadata&>(getCoreMetadata(getSeries(), getResolution())));
+            if (!ometa.subResolutionOffset)
+              {
+                boost::format fmt("Sub-resolution offset missing for series %1%, resolution %2%");
+                fmt % series % resolution;
+                throw FormatException(fmt.str());
+              }
+
+            std::shared_ptr<TIFF> tiff = ifd->getTIFF();
+
+            std::vector<uint64_t> subifds;
+            ifd->getField(tiff::SUBIFD).get(subifds);
+            ifd = tiff->getDirectoryByOffset(subifds.at(*(ometa.subResolutionOffset)));
+          }
 
         ifd->readImage(buf, x, y, w, h);
       }
@@ -1601,7 +1710,7 @@ namespace ome
         tiffs.insert(std::make_pair(tiff, std::shared_ptr<tiff::TIFF>()));
       }
 
-      const std::shared_ptr<const ome::files::tiff::TIFF>
+      std::shared_ptr<const ome::files::tiff::TIFF>
       OMETIFFReader::getTIFF(const boost::filesystem::path& tiff) const
       {
         tiff_map::iterator i = tiffs.find(tiff);
@@ -1645,7 +1754,7 @@ namespace ome
       bool
       OMETIFFReader::validTIFF(const boost::filesystem::path& tiff) const
       {
-        const std::shared_ptr<const ome::files::tiff::TIFF> valid(getTIFF(tiff));
+        std::shared_ptr<const ome::files::tiff::TIFF> valid(getTIFF(tiff));
         return static_cast<bool>(valid);
       }
 
@@ -1672,7 +1781,7 @@ namespace ome
         if (!checkSuffix(id, companion_suffixes))
           {
             addTIFF(id);
-            const std::shared_ptr<const TIFF> tiff(getTIFF(id));
+            std::shared_ptr<const TIFF> tiff(getTIFF(id));
             return createOMEXMLMetadata(getImageDescription(*tiff));
           }
         else
