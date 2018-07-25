@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -134,11 +135,31 @@ namespace
       tileinfo(tileinfo),
       region(region),
       tiles(tiles),
-      tilebuf(tileinfo.bufferSize())
+      // If using a PhotometricInterpretation requiring an RGB
+      // conversion, use an RGBA buffer
+      tilebuf(useRGBA(ifd) ? tileinfo.bufferSizeRGBA() : tileinfo.bufferSize())
     {}
 
     ~ReadVisitor()
     {
+    }
+
+    static bool
+    useRGBA(const IFD& ifd)
+    {
+      auto pt = ifd.getPixelType();
+      auto pi = ifd.getPhotometricInterpretation();
+
+      if (pt == PixelType::UINT8 &&
+          (pi == YCBCR ||
+           pi == CIELAB ||
+           pi == ICCLAB ||
+           pi == ITULAB ||
+           pi == LOGL ||
+           pi == LOGLUV))
+        return true;
+
+      return false;
     }
 
     template<typename T>
@@ -234,6 +255,59 @@ namespace
     }
 
     template<typename T>
+    void
+    transferRGBA(std::shared_ptr<T>&       /* buffer */,
+                 typename T::indices_type& /* destidx */,
+                 const TileBuffer&         /* tilebuf */,
+                 PlaneRegion&              /* rfull */,
+                 PlaneRegion&              /* rclip */,
+                 uint16_t                  /* copysamples */)
+    {
+      boost::format fmt("Unsupported TIFF RGBA pixel type %1%");
+      fmt % ifd.getPixelType();
+      throw Exception(fmt.str());
+    }
+
+    // Special case for UINT8 RGBA
+    void
+    transferRGBA(std::shared_ptr<PixelBuffer<PixelProperties<PixelType::UINT8>::std_type>>& buffer,
+                 PixelBuffer<PixelProperties<PixelType::UINT8>::std_type>::indices_type&    destidx,
+                 const TileBuffer&                                                          tilebuf,
+                 PlaneRegion&                                                               rfull,
+                 PlaneRegion&                                                               rclip,
+                 uint16_t                                                                   copysamples)
+    {
+      // Transfer discontiguous block (typically dropping alpha).
+
+      typedef PixelBuffer<PixelProperties<PixelType::UINT8>::std_type> T;
+
+      const T::value_type *src = reinterpret_cast<const T::value_type *>(tilebuf.data());
+
+      for (dimension_size_type row = rclip.y;
+           row < rclip.y + rclip.h;
+           ++row)
+        {
+          // Indexed from bottom-left, so invert y.
+          dimension_size_type yoffset = (rclip.y + rclip.h - row - 1) * (rfull.w * 4);
+          destidx[ome::files::DIM_SPATIAL_Y] = row - region.y;
+
+          for (dimension_size_type col = rclip.x;
+               col < rclip.x + rclip.w;
+               ++col)
+            {
+              dimension_size_type xoffset = (rclip.x - rfull.x + col) * 4;
+              destidx[ome::files::DIM_SPATIAL_X] = col - region.x;
+
+              for (uint16_t sample = 0; sample < copysamples; ++sample)
+                {
+                  destidx[ome::files::DIM_SUBCHANNEL] = sample;
+                  buffer->array()(destidx) = src[xoffset + yoffset + sample];
+                }
+            }
+        }
+    }
+
+    template<typename T>
     dimension_size_type
     expected_read(const std::shared_ptr<T>& /* buffer */,
                   const PlaneRegion&        rclip,
@@ -286,22 +360,45 @@ namespace
               dest_subchannel = sample;
             }
 
-          if (type == TILE)
+          if (!useRGBA(ifd))
             {
-              tmsize_t bytesread = TIFFReadEncodedTile(tiffraw, tile, tilebuf.data(), static_cast<tsize_t>(tilebuf.size()));
-              if (bytesread < 0)
-                sentry.error("Failed to read encoded tile");
-              else if (static_cast<dimension_size_type>(bytesread) != tilebuf.size())
-                sentry.error("Failed to read encoded tile fully");
+              if (type == TILE)
+                {
+                  tmsize_t bytesread = TIFFReadEncodedTile(tiffraw, tile, tilebuf.data(), static_cast<tsize_t>(tilebuf.size()));
+                  if (bytesread < 0)
+                    sentry.error("Failed to read encoded tile");
+                  else if (static_cast<dimension_size_type>(bytesread) != tilebuf.size())
+                    sentry.error("Failed to read encoded tile fully");
+                }
+              else
+                {
+                  tmsize_t bytesread = TIFFReadEncodedStrip(tiffraw, tile, tilebuf.data(), static_cast<tsize_t>(tilebuf.size()));
+                  dimension_size_type expectedread = expected_read(buffer, rclip, copysamples);
+                  if (bytesread < 0)
+                    sentry.error("Failed to read encoded strip");
+                  else if (static_cast<dimension_size_type>(bytesread) < expectedread)
+                    sentry.error("Failed to read encoded strip fully");
+                }
             }
           else
             {
-              tmsize_t bytesread = TIFFReadEncodedStrip(tiffraw, tile, tilebuf.data(), static_cast<tsize_t>(tilebuf.size()));
-              dimension_size_type expectedread = expected_read(buffer, rclip, copysamples);
-              if (bytesread < 0)
-                sentry.error("Failed to read encoded strip");
-              else if (static_cast<dimension_size_type>(bytesread) < expectedread)
-                sentry.error("Failed to read encoded strip fully");
+              uint32_t x = tileinfo.tileColumn(tile) * tileinfo.tileWidth();
+              uint32_t y = tileinfo.tileRow(tile) * tileinfo.tileHeight();
+
+              uint32_t *tilebuf32 = reinterpret_cast<uint32_t *>(tilebuf.data());
+
+              if (type == TILE)
+                {
+                  tmsize_t bytesread = TIFFReadRGBATile(tiffraw, x, y, tilebuf32);
+                  if (bytesread < 0)
+                    sentry.error("Failed to read RGBA tile");
+                }
+              else
+                {
+                  tmsize_t bytesread = TIFFReadRGBAStrip(tiffraw, x, tilebuf32);
+                  if (bytesread < 0)
+                    sentry.error("Failed to read RGBA strip");
+                }
             }
 
           typename T::indices_type destidx;
@@ -312,7 +409,14 @@ namespace
             destidx[ome::files::DIM_CHANNEL] = destidx[ome::files::DIM_MODULO_Z] =
             destidx[ome::files::DIM_MODULO_T] = destidx[ome::files::DIM_MODULO_C] = 0;
 
-          transfer(buffer, destidx, tilebuf, rfull, rclip, copysamples);
+          if (!useRGBA(ifd))
+            {
+              transfer(buffer, destidx, tilebuf, rfull, rclip, copysamples);
+            }
+          else
+            {
+              transferRGBA(buffer, destidx, tilebuf, rfull, rclip, copysamples);
+            }
         }
     }
   };
@@ -511,7 +615,9 @@ namespace
           // Note boost::make_shared makes arguments const, so can't use
           // here.
           if (!tilecache.find(tile))
-            tilecache.insert(tile, std::shared_ptr<TileBuffer>(new TileBuffer(tileinfo.bufferSize())));
+            {
+              tilecache.insert(tile, std::shared_ptr<TileBuffer>(new TileBuffer(tileinfo.bufferSize())));
+            }
           assert(tilecache.find(tile));
           TileBuffer& tilebuf = *tilecache.find(tile);
 

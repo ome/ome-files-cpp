@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -130,6 +131,18 @@ namespace ome
          */
         dimension_size_type
         bufferSize() const;
+
+        /**
+         * Get the buffer size needed to contain a single tile in RGBA format.
+         *
+         * For @c TIFFReadRGBATile and @c TIFFReadRGBAStrip and
+         * related functions.  The buffer is unsigned 32-bit data
+         * comprised of unsigned 8-bit RGBA samples.
+         *
+         * @returns the buffer size.
+         */
+        dimension_size_type
+        bufferSizeRGBA() const;
 
         /**
          * Get the tile index covering the given coordinates.
