@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -221,6 +222,12 @@ namespace ome
       TileInfo::bufferSize() const
       {
         return impl->buffersize;
+      }
+
+      dimension_size_type
+      TileInfo::bufferSizeRGBA() const
+      {
+        return 4U * impl->tilewidth * impl->tileheight;
       }
 
       dimension_size_type
