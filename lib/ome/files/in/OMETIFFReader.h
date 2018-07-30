@@ -292,6 +292,7 @@ namespace ome
          * @param meta the metadata store to query.
          * @param series the series to check.
          * @param tiffDataIndex the TIFF data index to check.
+         * @returns the filename.
          */
         boost::filesystem::path
         getTiffDataFilename(const ome::xml::meta::OMEXMLMetadata&    meta,
