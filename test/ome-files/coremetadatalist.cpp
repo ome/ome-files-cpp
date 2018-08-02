@@ -155,10 +155,13 @@ operator<< (std::basic_ostream<charT,traits>& os,
             const ListTestParameters& p)
 {
   os << p.list;
-  os << " [";
+  os << " [ ";
     for (const auto& s : p.order)
       {
-        os << s << ",";
+        os << '(';
+        for (const auto& r : s)
+          os << r << ",";
+        os << "), ";
       }
   os << ']';
   return os;
