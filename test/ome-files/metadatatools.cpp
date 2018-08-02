@@ -8,6 +8,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -56,6 +57,9 @@
 #include <ome/xml/version.h>
 #include <ome/xml/OMETransformResolver.h>
 #include <ome/xml/OMETransformResolver.h>
+#include <ome/xml/model/Image.h>
+#include <ome/xml/model/Instrument.h>
+#include <ome/xml/model/LongAnnotation.h>
 #include <ome/xml/model/enums/EnumerationException.h>
 
 using boost::filesystem::path;
@@ -667,6 +671,245 @@ TEST_P(ModelTest, CreateMetadataFromString)
 
   std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> meta;
   ASSERT_NO_THROW(meta = createOMEXMLMetadata(input));
+}
+
+namespace
+{
+
+  std::shared_ptr<::ome::xml::meta::OMEXMLMetadata>
+  createResolutionMetadata()
+  {
+    boost::filesystem::path sample_path(ome::common::module_runtime_path("ome-xml-sample"));
+    sample_path /= "2016-06/spim.ome.xml";
+
+    std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> meta;
+    meta = createOMEXMLMetadata(sample_path);
+
+    meta->setPixelsSizeX(8192U, 0);
+    meta->setPixelsSizeY(8192U, 0);
+    meta->setPixelsSizeZ(12U, 0);
+    meta->setPixelsSizeX(4096U, 1);
+    meta->setPixelsSizeY(4096U, 1);
+    meta->setPixelsSizeZ(8U, 1);
+    meta->setPixelsSizeX(2048U, 2);
+    meta->setPixelsSizeY(2048U, 2);
+    meta->setPixelsSizeZ(4U, 2);
+    meta->setPixelsSizeX(2048U, 3);
+    meta->setPixelsSizeY(2048U, 3);
+    meta->setPixelsSizeZ(2U, 3);
+
+    ome::files::addResolutions(*meta, 0, {{4096U,4096U,12U}, {2048U,2048U,12U}, {1024U,1024U,12U}});
+    ome::files::addResolutions(*meta, 2, {{1024U,1024U,4U}, {512U,512,4U}});
+    ome::files::addResolutions(*meta, 3, {{1024U,1024U,4U}, {512U,512,4U}, {256U,256U,4U}, {128U,128U,4U}, {64U,64U,4U}});
+
+    return meta;
+  }
+
+  const std::string test_long_ns("test.org/longnamespace");
+  long test_long_val = 342234208992L;
+
+  std::shared_ptr<::ome::xml::meta::OMEXMLMetadata>
+  createLongAnnotation()
+  {
+    boost::filesystem::path sample_path(ome::common::module_runtime_path("ome-xml-sample"));
+    sample_path /= "2016-06/spim.ome.xml";
+
+    std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> meta;
+    meta = createOMEXMLMetadata(sample_path);
+
+    auto long_idx = meta->getLongAnnotationCount();
+
+    std::string annotation_id = createID("Annotation:Long", long_idx);
+    meta->setLongAnnotationID(annotation_id, long_idx);
+    meta->setLongAnnotationNamespace(test_long_ns, long_idx);
+    meta->setLongAnnotationValue(test_long_val, long_idx);
+
+    meta->setInstrumentAnnotationRef(annotation_id, 0U,
+                                     meta->getInstrumentAnnotationRefCount(0U));
+
+    meta->resolveReferences(); // Not resolved automatically.
+
+    return meta;
+  }
+
+}
+
+TEST(MetadataTools, GetAnnotation)
+{
+  auto meta = createLongAnnotation();
+
+  ASSERT_EQ(1U, meta->getInstrumentCount());
+  ASSERT_EQ(1U, meta->getLongAnnotationCount());
+
+  auto root = meta->getRoot();
+  auto omexmlroot = std::dynamic_pointer_cast<ome::xml::meta::OMEXMLMetadataRoot>(root);
+  std::shared_ptr<::ome::xml::model::Instrument> minstrument(omexmlroot->getInstrument(0U));
+
+  auto result = ome::files::getAnnotation<::ome::xml::model::Instrument,
+    ::ome::xml::model::LongAnnotation>(minstrument, test_long_ns);
+  ASSERT_NE(nullptr, result);
+  ASSERT_EQ(test_long_val, result->getValue());
+}
+
+TEST(MetadataTools, RemoveAnnotation)
+{
+  auto meta = createLongAnnotation();
+
+  auto root = meta->getRoot();
+  auto omexmlroot = std::dynamic_pointer_cast<ome::xml::meta::OMEXMLMetadataRoot>(root);
+  std::shared_ptr<::ome::xml::model::Instrument> minstrument(omexmlroot->getInstrument(0U));
+
+  ASSERT_EQ(1U, meta->getLongAnnotationCount());
+  ASSERT_EQ(1U, omexmlroot->getInstrument(0U)->sizeOfLinkedAnnotationList());
+
+  ome::files::removeAnnotation<::ome::xml::model::Instrument,
+    ::ome::xml::model::LongAnnotation>(minstrument, test_long_ns);
+
+  ASSERT_EQ(1U, meta->getLongAnnotationCount());
+  ASSERT_EQ(0U, omexmlroot->getInstrument(0U)->sizeOfLinkedAnnotationList());
+
+  auto result = ome::files::getAnnotation<::ome::xml::model::Instrument,
+    ::ome::xml::model::LongAnnotation>(minstrument, test_long_ns);
+
+  ASSERT_EQ(nullptr, result);
+}
+
+TEST(MetadataTools, AddResolutions)
+{
+  std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> meta;
+
+  ASSERT_NO_THROW(meta = createResolutionMetadata());
+  ASSERT_EQ(4U, meta->getImageCount());
+  ASSERT_EQ(3U, meta->getMapAnnotationCount());
+
+  std::cout << "Resolution annotations:\n" << meta->dumpXML() << '\n';
+}
+TEST(MetadataTools, AddAllResolutions)
+{
+  std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> meta;
+
+  ASSERT_NO_THROW(meta = createLongAnnotation());
+
+  ome::files::MetadataList<ome::files::Resolution> resolutions =
+    {{
+        {{4096U,4096U,12U}, {2048U,2048U,12U}, {1024U,1024U,12U}},
+        {},
+        {{1024U,1024U,4U}, {512U,512,4U}},
+        {{1024U,1024U,4U}, {512U,512,4U}, {256U,256U,4U}, {128U,128U,4U}, {64U,64U,4U}}
+    }};
+  ome::files::addResolutions(*meta, resolutions);
+
+  ASSERT_EQ(4U, meta->getImageCount());
+  ASSERT_EQ(3U, meta->getMapAnnotationCount());
+
+  std::cout << "Resolution annotations:\n" << meta->dumpXML() << '\n';
+}
+
+TEST(MetadataTools, GetEmptyResolutions)
+{
+  boost::filesystem::path sample_path(ome::common::module_runtime_path("ome-xml-sample"));
+  sample_path /= "2016-06/multi-channel.ome.xml";
+
+  auto meta = createOMEXMLMetadata(sample_path);
+
+  auto res0 = ome::files::getResolutions(*meta, 0);
+  ASSERT_EQ(0U, res0.size());
+}
+
+TEST(MetadataTools, GetResolutions)
+{
+  auto meta = createResolutionMetadata();
+
+  auto res0 = ome::files::getResolutions(*meta, 0);
+  ASSERT_EQ(3U, res0.size());
+  ASSERT_EQ(ome::files::Resolution({4096U,4096U,12U}), res0[0]);
+  ASSERT_EQ(ome::files::Resolution({2048U,2048U,12U}), res0[1]);
+  ASSERT_EQ(ome::files::Resolution({1024U,1024U,12U}), res0[2]);
+
+  auto res1 = ome::files::getResolutions(*meta, 1);
+  ASSERT_EQ(0U, res1.size());
+
+  auto res2 = ome::files::getResolutions(*meta, 2);
+  ASSERT_EQ(2U, res2.size());
+  ASSERT_EQ(ome::files::Resolution({1024U,1024U,4U}), res2[0]);
+  ASSERT_EQ(ome::files::Resolution({512U,512U,4U}), res2[1]);
+
+  auto res3 = ome::files::getResolutions(*meta, 3);
+  ASSERT_EQ(5U, res3.size());
+  ASSERT_EQ(ome::files::Resolution({1024U,1024U,4U}), res3[0]);
+  ASSERT_EQ(ome::files::Resolution({512U,512U,4U}), res3[1]);
+  ASSERT_EQ(ome::files::Resolution({256U,256U,4U}), res3[2]);
+  ASSERT_EQ(ome::files::Resolution({128U,128U,4U}), res3[3]);
+  ASSERT_EQ(ome::files::Resolution({64U,64U,4U}), res3[4]);
+}
+
+TEST(MetadataTools, GetAllResolutions)
+{
+  auto meta = createResolutionMetadata();
+
+  auto allres = ome::files::getResolutions(*meta);
+
+  ASSERT_EQ(4U, allres.size());
+  ASSERT_EQ(3U, allres[0].size());
+  ASSERT_EQ(ome::files::Resolution({4096U,4096U,12U}), allres[0][0]);
+  ASSERT_EQ(ome::files::Resolution({2048U,2048U,12U}), allres[0][1]);
+  ASSERT_EQ(ome::files::Resolution({1024U,1024U,12U}), allres[0][2]);
+
+  ASSERT_EQ(0U, allres[1].size());
+
+  ASSERT_EQ(2U, allres[2].size());
+  ASSERT_EQ(ome::files::Resolution({1024U,1024U,4U}), allres[2][0]);
+  ASSERT_EQ(ome::files::Resolution({512U,512U,4U}), allres[2][1]);
+
+  ASSERT_EQ(5U, allres[3].size());
+  ASSERT_EQ(ome::files::Resolution({1024U,1024U,4U}), allres[3][0]);
+  ASSERT_EQ(ome::files::Resolution({512U,512U,4U}), allres[3][1]);
+  ASSERT_EQ(ome::files::Resolution({256U,256U,4U}), allres[3][2]);
+  ASSERT_EQ(ome::files::Resolution({128U,128U,4U}), allres[3][3]);
+  ASSERT_EQ(ome::files::Resolution({64U,64U,4U}), allres[3][4]);
+}
+
+TEST(MetadataTools, RemoveResolutions)
+{
+  auto meta = createResolutionMetadata();
+
+  auto root = meta->getRoot();
+  auto omexmlroot = std::dynamic_pointer_cast<ome::xml::meta::OMEXMLMetadataRoot>(root);
+
+  ASSERT_EQ(3U, meta->getMapAnnotationCount());
+  ASSERT_EQ(5U, omexmlroot->getImage(2U)->sizeOfLinkedAnnotationList());
+
+  ome::files::removeResolutions(*meta, 2U);
+
+  ASSERT_EQ(2U, meta->getMapAnnotationCount());
+  ASSERT_EQ(4U, omexmlroot->getImage(2U)->sizeOfLinkedAnnotationList());
+}
+
+TEST(MetadataTools, RemoveAllResolutions)
+{
+  auto meta = createResolutionMetadata();
+
+  auto root = meta->getRoot();
+  auto omexmlroot = std::dynamic_pointer_cast<ome::xml::meta::OMEXMLMetadataRoot>(root);
+
+  ASSERT_EQ(3U, meta->getMapAnnotationCount());
+  ASSERT_EQ(5U, omexmlroot->getImage(0U)->sizeOfLinkedAnnotationList());
+  ASSERT_EQ(4U, omexmlroot->getImage(1U)->sizeOfLinkedAnnotationList());
+  ASSERT_EQ(5U, omexmlroot->getImage(2U)->sizeOfLinkedAnnotationList());
+  ASSERT_EQ(5U, omexmlroot->getImage(3U)->sizeOfLinkedAnnotationList());
+
+  ome::files::removeResolutions(*meta);
+
+  ASSERT_EQ(0U, meta->getMapAnnotationCount());
+  ASSERT_EQ(4U, omexmlroot->getImage(0U)->sizeOfLinkedAnnotationList());
+  ASSERT_EQ(4U, omexmlroot->getImage(1U)->sizeOfLinkedAnnotationList());
+  ASSERT_EQ(4U, omexmlroot->getImage(2U)->sizeOfLinkedAnnotationList());
+  ASSERT_EQ(4U, omexmlroot->getImage(3U)->sizeOfLinkedAnnotationList());
+
+  ASSERT_EQ(0U, ome::files::getResolutions(*meta, 0).size());
+  ASSERT_EQ(0U, ome::files::getResolutions(*meta, 1).size());
+  ASSERT_EQ(0U, ome::files::getResolutions(*meta, 2).size());
+  ASSERT_EQ(0U, ome::files::getResolutions(*meta, 3).size());
 }
 
 // Disable missing-prototypes warning for INSTANTIATE_TEST_CASE_P;

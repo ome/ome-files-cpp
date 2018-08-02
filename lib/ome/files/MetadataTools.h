@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -35,6 +36,7 @@
  * #L%
  */
 
+#include <array>
 #include <string>
 
 #include <boost/filesystem/path.hpp>
@@ -47,6 +49,7 @@
 #include <ome/xml/meta/MetadataRoot.h>
 #include <ome/xml/meta/OMEXMLMetadata.h>
 
+#include <ome/xml/model/Annotation.h>
 #include <ome/xml/model/enums/DimensionOrder.h>
 
 #ifndef OME_FILES_METADATATOOLS_H
@@ -311,6 +314,81 @@ namespace ome
                     bool                              resolve = true);
 
     /**
+     * Get an annotation by namespace.
+     *
+     * If multiple annotations exist with the same namespace, the
+     * first one (in order of addition) will be returned.
+     *
+     * @tparam T the model object type
+     * @tparam A the annotation type
+     * @param object the object the annotation is linked to.
+     * @param ns the annotation namespace
+     * @returns the linked annotation, or @c nullptr if not found.
+     */
+    template<typename T, typename A = ::ome::xml::model::Annotation>
+    inline
+    std::shared_ptr<A>
+    getAnnotation(std::shared_ptr<T> object,
+                  const std::string& ns)
+    {
+      std::shared_ptr<A> ret;
+
+      if (object)
+        {
+          for(const auto& weak_annotation : object->getLinkedAnnotationList())
+            {
+              auto annotation = weak_annotation.lock();
+              auto typed_annotation = std::dynamic_pointer_cast<A>(weak_annotation.lock());
+              if (typed_annotation &&
+                  typed_annotation->getNamespace() &&
+                  *(typed_annotation->getNamespace()) == ns)
+                {
+                  ret = typed_annotation;
+                  break;
+                }
+            }
+        }
+
+      return ret;
+    }
+
+    /**
+     * Remove an annotation by namespace.
+     *
+     * If multiple annotations exist with the same namespace, they
+     * will all be removed.
+     *
+     * Note that this removes the annotation link from the specified
+     * model object.  It does not remove the annotation itself from
+     * the @c StructuredAnnotations list.
+     *
+     * @tparam T the model object type
+     * @tparam A the annotation type
+     * @param object the object the annotation is linked to.
+     * @param ns the annotation namespace
+     * @returns the linked annotation, or @c nullptr if not found.
+     */
+    template<typename T, typename A = ::ome::xml::model::Annotation>
+    inline
+    void
+    removeAnnotation(std::shared_ptr<T> object,
+                     const std::string& ns)
+    {
+      if (object)
+        {
+          for(const auto& weak_annotation : object->getLinkedAnnotationList())
+            {
+              auto annotation = weak_annotation.lock();
+              auto typed_annotation = std::dynamic_pointer_cast<A>(annotation);
+              if (typed_annotation &&
+                  typed_annotation->getNamespace() &&
+                  *(typed_annotation->getNamespace()) == ns)
+                object->unlinkAnnotation(annotation);
+            }
+        }
+    }
+
+    /**
      * Get ModuloAlongZ annotation from OME-XML metadata.
      *
      * @param omexml the OME-XML metadata store.
@@ -355,6 +433,87 @@ namespace ome
     getModulo(const ::ome::xml::meta::OMEXMLMetadata& omexml,
               const std::string&                      tag,
               dimension_size_type                     image);
+
+    /**
+     * A reduced resolution image size.  Needed to support
+     * sub-resolutions.  The three elements are @c x, @c y and @c z,
+     * respectively.
+     */
+    using Resolution = std::array<dimension_size_type, 3>;
+
+    /// A list of resolution levels.
+    using ResolutionList = std::vector<Resolution>;
+
+    /**
+     * Add additional resolution levels for the specified series.
+     *
+     * The resolution levels will be overwritten if already set.
+     *
+     * @param store the OME-XML metadata store.
+     * @param series the image series to modify.
+     * @param resolutions the resolution list to add.
+     */
+    void
+    addResolutions(::ome::xml::meta::MetadataStore& store,
+                   dimension_size_type              series,
+                   const ResolutionList&            resolutions);
+
+    /**
+     * Add additional resolution levels for all series.
+     *
+     * The resolution levels will be overwritten if already set.
+     *
+     * @param store the OME-XML metadata store.
+     * @param resolutions the list of resolution lists to add.
+     */
+    void
+    addResolutions(::ome::xml::meta::MetadataStore& store,
+                   const MetadataList<Resolution>&  resolutions);
+
+    /**
+     * Get additional resolution levels for the specified series.
+     *
+     * @param retrieve the OME-XML metadata store.
+     * @param series the image series to modify.
+     * @returns the resolution list.
+     */
+    ResolutionList
+    getResolutions(::ome::xml::meta::MetadataRetrieve& retrieve,
+                   dimension_size_type                 series);
+
+    /**
+     * Get resolution levels for all series.
+     *
+     * Note: Also includes the full resolution image size.
+     *
+     * @param retrieve the OME-XML metadata store.
+     * @returns a metadata list of all resolution levels.
+     */
+    MetadataList<Resolution>
+    getResolutions(::ome::xml::meta::MetadataRetrieve& retrieve);
+
+    /**
+     * Remove additional resolution levels for the specified series.
+     *
+     * The resolution levels will be removed if present.
+     *
+     * @param store the OME-XML metadata store.
+     * @param series the image series to modify.
+     */
+    void
+    removeResolutions(::ome::xml::meta::MetadataStore& store,
+                      dimension_size_type              series);
+
+    /**
+     * Remove additional resolution levels for all series.
+     *
+     * The resolution levels will be removed from all series if
+     * present.
+     *
+     * @param store the OME-XML metadata store.
+     */
+    void
+    removeResolutions(::ome::xml::meta::MetadataStore& store);
 
     /**
      * Verify correctness of minimal amount of metadata in a series.
