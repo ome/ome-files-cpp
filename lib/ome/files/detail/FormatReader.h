@@ -130,6 +130,14 @@ namespace ome
         mutable dimension_size_type series;
 
         /**
+         * The number of the current resolution.
+         *
+         * @todo Remove use of stateful API which requires use of
+         * series switching in const methods.
+         */
+        mutable dimension_size_type resolution;
+
+        /**
          * The number of the current plane in the current series.
          *
          * @todo Remove use of stateful API which requires use of
@@ -139,14 +147,6 @@ namespace ome
 
         /// Core metadata values.
         CoreMetadataList core;
-
-        /**
-         * The number of the current resolution.
-         *
-         * @todo Remove use of stateful API which requires use of
-         * series switching in const methods.
-         */
-        mutable dimension_size_type resolution;
 
         /// Whether or not resolutions are flattened.
         bool flattenedResolutions;
