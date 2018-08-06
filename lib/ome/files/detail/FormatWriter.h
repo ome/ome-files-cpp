@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -40,6 +41,7 @@
 
 #include <ome/files/FormatWriter.h>
 #include <ome/files/FormatHandler.h>
+#include <ome/files/MetadataTools.h>
 
 #include <map>
 
@@ -121,6 +123,9 @@ namespace ome
         /// Current series.
         mutable dimension_size_type series;
 
+        /// Current resolution.
+        mutable dimension_size_type resolution;
+
         /// Current plane.
         mutable dimension_size_type plane;
 
@@ -147,6 +152,12 @@ namespace ome
          * semantics of getMetadataRetrieve() prevent "null" access.
          */
         std::shared_ptr<::ome::xml::meta::MetadataRetrieve> metadataRetrieve;
+
+        /**
+         * Current resolution levels.  Set from annotations in
+         * metadataRetrieve.
+         */
+        MetadataList<Resolution> resolutionLevels;
 
         /// Constructor.
         FormatWriter(const WriterProperties&);
@@ -466,6 +477,18 @@ namespace ome
         // Documented in superclass.
         dimension_size_type
         getTileSizeY() const;
+
+        // Documented in superclass.
+        dimension_size_type
+        getResolutionCount() const;
+
+        // Documented in superclass.
+        void
+        setResolution(dimension_size_type resolution) const;
+
+        // Documented in superclass.
+        dimension_size_type
+        getResolution() const;
       };
 
     }

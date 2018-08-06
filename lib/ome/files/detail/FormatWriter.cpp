@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -55,7 +56,6 @@
 
 #include <ome/xml/meta/DummyMetadata.h>
 #include <ome/xml/meta/FilterMetadata.h>
-#include <ome/xml/meta/MetadataStore.h>
 #include <ome/xml/meta/OMEXMLMetadata.h>
 
 using boost::filesystem::path;
@@ -75,6 +75,26 @@ namespace ome
       {
         // Default thumbnail width and height.
         const dimension_size_type THUMBNAIL_DIMENSION = 128;
+
+
+        MetadataList<Resolution>
+        getAllResolutions(::ome::xml::meta::MetadataRetrieve& retrieve)
+        {
+          MetadataList<Resolution> rl = getResolutions(retrieve);
+
+          // Add full resolutions.
+          for (::ome::xml::meta::MetadataRetrieve::index_type image = 0;
+               image < retrieve.getImageCount();
+               ++image)
+            {
+              Resolution r = {{ static_cast<dimension_size_type>(retrieve.getPixelsSizeX(image)), static_cast<dimension_size_type>(retrieve.getPixelsSizeY(image)), static_cast<dimension_size_type>(retrieve.getPixelsSizeZ(image)) }};
+              auto& series = rl.at(image);
+              series.insert(series.begin(), r);
+            }
+
+          return rl;
+        }
+
       }
 
       FormatWriter::FormatWriter(const WriterProperties& writerProperties):
@@ -82,6 +102,7 @@ namespace ome
         currentId(boost::none),
         out(),
         series(0),
+        resolution(0),
         plane(0),
         compression(boost::none),
         interleaved(boost::none),
@@ -89,7 +110,8 @@ namespace ome
         framesPerSecond(0),
         tile_size_x(boost::none),
         tile_size_y(boost::none),
-        metadataRetrieve(std::make_shared<DummyMetadata>())
+        metadataRetrieve(std::make_shared<DummyMetadata>()),
+        resolutionLevels()
       {
         assertId(currentId, false);
       }
@@ -133,11 +155,13 @@ namespace ome
         out.reset(); // set to null.
         currentId = boost::none;
         series = 0;
+        resolution = 0;
         plane = 0;
         compression = boost::none;
         sequential = false;
         framesPerSecond = 0;
         metadataRetrieve.reset();
+        resolutionLevels.clear();
       }
 
       bool
@@ -170,8 +194,8 @@ namespace ome
       {
         assertId(currentId, true);
 
-        dimension_size_type width = metadataRetrieve->getPixelsSizeX(getSeries());
-        dimension_size_type height = metadataRetrieve->getPixelsSizeY(getSeries());
+        dimension_size_type width = getSizeX();
+        dimension_size_type height = getSizeY();
         saveBytes(plane, buf, 0, 0, width, height);
       }
 
@@ -197,6 +221,7 @@ namespace ome
           }
 
         this->series = series;
+        this->resolution = 0U;
         this->plane = 0U;
       }
 
@@ -350,6 +375,7 @@ namespace ome
           throw std::logic_error("MetadataStore can not be null");
 
         metadataRetrieve = retrieve;
+        resolutionLevels = getAllResolutions(*retrieve);
       }
 
       const std::shared_ptr<::ome::xml::meta::MetadataRetrieve>&
@@ -379,8 +405,7 @@ namespace ome
       dimension_size_type
       FormatWriter::getSizeX() const
       {
-        dimension_size_type series = getSeries();
-        dimension_size_type sizeX = metadataRetrieve->getPixelsSizeX(series);
+        dimension_size_type sizeX = resolutionLevels.at(getSeries()).at(getResolution())[0];
         if (sizeX == 0U)
           sizeX = 1U;
         return sizeX;
@@ -389,8 +414,7 @@ namespace ome
       dimension_size_type
       FormatWriter::getSizeY() const
       {
-        dimension_size_type series = getSeries();
-        dimension_size_type sizeY = metadataRetrieve->getPixelsSizeY(series);
+        dimension_size_type sizeY = resolutionLevels.at(getSeries()).at(getResolution())[1];
         if (sizeY == 0U)
           sizeY = 1U;
         return sizeY;
@@ -399,8 +423,7 @@ namespace ome
       dimension_size_type
       FormatWriter::getSizeZ() const
       {
-        dimension_size_type series = getSeries();
-        dimension_size_type sizeZ = metadataRetrieve->getPixelsSizeZ(series);
+        dimension_size_type sizeZ = resolutionLevels.at(getSeries()).at(getResolution())[2];
         if (sizeZ == 0U)
           sizeZ = 1U;
         return sizeZ;
@@ -564,7 +587,7 @@ namespace ome
               throw std::logic_error("MetadataStore can not be null");
             if (currentId)
               // after setId
-              return metadataRetrieve->getPixelsSizeX(getSeries());
+              return getSizeX();
             else
               // fallback before setId
               return metadataRetrieve->getPixelsSizeX(0);
@@ -590,12 +613,44 @@ namespace ome
               throw std::logic_error("MetadataStore can not be null");
             if (currentId)
               // after setId
-              return metadataRetrieve->getPixelsSizeY(getSeries());
+              return getSizeX();
             else
               // fallback before setId
               return metadataRetrieve->getPixelsSizeX(0);
           }
         return *tile_size_y;
+      }
+
+      dimension_size_type
+      FormatWriter::getResolutionCount() const
+      {
+        assertId(currentId, true);
+
+        return resolutionLevels.at(getSeries()).size();
+      }
+
+      void
+      FormatWriter::setResolution(dimension_size_type resolution) const
+      {
+        assertId(currentId, true);
+
+        if (resolution >= getResolutionCount())
+          {
+            boost::format fmt("Invalid resolution: %1%");
+            fmt % resolution;
+            throw std::logic_error(fmt.str());
+          }
+        // this->series unchanged.
+        this->resolution = resolution;
+        this->plane = 0;
+      }
+
+      dimension_size_type
+      FormatWriter::getResolution() const
+      {
+        assertId(currentId, true);
+
+        return resolution;
       }
 
     }

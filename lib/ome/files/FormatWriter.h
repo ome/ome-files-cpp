@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -447,6 +448,50 @@ namespace ome
       virtual
       dimension_size_type
       getTileSizeY() const = 0;
+
+      // Sub-resolution API methods
+
+      /**
+       * Get the number of resolutions for the current series.
+       *
+       * Resolutions are stored in descending order of size, so the
+       * largest resolution is first and the smallest resolution is
+       * last.
+       *
+       * @returns the number of resolutions.
+       */
+      virtual
+      dimension_size_type
+      getResolutionCount() const = 0;
+
+      /**
+       * Set the active resolution level.
+       *
+       * @note This also resets the current plane to 0.
+       *
+       * @param resolution the resolution to set.
+       *
+       * @see getResolutionCount()
+       *
+       * @todo Remove use of stateful API which requires use of
+       * series switching in const methods.
+       *
+       * @throws std::logic_error if the resolution is invalid.
+       */
+      virtual
+      void
+      setResolution(dimension_size_type resolution) const = 0;
+
+      /**
+       * Get the active resolution level.
+       *
+       * @returns the resolution level.
+       *
+       * @see getResolutionCount()
+       */
+      virtual
+      dimension_size_type
+      getResolution() const = 0;
     };
 
   }
