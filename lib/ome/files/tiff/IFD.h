@@ -474,6 +474,41 @@ namespace ome
         setCompression(Compression compression);
 
         /**
+         * Get number of SubIFDs.
+         *
+         * @returns the SubIFD count.
+         */
+        uint16_t
+        getSubIFDCount() const;
+
+        /**
+         * Get SubIFD offsets.
+         *
+         * @returns the SubIFD count.
+         */
+        std::vector<uint64_t>
+        getSubIFDOffsets() const;
+
+        /**
+         * Set number of SubIFDs.
+         *
+         * The offset for each IFD is set to zero.  It will be filled
+         * in later.
+         *
+         * @param size the number of SubIFDs to set.
+         */
+        void
+        setSubIFDCount(uint16_t size);
+
+        /**
+         * Set SubIFD offsets.
+         *
+         * @param subifds the offsets to set.
+         */
+        void
+        setSubIFDOffsets(const std::vector<uint64_t>& subifds);
+
+        /**
          * Read a whole image plane into a pixel buffer.
          *
          * @param buf the destination pixel buffer.

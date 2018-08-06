@@ -602,6 +602,8 @@ namespace ome
         boost::optional<PhotometricInterpretation> photometric;
         /// Compression scheme.
         boost::optional<Compression> compression;
+        /// Compression scheme.
+        boost::optional<std::vector<uint64_t>> subifds;
         /// Current tile (for writing).
         tstrile_t ctile;
 
@@ -1213,6 +1215,39 @@ namespace ome
       {
         getField(COMPRESSION).set(compression);
         impl->compression = compression;
+      }
+
+      uint16_t
+      IFD::getSubIFDCount() const
+      {
+        return getSubIFDOffsets().size();
+      }
+
+      std::vector<uint64_t>
+      IFD::getSubIFDOffsets() const
+      {
+        if (!impl->subifds)
+          {
+            std::vector<uint64_t> subifds;
+            getField(SUBIFD).get(subifds);
+            impl->subifds = subifds;
+          }
+        return impl->subifds.get();
+      }
+
+      void
+      IFD::setSubIFDCount(uint16_t size)
+      {
+        std::vector<uint64_t> subifds(size, 0U);
+        setSubIFDOffsets(subifds);
+      }
+
+
+      void
+      IFD::setSubIFDOffsets(const std::vector<uint64_t>& subifds)
+      {
+        getField(SUBIFD).set(subifds);
+        impl->subifds = subifds;
       }
 
       void
