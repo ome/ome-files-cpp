@@ -606,6 +606,19 @@ namespace ome
       }
 
       void
+      OMETIFFWriter::setResolution(dimension_size_type resolution) const
+      {
+        const dimension_size_type currentResolution = getResolution();
+        detail::FormatWriter::setResolution(resolution);
+
+        if (currentResolution != resolution)
+          {
+            nextIFD();
+            setupIFD();
+          }
+      }
+
+      void
       OMETIFFWriter::setPlane(dimension_size_type plane) const
       {
         const dimension_size_type currentPlane = getPlane();
@@ -652,7 +665,10 @@ namespace ome
       OMETIFFWriter::nextIFD() const
       {
         currentTIFF->second.tiff->writeCurrentDirectory();
-        ++currentTIFF->second.ifdCount;
+
+        // Only update IFD count for full resolutions
+        if (getResolution() == 0)
+          ++currentTIFF->second.ifdCount;
       }
 
       void
@@ -755,6 +771,14 @@ namespace ome
 
         if (currentTIFF->second.ifdCount == 0)
           ifd->getField(ome::files::tiff::IMAGEDESCRIPTION).set(default_description);
+
+        // Set up SubIFD if this is a full-resolution image and
+        // sub-resolution images are present.
+        if (getResolution() == 0 &&
+            getResolutionCount() > 1)
+          {
+            ifd->setSubIFDCount(getResolutionCount() - 1);
+          }
       }
 
       void

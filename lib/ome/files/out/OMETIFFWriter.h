@@ -171,6 +171,10 @@ namespace ome
 
         // Documented in superclass.
         void
+        setResolution(dimension_size_type resolution) const;
+
+        // Documented in superclass.
+        void
         setPlane(dimension_size_type plane) const;
 
         // Documented in superclass.
