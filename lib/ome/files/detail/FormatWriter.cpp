@@ -376,6 +376,11 @@ namespace ome
 
         metadataRetrieve = retrieve;
         resolutionLevels = getAllResolutions(*retrieve);
+
+        // Strip resolution annotations from the metadata store.
+        auto store(std::dynamic_pointer_cast<ome::xml::meta::MetadataStore>(retrieve));
+        if (store)
+          ome::files::removeResolutions(*store);
       }
 
       const std::shared_ptr<::ome::xml::meta::MetadataRetrieve>&
