@@ -750,6 +750,8 @@ Full example source: :download:`metadata-formatreader.cpp <examples/metadata-for
   - :ome_files_api:`TIFFReader <classome_1_1files_1_1in_1_1TIFFReader.html>`
   - :ome_files_api:`OMETIFFReader <classome_1_1files_1_1in_1_1OMETIFFReader.html>`
 
+.. _tutorial_writing_images:
+
 Writing images
 --------------
 
@@ -805,4 +807,110 @@ Full example source: :download:`metadata-formatwriter.cpp <examples/metadata-for
 
   - :ome_files_api:`FormatWriter <classome_1_1files_1_1FormatWriter.html>`
   - :ome_files_api:`TIFFWriter <classome_1_1files_1_1out_1_1MinimalTIFFWriter.html>`
+  - :ome_files_api:`OMETIFFWriter <classome_1_1files_1_1out_1_1OMETIFFWriter.html>`
+
+Writing sub-resolution images
+-----------------------------
+
+Very large images may be accompanied by reduced-resolution copies of
+the full resolution image.  These are also known as image "pyramids",
+with the full-resolution image being reduced in size typically by
+successive power of two reductions.  For example, if the full
+resolution image measured 65536 × 65536 pixels, the reductions might
+be be 32768 × 32768, 16384 × 16384, 8192 × 8192 and so on.  While
+power of two reductions are conventional, power of three or reductions
+of arbitrary size are possible.  The file format and the writer API
+place no restrictions upon the possible sizes, except that each
+reduction must be smaller in at least one of the X or Y dimensions.
+
+.. note::
+
+  Reductions in Z are not currently supported due to the OME data
+  model being plane-based, with ``TiffData`` elements referencing
+  planes, and the TIFF SubIFD field only permitting reduction in size
+  of a single plane.  This limitation may be lifted with future model
+  and file format changes.
+
+Writing is essentially the same as the :ref:`tutorial_writing_images`
+example, above, with a few additional steps.  The first step is to set
+the sub-resolution levels for each series which requires them, by
+adding them to the metadata store:
+
+.. literalinclude:: examples/subresolution.cpp
+   :language: cpp
+   :start-after: create-metadata-start
+   :end-before: create-metadata-end
+
+In the above example, we compute the list of resolution levels
+automatically.  The :cpp:func:`addResolutions` helper function adds
+these to the metadata store as a custom annotation linked to the
+specified image series.  If you need to, you can remove them with the
+corresponding :cpp:func:`removeResolutions` function, or retrieve it
+with the :cpp:func:`getResolutions` function.  There are additional
+functions to add, remove and get all resolution levels for all series
+at once.
+
+.. note::
+
+  The resolution annotations will be removed from the metadata store
+  prior to generating the OME-XML to be embedded in the OME-TIFF file
+  being written.  This is because these annotations are only used to
+  provide the needed resolution information to the writer, and are not
+  needed for reading since the resolution information is stored
+  directly in the TIFF format as SubIFD fields.
+
+Next, we will add some writer options:
+
+.. literalinclude:: examples/subresolution.cpp
+   :language: cpp
+   :start-after: writer-options-start
+   :end-before: writer-options-end
+
+These options include interleaving (so that the RGB samples are stored
+together rather than as separate planes), tiling (to improve random
+access to big image planes), and compression (to reduce the image size
+of such a large image).  These are all optional, but will generally
+improve efficiency in both file size and read time.
+
+Lastly, we can call :cpp:func:`setId` to initialise the writer with
+all the above options, and then write the pixel data:
+
+.. literalinclude:: examples/subresolution.cpp
+   :language: cpp
+   :start-after: pixel-data-start
+   :end-before: pixel-data-end
+
+In the previous example, we used the methods
+:cpp:func:`getSeriesCount` and :cpp:func:`setSeries` to find out the
+total number of images to write, and to switch between them in
+ascending order to write out the pixel data associated with each
+image.  In this example, we also make use of
+:cpp:func:`getResolutionCount` and :cpp:func:`setResolution` to
+additionally write out the reduced-resolution copies of each image.
+As for the use of :cpp:func:`setSeries` in the previous example, the
+resolution levels also require writing in strictly ascending order.
+
+For the purposes of this example, the pixel data written here is a
+fractal from the Mandelbrot or Julia set, since they can be scaled
+infinitely and rendered as individual tiles.  In this example, we use
+16× multisampling to smooth the rendered image and also use multiple
+threads to generate and write the tiles concurrently, which may be of
+interest if you wish to write tiled images in parallel.  The first
+image is the Mandelbrot set, the second is from the Julia set:
+
+.. image:: /images/mandelbrot.png
+
+.. image:: /images/julia.png
+
+As the image size is progressively reduced, there will be
+correspondingly less detail in the image.  The lookup tables and
+constants may be adjusted to alter the images.
+
+Full example source: :download:`subresolution.cpp
+<examples/subresolution.cpp>`, :download:`fractal.cpp
+<examples/fractal.cpp>`, :download:`fractal.h <examples/fractal.h>`
+
+.. seealso::
+
+  - :ome_files_api:`FormatWriter <classome_1_1files_1_1FormatWriter.html>`
   - :ome_files_api:`OMETIFFWriter <classome_1_1files_1_1out_1_1OMETIFFWriter.html>`

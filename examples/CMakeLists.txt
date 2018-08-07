@@ -57,6 +57,9 @@ target_link_libraries(metadata-formatwriter2 OME::XML OME::Files ${CMAKE_THREAD_
 add_executable(pixeldata "${exampledir}/pixeldata.cpp")
 target_link_libraries(pixeldata OME::Files ${CMAKE_THREAD_LIBS_INIT})
 
+add_executable(subresolution "${exampledir}/subresolution.cpp" "${exampledir}/fractal.cpp" "${exampledir}/fractal.h")
+target_link_libraries(subresolution OME::Files ${CMAKE_THREAD_LIBS_INIT})
+
 add_executable(units "${exampledir}/units.cpp")
 target_link_libraries(units OME::Files ${CMAKE_THREAD_LIBS_INIT})
 
