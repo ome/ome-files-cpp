@@ -1034,9 +1034,13 @@ TEST_P(TIFFVariantTest, TileInfo)
   TileInfo info = ifd->getTileInfo();
 
   if (params.tilewidth)
-    EXPECT_EQ(*params.tilewidth, info.tileWidth());
+    {
+      EXPECT_EQ(*params.tilewidth, info.tileWidth());
+    }
   if (params.tilelength)
-    EXPECT_EQ(*params.tilelength, info.tileHeight());
+    {
+      EXPECT_EQ(*params.tilelength, info.tileHeight());
+    }
   EXPECT_NE(0U, info.bufferSize());
 
   dimension_size_type ecol = iwidth /
