@@ -186,10 +186,9 @@ namespace ome
         }
       };
 
-      // Note boost::make_shared can't be used here.
       TIFF::TIFF(const boost::filesystem::path& filename,
                  const std::string&             mode):
-        impl(std::shared_ptr<Impl>(new Impl(filename, mode)))
+        impl(std::make_shared<Impl>(filename, mode))
       {
         registerImageJTags();
 
@@ -224,8 +223,7 @@ namespace ome
         std::shared_ptr<TIFF> ret;
         try
           {
-            // Note boost::make_shared can't be used here.
-            ret = std::shared_ptr<TIFF>(new TIFFConcrete(filename, mode));
+            ret = std::make_shared<TIFFConcrete>(filename, mode);
           }
         catch (const std::exception& e)
           {

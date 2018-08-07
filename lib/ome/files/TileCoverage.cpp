@@ -194,7 +194,7 @@ namespace ome
     };
 
     TileCoverage::TileCoverage():
-      impl(std::shared_ptr<Impl>(new Impl()))
+      impl(std::make_shared<Impl>())
     {
     }
 

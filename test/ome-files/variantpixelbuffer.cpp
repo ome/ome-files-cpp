@@ -240,8 +240,7 @@ struct ConstructExtentRefTestVisitor
 
     // VariantPixelBuffer with unmanaged backing store.
     value_type backing[10];
-    std::shared_ptr<PixelBuffer<value_type>> buf
-      (new PixelBuffer<value_type>(&backing[0], extents));
+    auto buf = std::make_shared<PixelBuffer<value_type>>(&backing[0], extents);
     VariantPixelBuffer mbuf(buf);
 
     ASSERT_EQ(10U, mbuf.num_elements());
@@ -264,9 +263,8 @@ struct ConstructRangeRefTestVisitor
 
     // VariantPixelBuffer with unmanaged backing store.
     value_type backing[100];
-    std::shared_ptr<PixelBuffer<value_type>> buf
-      (new PixelBuffer<value_type>(&backing[0],
-                                   boost::extents[10][10][1][1][1][1][1][1][1]));
+    auto buf = std::make_shared<PixelBuffer<value_type>>(&backing[0],
+                                                         boost::extents[10][10][1][1][1][1][1][1][1]);
     VariantPixelBuffer mbuf(buf);
 
     ASSERT_EQ(100U, mbuf.num_elements());
@@ -336,9 +334,8 @@ struct ManagedTestVisitor
     {
       // VariantPixelBuffer with unmanaged backing store.
       value_type backing[100];
-      std::shared_ptr<PixelBuffer<value_type>> buf
-        (new PixelBuffer<value_type>(&backing[0],
-                                     boost::extents[10][10][1][1][1][1][1][1][1]));
+      auto buf = std::make_shared<PixelBuffer<value_type>>(&backing[0],
+                                                           boost::extents[10][10][1][1][1][1][1][1][1]);
       VariantPixelBuffer mbuf(buf);
       const VariantPixelBuffer& cmbuf(mbuf);
 

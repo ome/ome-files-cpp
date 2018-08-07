@@ -508,10 +508,10 @@ namespace
               dest_subchannel = sample;
             }
 
-          // Note boost::make_shared makes arguments const, so can't use
-          // here.
           if (!tilecache.find(tile))
-            tilecache.insert(tile, std::shared_ptr<TileBuffer>(new TileBuffer(tileinfo.bufferSize())));
+            {
+              tilecache.insert(tile, std::make_shared<TileBuffer>(tileinfo.bufferSize()));
+            }
           assert(tilecache.find(tile));
           TileBuffer& tilebuf = *tilecache.find(tile);
 
@@ -645,16 +645,12 @@ namespace ome
 
       IFD::IFD(std::shared_ptr<TIFF>& tiff,
                offset_type            offset):
-        // Note boost::make_shared makes arguments const, so can't use
-        // here.
-        impl(std::shared_ptr<Impl>(new Impl(tiff, offset)))
+        impl(std::make_shared<Impl>(tiff, offset))
       {
       }
 
       IFD::IFD(std::shared_ptr<TIFF>& tiff):
-        // Note boost::make_shared makes arguments const, so can't use
-        // here.
-        impl(std::shared_ptr<Impl>(new Impl(tiff, 0)))
+        impl(std::make_shared<Impl>(tiff, 0))
       {
       }
 
@@ -673,8 +669,6 @@ namespace ome
         if (!TIFFSetDirectory(tiffraw, index))
           sentry.error();
 
-        // Note boost::make_shared makes arguments const, so can't use
-        // here.
         return openOffset(tiff, static_cast<uint64_t>(TIFFCurrentDirOffset(tiffraw)));
       }
 
@@ -682,17 +676,13 @@ namespace ome
       IFD::openOffset(std::shared_ptr<TIFF>& tiff,
                       offset_type            offset)
       {
-        // Note boost::make_shared makes arguments const, so can't use
-        // here.
-        return std::shared_ptr<IFD>(new IFDConcrete(tiff, offset));
+        return std::make_shared<IFDConcrete>(tiff, offset);
       }
 
       std::shared_ptr<IFD>
       IFD::current(std::shared_ptr<TIFF>& tiff)
       {
-        // Note boost::make_shared makes arguments const, so can't use
-        // here.
-        return std::shared_ptr<IFD>(new IFDConcrete(tiff));
+        return std::make_shared<IFDConcrete>(tiff);
       }
 
       void

@@ -259,8 +259,8 @@ namespace ome
        */
       explicit PixelBuffer():
         PixelBufferBase(::ome::xml::model::enums::PixelType::UINT8, ENDIAN_NATIVE),
-        multiarray(std::shared_ptr<array_type>(new array_type(boost::extents[1][1][1][1][1][1][1][1][1],
-                                                              PixelBufferBase::default_storage_order())))
+        multiarray(std::make_shared<array_type>(boost::extents[1][1][1][1][1][1][1][1][1],
+                                                PixelBufferBase::default_storage_order()))
       {}
 
       /**
@@ -281,7 +281,7 @@ namespace ome
                   EndianType                          endiantype = ENDIAN_NATIVE,
                   const storage_order_type&           storage = PixelBufferBase::default_storage_order()):
         PixelBufferBase(pixeltype, endiantype),
-        multiarray(std::shared_ptr<array_type>(new array_type(extents, storage)))
+        multiarray(std::make_shared<array_type>(extents, storage))
       {}
 
       /**
@@ -306,7 +306,7 @@ namespace ome
                   EndianType                           endiantype = ENDIAN_NATIVE,
                   const storage_order_type&            storage = PixelBufferBase::default_storage_order()):
         PixelBufferBase(pixeltype, endiantype),
-        multiarray(std::shared_ptr<array_ref_type>(new array_ref_type(pixeldata, extents, storage)))
+        multiarray(std::make_shared<array_ref_type>(pixeldata, extents, storage))
       {}
 
       /**
@@ -326,7 +326,7 @@ namespace ome
                   EndianType                          endiantype = ENDIAN_NATIVE,
                   const storage_order_type&           storage = PixelBufferBase::default_storage_order()):
         PixelBufferBase(pixeltype, endiantype),
-        multiarray(std::shared_ptr<array_type>(new array_type(range, storage)))
+        multiarray(std::make_shared<array_type>(range, storage))
       {}
 
       /**
@@ -350,7 +350,7 @@ namespace ome
                   EndianType                           endiantype = ENDIAN_NATIVE,
                   const storage_order_type&            storage = PixelBufferBase::default_storage_order()):
         PixelBufferBase(pixeltype, endiantype),
-        multiarray(std::shared_ptr<array_ref_type>(new array_ref_type(pixeldata, range, storage)))
+        multiarray(std::make_shared<array_ref_type>(pixeldata, range, storage))
       {}
 
       /**

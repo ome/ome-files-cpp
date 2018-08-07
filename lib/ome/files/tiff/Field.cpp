@@ -188,7 +188,7 @@ namespace ome
 
       FieldBase::FieldBase(std::shared_ptr<IFD> ifd,
                            tag_type             tag):
-        impl(std::shared_ptr<Impl>(new Impl(ifd, tag)))
+        impl(std::make_shared<Impl>(ifd, tag))
       {
       }
 

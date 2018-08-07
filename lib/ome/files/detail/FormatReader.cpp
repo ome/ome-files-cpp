@@ -385,10 +385,7 @@ namespace ome
       std::shared_ptr<::ome::xml::meta::MetadataStore>
       FormatReader::makeFilterMetadata()
       {
-        // While std::make_shared<> works, here, boost::make_shared<>
-        // does not, so use new directly.
-        return std::shared_ptr<::ome::xml::meta::MetadataStore>
-          (new FilterMetadata(getMetadataStore(), isMetadataFiltered()));
+        return std::make_shared<FilterMetadata>(getMetadataStore(), isMetadataFiltered());
       }
 
       void

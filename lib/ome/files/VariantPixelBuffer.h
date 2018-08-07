@@ -230,7 +230,7 @@ namespace ome
                  const storage_order_type&           storage,
                  ::ome::xml::model::enums::PixelType pixeltype)
       {
-        return variant_buffer_type(std::shared_ptr<PixelBuffer<T>>(new PixelBuffer<T>(extents, pixeltype, ENDIAN_NATIVE, storage)));
+        return std::make_shared<PixelBuffer<T>>(extents, pixeltype, ENDIAN_NATIVE, storage);
       }
 
       /**
@@ -250,7 +250,7 @@ namespace ome
                  const storage_order_type&           storage,
                  ::ome::xml::model::enums::PixelType pixeltype)
       {
-        return variant_buffer_type(std::shared_ptr<PixelBuffer<T>>(new PixelBuffer<T>(range, pixeltype, ENDIAN_NATIVE, storage)));
+        return std::make_shared<PixelBuffer<T>>(range, pixeltype, ENDIAN_NATIVE, storage);
       }
 
       // No switch default to avoid -Wunreachable-code errors.

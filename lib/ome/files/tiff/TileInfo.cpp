@@ -173,7 +173,7 @@ namespace ome
       };
 
       TileInfo::TileInfo(std::shared_ptr<IFD> ifd):
-        impl(std::shared_ptr<Impl>(new Impl(ifd)))
+        impl(std::make_shared<Impl>(ifd))
       {
       }
 
