@@ -577,9 +577,9 @@ namespace ome
         /// Offset of this IFD.
         offset_type offset;
         /// Tile coverage cache (used when writing).
-        std::vector<TileCoverage> coverage;
+        std::shared_ptr<std::vector<TileCoverage>> coverage;
         /// Tile cache (used when writing).
-        TileCache tilecache;
+        std::shared_ptr<TileCache> tilecache;
         /// Tile type.
         boost::optional<TileType> tiletype;
         /// Image width.
@@ -617,8 +617,8 @@ namespace ome
              offset_type            offset):
           tiff(tiff),
           offset(offset),
-          coverage(),
-          tilecache(),
+          coverage(std::make_shared<std::vector<TileCoverage>>()),
+          tilecache(std::make_shared<TileCache>()),
           imagewidth(),
           imageheight(),
           tilewidth(),
@@ -630,32 +630,86 @@ namespace ome
         {
         }
 
+        /**
+         * Copy constructor.
+         *
+         * @param copy the object to copy.
+         */
+        Impl(const Impl& copy):
+          tiff(copy.tiff),
+          offset(copy.offset),
+          coverage(copy.coverage),
+          tilecache(copy.tilecache),
+          imagewidth(copy.imagewidth),
+          imageheight(copy.imageheight),
+          tilewidth(copy.tilewidth),
+          tileheight(copy.tileheight),
+          pixeltype(copy.pixeltype),
+          samples(copy.samples),
+          planarconfig(copy.planarconfig),
+          ctile(copy.ctile)
+        {
+        }
+
         /// Destructor.
         ~Impl()
         {
         }
 
-        /// @cond SKIP
-        Impl (const Impl&) = delete;
-
+        /**
+         * Copy assignment operator.
+         *
+         * @param rhs the object to assign.
+         * @returns the modified object.
+         */
         Impl&
-        operator= (const Impl&) = delete;
-        /// @endcond SKIP
+        operator= (const Impl& rhs)
+        {
+          tiff = rhs.tiff;
+          offset = rhs.offset;
+          coverage = rhs.coverage;
+          tilecache = rhs.tilecache;
+          imagewidth = rhs.imagewidth;
+          imageheight = rhs.imageheight;
+          tilewidth = rhs.tilewidth;
+          tileheight = rhs.tileheight;
+          pixeltype = rhs.pixeltype;
+          samples = rhs.samples;
+          planarconfig = rhs.planarconfig;
+          ctile = rhs.ctile;
+
+          return *this;
+        }
       };
 
       IFD::IFD(std::shared_ptr<TIFF>& tiff,
                offset_type            offset):
-        impl(std::make_shared<Impl>(tiff, offset))
+        enable_shared_from_this(),
+        impl(std::make_unique<Impl>(tiff, offset))
       {
       }
 
       IFD::IFD(std::shared_ptr<TIFF>& tiff):
-        impl(std::make_shared<Impl>(tiff, 0))
+        enable_shared_from_this(),
+        impl(std::make_unique<Impl>(tiff, 0))
+      {
+      }
+
+      IFD::IFD(const IFD& copy):
+        enable_shared_from_this(),
+        impl(std::make_unique<Impl>(*(copy.impl)))
       {
       }
 
       IFD::~IFD()
       {
+      }
+
+      IFD&
+      IFD::operator= (const IFD& rhs)
+      {
+        *impl = *(rhs.impl);
+        return *this;
       }
 
       std::shared_ptr<IFD>
@@ -850,13 +904,13 @@ namespace ome
       std::vector<TileCoverage>&
       IFD::getTileCoverage()
       {
-        return impl->coverage;
+        return *(impl->coverage);
       }
 
       const std::vector<TileCoverage>&
       IFD::getTileCoverage() const
       {
-        return impl->coverage;
+        return *(impl->coverage);
       }
 
       uint32_t
@@ -1431,7 +1485,7 @@ namespace ome
         PlaneRegion region(x, y, w, h);
         std::vector<dimension_size_type> tiles(info.tileCoverage(region));
 
-        WriteVisitor v(*this, impl->coverage, impl->tilecache, info, region, tiles);
+        WriteVisitor v(*this, *(impl->coverage), *(impl->tilecache), info, region, tiles);
         ome::compat::visit(v, source.vbuffer());
       }
 

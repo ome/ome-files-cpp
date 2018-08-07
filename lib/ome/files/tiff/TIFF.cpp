@@ -188,7 +188,7 @@ namespace ome
 
       TIFF::TIFF(const boost::filesystem::path& filename,
                  const std::string&             mode):
-        impl(std::make_shared<Impl>(filename, mode))
+        impl(std::make_unique<Impl>(filename, mode))
       {
         registerImageJTags();
 

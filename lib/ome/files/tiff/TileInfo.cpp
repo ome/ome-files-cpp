@@ -91,6 +91,7 @@ namespace ome
          */
         Impl(std::shared_ptr<IFD>& ifd):
           ifd(ifd),
+          type(),
           tilewidth(),
           tileheight(),
           planarconfig(),
@@ -136,9 +137,53 @@ namespace ome
           ntiles = nrows * ncols;
         }
 
+        /**
+         * Copy constructor.
+         *
+         * @param copy the object to copy.
+         */
+        Impl(const Impl& copy):
+          ifd(copy.ifd),
+          type(copy.type),
+          tilewidth(copy.tilewidth),
+          tileheight(copy.tileheight),
+          planarconfig(copy.planarconfig),
+          samples(copy.samples),
+          tilecount(copy.tilecount),
+          nrows(copy.nrows),
+          ncols(copy.ncols),
+          ntiles(copy.ntiles),
+          buffersize(copy.buffersize)
+        {
+        }
+
         /// Destructor.
         ~Impl()
         {
+        }
+
+        /**
+         * Copy assignment operator.
+         *
+         * @param rhs the object to assign.
+         * @returns the modified object.
+         */
+        Impl&
+        operator= (const Impl& rhs)
+        {
+          ifd = rhs.ifd;
+          type = rhs.type;
+          tilewidth = rhs.tilewidth;
+          tileheight = rhs.tileheight;
+          planarconfig = rhs.planarconfig;
+          samples = rhs.samples;
+          tilecount = rhs.tilecount;
+          nrows = rhs.nrows;
+          ncols = rhs.ncols;
+          ntiles = rhs.ntiles;
+          buffersize = rhs.buffersize;
+
+          return *this;
         }
 
         /**
@@ -173,12 +218,24 @@ namespace ome
       };
 
       TileInfo::TileInfo(std::shared_ptr<IFD> ifd):
-        impl(std::make_shared<Impl>(ifd))
+        impl(std::make_unique<Impl>(ifd))
+      {
+      }
+
+      TileInfo::TileInfo(const TileInfo& copy):
+        impl(std::make_unique<Impl>(*(copy.impl)))
       {
       }
 
       TileInfo::~TileInfo()
       {
+      }
+
+      TileInfo&
+      TileInfo::operator= (const TileInfo& rhs)
+      {
+        *impl = *(rhs.impl);
+        return *this;
       }
 
       TileType

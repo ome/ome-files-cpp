@@ -72,8 +72,24 @@ namespace ome
         TileInfo(std::shared_ptr<IFD> ifd);
 
       public:
+        /**
+         * Copy constructor.
+         *
+         * @param copy the object to copy.
+         */
+        TileInfo(const TileInfo& copy);
+
         /// Destructor.
         virtual ~TileInfo();
+
+        /**
+         * Copy assignment operator.
+         *
+         * @param rhs the object to assign.
+         * @returns the modified object.
+         */
+        TileInfo&
+        operator= (const TileInfo& rhs);
 
         /**
          * Get the type of a tile.
@@ -228,7 +244,7 @@ namespace ome
       protected:
         class Impl;
         /// Private implementation details.
-        std::shared_ptr<Impl> impl;
+        std::unique_ptr<Impl> impl;
       };
 
     }

@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -69,9 +70,25 @@ namespace ome
                   tag_type             tag);
 
       public:
+        /**
+         * Copy constructor.
+         *
+         * @param copy the object to copy.
+         */
+        FieldBase(const FieldBase& copy);
+
         /// Destructor.
         virtual
         ~FieldBase();
+
+        /**
+         * Copy assignment operator.
+         *
+         * @param rhs the object to assign.
+         * @returns the modified object.
+         */
+        FieldBase&
+        operator= (const FieldBase& rhs);
 
         /**
          * Get field data type.
@@ -146,7 +163,7 @@ namespace ome
       protected:
         class Impl;
         /// Private implementation details.
-        std::shared_ptr<Impl> impl;
+        std::unique_ptr<Impl> impl;
       };
 
       /**
@@ -177,11 +194,33 @@ namespace ome
           tag(tag)
         {}
 
-
       public:
+        /**
+         * Copy constructor.
+         *
+         * @param copy the object to copy.
+         */
+        Field(const Field& copy):
+          FieldBase(copy)
+        {
+        }
+
         /// Destructor.
         virtual ~Field()
         {}
+
+        /**
+         * Copy assignment operator.
+         *
+         * @param rhs the object to assign.
+         * @returns the modified object.
+         */
+        Field&
+        operator= (const Field& rhs)
+        {
+          FieldBase::operator=(rhs);
+          return *this;
+        }
 
         /**
          * Get the value for this field.
@@ -198,19 +237,6 @@ namespace ome
          */
         void
         set(const value_type& value);
-
-        /**
-         * Assign a field value.
-         *
-         * @param field the field to assign from.
-         * @returns the Field.
-         */
-        Field&
-        operator=(const Field& field)
-        {
-          set(field);
-          return *this;
-        }
 
         /**
          * Cast operator for getting the value of this field.

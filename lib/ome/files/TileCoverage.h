@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -63,8 +64,24 @@ namespace ome
       /// Constructor.
       TileCoverage();
 
+      /**
+       * Copy constructor.
+       *
+       * @param copy the object to copy.
+       */
+      TileCoverage(const TileCoverage& copy);
+
       /// Destructor.
       virtual ~TileCoverage();
+
+      /**
+       * Copy assignment operator.
+       *
+       * @param rhs the object to assign.
+       * @returns the modified object.
+       */
+      TileCoverage&
+      operator= (const TileCoverage& rhs);
 
       /**
        * Insert a region into the coverage cache.
@@ -147,7 +164,7 @@ namespace ome
     protected:
       class Impl;
       /// Private implementation details.
-      std::shared_ptr<Impl> impl;
+      std::unique_ptr<Impl> impl;
     };
 
   }

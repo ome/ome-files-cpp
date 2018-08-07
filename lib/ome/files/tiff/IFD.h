@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -72,7 +73,7 @@ namespace ome
       private:
         class Impl;
         /// Private implementation details.
-        std::shared_ptr<Impl> impl;
+        std::unique_ptr<Impl> impl;
 
       protected:
         /**
@@ -91,16 +92,25 @@ namespace ome
          */
         IFD(std::shared_ptr<TIFF>& tiff);
 
-        /// @cond SKIP
-        IFD (const IFD&) = delete;
-
-        IFD&
-        operator= (const IFD&) = delete;
-        /// @endcond SKIP
-
       public:
+        /**
+         * Copy constructor.
+         *
+         * @param copy the object to copy.
+         */
+        IFD(const IFD& copy);
+
         /// Destructor.
         virtual ~IFD();
+
+        /**
+         * Copy assignment operator.
+         *
+         * @param rhs the object to assign.
+         * @returns the modified object.
+         */
+        IFD&
+        operator= (const IFD& rhs);
 
         /**
          * Open an IFD by index.

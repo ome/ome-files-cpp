@@ -159,7 +159,7 @@ namespace ome
         class Impl;
         class wrapped_type;
         /// Private implementation details.
-        std::shared_ptr<Impl> impl;
+        std::unique_ptr<Impl> impl;
 
       protected:
         /**

@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -82,9 +83,37 @@ namespace ome
         {
         }
 
+        /**
+         * Copy constructor.
+         *
+         * @param copy the object to copy.
+         */
+        Impl(const Impl& copy):
+          ifd(copy.ifd),
+          tag(copy.tag),
+          fieldinfo(copy.fieldinfo)
+        {
+        }
+
         /// Destructor.
         ~Impl()
         {
+        }
+
+        /**
+         * Copy assignment operator.
+         *
+         * @param rhs the object to assign.
+         * @returns the modified object.
+         */
+        Impl&
+        operator= (const Impl& rhs)
+        {
+          ifd = rhs.ifd;
+          tag = rhs.tag;
+          fieldinfo = rhs.fieldinfo;
+
+          return *this;
         }
 
         /**
@@ -188,12 +217,24 @@ namespace ome
 
       FieldBase::FieldBase(std::shared_ptr<IFD> ifd,
                            tag_type             tag):
-        impl(std::make_shared<Impl>(ifd, tag))
+        impl(std::make_unique<Impl>(ifd, tag))
+      {
+      }
+
+      FieldBase::FieldBase(const FieldBase& copy):
+        impl(std::make_unique<Impl>(*(copy.impl)))
       {
       }
 
       FieldBase::~FieldBase()
       {
+      }
+
+      FieldBase&
+      FieldBase::operator= (const FieldBase& rhs)
+      {
+        *impl = *(rhs.impl);
+        return *this;
       }
 
       std::string
