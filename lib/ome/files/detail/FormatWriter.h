@@ -179,14 +179,7 @@ namespace ome
         isThisType(const boost::filesystem::path& name,
                    bool                           open = true) const;
 
-        /**
-         * Get the number of image series in this file.
-         *
-         * @returns the number of image series.
-         * @throws std::logic_error if the sub-resolution metadata (if
-         * any) is invalid; this will only occur if the reader sets
-         * invalid metadata.
-         */
+        // Documented in superclass.
         virtual
         dimension_size_type
         getSeriesCount() const;
@@ -235,145 +228,74 @@ namespace ome
         std::shared_ptr<::ome::xml::meta::MetadataRetrieve>&
         getMetadataRetrieve();
 
-        /**
-         * Determine the number of image planes in the current series.
-         *
-         * @returns the number of image planes.
-         */
+        // Documented in superclass.
         virtual
         dimension_size_type
         getImageCount() const;
 
-        /**
-         * Does a channel contain subchannels?
-         *
-         * Check if the image planes in the file have more than one subchannel per
-         * openBytes() call for the specified channel.
-         *
-         * @param channel the channel to use, range [0, EffectiveSizeC).
-         * @returns @c true if and only if @c getRGBChannelCount(channel) returns
-         * a value greater than 1, @c false otherwise.
-         */
+        // Documented in superclass.
         virtual
         bool
         isRGB(dimension_size_type channel) const;
 
-        /**
-         * Get the size of the X dimension.
-         *
-         * @returns the X dimension size.
-         */
+        // Documented in superclass.
         virtual
         dimension_size_type
         getSizeX() const;
 
-        /**
-         * Get the size of the Y dimension.
-         *
-         * @returns the Y dimension size.
-         */
+        // Documented in superclass.
         virtual
         dimension_size_type
         getSizeY() const;
 
-        /**
-         * Get the size of the Z dimension.
-         *
-         * @returns the Z dimension size.
-         */
+        // Documented in superclass.
         virtual
         dimension_size_type
         getSizeZ() const;
 
-        /**
-         * Get the size of the T dimension.
-         *
-         * @returns the T dimension size.
-         */
+        // Documented in superclass.
         virtual
         dimension_size_type
         getSizeT() const;
 
-        /**
-         * Get the size of the C dimension.
-         *
-         * @returns the C dimension size.
-         */
+        // Documented in superclass.
         virtual
         dimension_size_type
         getSizeC() const;
 
-        /**
-         * Get the pixel type.
-         *
-         * @returns the pixel type.
-         */
+        // Documented in superclass.
         virtual
         ome::xml::model::enums::PixelType
         getPixelType() const;
 
-        /**
-         * Get the number of valid bits per pixel.
-         *
-         * The number of valid bits per pixel is always less than or
-         * equal to the number of bits per pixel that correspond to
-         * getPixelType().
-         *
-         * @returns the number of valid bits per pixel.
-         */
+        // Documented in superclass.
         virtual
         pixel_size_type
         getBitsPerPixel() const;
 
-        /**
-         * Get the effective size of the C dimension
-         *
-         * This guarantees that
-         * \code{.cpp}
-         * getEffectiveSizeC() * getSizeZ() * getSizeT() == getImageCount()
-         * \endcode
-         * regardless of the result of isRGB().
-         *
-         * @returns the effective C dimension size.
-         */
+        // Documented in superclass.
         virtual
         dimension_size_type
         getEffectiveSizeC() const;
 
-        /**
-         * Get the number of channels required for a call to saveBytes().
-         *
-         * The most common case where this value is greater than 1 is for interleaved
-         * RGB data, such as a 24-bit color image plane. However, it is possible for
-         * this value to be greater than 1 for non-interleaved data, such as an RGB
-         * TIFF with Planar rather than Chunky configuration.
-         *
-         * @param channel the channel to use, range [0, EffectiveSizeC).
-         * @returns the number of channels.
-         */
+        // Documented in superclass.
         virtual
         dimension_size_type
         getRGBChannelCount(dimension_size_type channel) const;
 
-        /**
-         * @copydoc ome::files::FormatReader::getDimensionOrder() const
-         */
+        // Documented in superclass.
         virtual
         const std::string&
         getDimensionOrder() const;
 
-        /**
-         * @copydoc ome::files::FormatReader::getIndex(dimension_size_type,dimension_size_type,dimension_size_type) const
-         */
+        // Documented in superclass.
         virtual
         dimension_size_type
         getIndex(dimension_size_type z,
                  dimension_size_type c,
                  dimension_size_type t) const;
 
-        /**
-         * @copydoc ome::files::FormatReader::getZCTCoords(dimension_size_type) const
-         */
+        // Documented in superclass.
         virtual
         std::array<dimension_size_type, 3>
         getZCTCoords(dimension_size_type index) const;

@@ -105,6 +105,18 @@ namespace ome
       {}
 
       /**
+       * Get the number of image series in this file.
+       *
+       * @returns the number of image series.
+       * @throws std::logic_error if the sub-resolution metadata (if
+       * any) is invalid; this will only occur if the reader sets
+       * invalid metadata.
+       */
+      virtual
+      dimension_size_type
+      getSeriesCount() const = 0;
+
+      /**
        * Set the color lookup table associated with the current
        * series.
        *
@@ -246,6 +258,149 @@ namespace ome
       virtual
       std::shared_ptr<::ome::xml::meta::MetadataRetrieve>&
       getMetadataRetrieve() = 0;
+
+      /**
+       * Determine the number of image planes in the current series.
+       *
+       * @returns the number of image planes.
+       */
+      virtual
+      dimension_size_type
+      getImageCount() const = 0;
+
+      /**
+       * Does a channel contain subchannels?
+       *
+       * Check if the image planes in the file have more than one subchannel per
+       * openBytes() call for the specified channel.
+       *
+       * @param channel the channel to use, range [0, EffectiveSizeC).
+       * @returns @c true if and only if @c getRGBChannelCount(channel) returns
+       * a value greater than 1, @c false otherwise.
+       */
+      virtual
+      bool
+      isRGB(dimension_size_type channel) const = 0;
+
+      /**
+       * Get the size of the X dimension.
+       *
+       * @returns the X dimension size.
+       */
+      virtual
+      dimension_size_type
+      getSizeX() const = 0;
+
+      /**
+       * Get the size of the Y dimension.
+       *
+       * @returns the Y dimension size.
+       */
+      virtual
+      dimension_size_type
+      getSizeY() const = 0;
+
+      /**
+       * Get the size of the Z dimension.
+       *
+       * @returns the Z dimension size.
+       */
+      virtual
+      dimension_size_type
+      getSizeZ() const = 0;
+
+      /**
+       * Get the size of the T dimension.
+       *
+       * @returns the T dimension size.
+       */
+      virtual
+      dimension_size_type
+      getSizeT() const = 0;
+
+      /**
+       * Get the size of the C dimension.
+       *
+       * @returns the C dimension size.
+       */
+      virtual
+      dimension_size_type
+      getSizeC() const = 0;
+
+      /**
+       * Get the pixel type.
+       *
+       * @returns the pixel type.
+       */
+      virtual
+      ome::xml::model::enums::PixelType
+      getPixelType() const = 0;
+
+      /**
+       * Get the number of valid bits per pixel.
+       *
+       * The number of valid bits per pixel is always less than or
+       * equal to the number of bits per pixel that correspond to
+       * getPixelType().
+       *
+       * @returns the number of valid bits per pixel.
+       */
+      virtual
+      pixel_size_type
+      getBitsPerPixel() const = 0;
+
+      /**
+       * Get the effective size of the C dimension
+       *
+       * This guarantees that
+       * \code{.cpp}
+       * getEffectiveSizeC() * getSizeZ() * getSizeT() == getImageCount()
+       * \endcode
+       * regardless of the result of isRGB().
+       *
+       * @returns the effective C dimension size.
+       */
+      virtual
+      dimension_size_type
+      getEffectiveSizeC() const = 0;
+
+      /**
+       * Get the number of channels required for a call to saveBytes().
+       *
+       * The most common case where this value is greater than 1 is for interleaved
+       * RGB data, such as a 24-bit color image plane. However, it is possible for
+       * this value to be greater than 1 for non-interleaved data, such as an RGB
+       * TIFF with Planar rather than Chunky configuration.
+       *
+       * @param channel the channel to use, range [0, EffectiveSizeC).
+       * @returns the number of channels.
+       */
+      virtual
+      dimension_size_type
+      getRGBChannelCount(dimension_size_type channel) const = 0;
+
+      /**
+       * @copydoc ome::files::FormatReader::getDimensionOrder() const
+       */
+      virtual
+      const std::string&
+      getDimensionOrder() const = 0;
+
+      /**
+       * @copydoc ome::files::FormatReader::getIndex(dimension_size_type,dimension_size_type,dimension_size_type) const
+       */
+      virtual
+      dimension_size_type
+      getIndex(dimension_size_type z,
+               dimension_size_type c,
+               dimension_size_type t) const = 0;
+
+      /**
+       * @copydoc ome::files::FormatReader::getZCTCoords(dimension_size_type) const
+       */
+      virtual
+      std::array<dimension_size_type, 3>
+      getZCTCoords(dimension_size_type index) const = 0;
 
       /**
        * Set the frame rate to use when writing.
