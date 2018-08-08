@@ -101,10 +101,8 @@ namespace ome
       data() const;
 
     private:
-      /// Buffer size (bytes).
-      dimension_size_type bufsize;
       /// Raw buffer.
-      uint8_t *buf;
+      std::vector<uint8_t> buf;
     };
 
   }

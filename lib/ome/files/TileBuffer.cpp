@@ -45,33 +45,30 @@ namespace ome
   {
 
     TileBuffer::TileBuffer(dimension_size_type size):
-      bufsize(size),
-      buf(new uint8_t[size])
+      buf(size, 0)
     {
-      std::memset(buf, 0, size);
     }
 
     TileBuffer::~TileBuffer()
     {
-      delete[] buf;
     }
 
     dimension_size_type
     TileBuffer::size() const
     {
-      return bufsize;
+      return buf.size();
     }
 
     uint8_t *
     TileBuffer::data()
     {
-      return buf;
+      return buf.data();
     }
 
     const uint8_t *
     TileBuffer::data() const
     {
-      return buf;
+      return buf.data();
     }
 
   }
