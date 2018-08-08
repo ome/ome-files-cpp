@@ -125,7 +125,7 @@ namespace ome
 
         /// TIFF flags.
         std::string flags;
-        
+
         /// State of each series.
         series_list seriesState;
 

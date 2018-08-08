@@ -793,17 +793,20 @@ namespace ome
 
         setPlane(plane);
 
-        // Get current IFD.
-        std::shared_ptr<tiff::IFD> ifd (currentTIFF->second.tiff->getCurrentDirectory());
-
         // Get plane metadata.
         detail::OMETIFFPlane& planeMeta(seriesState.at(getSeries()).planes.at(plane));
+
+        // Get current IFD.
+        std::shared_ptr<tiff::IFD> ifd = planeMeta.ifd;
+        if (!ifd)
+          ifd = currentTIFF->second.tiff->getCurrentDirectory();
 
         ifd->writeImage(buf, x, y, w, h);
 
         // Set plane metadata.
         planeMeta.id = currentTIFF->first;
-        planeMeta.ifd = currentTIFF->second.ifdCount;
+        planeMeta.index = currentTIFF->second.ifdCount;
+        planeMeta.ifd = ifd;
         planeMeta.certain = true;
         planeMeta.status = detail::OMETIFFPlane::PRESENT; // Plane now written.
       }
@@ -862,7 +865,7 @@ namespace ome
                     omeMeta->setTiffDataFirstZ(coords[0], series, plane);
                     omeMeta->setTiffDataFirstT(coords[2], series, plane);
                     omeMeta->setTiffDataFirstC(coords[1], series, plane);
-                    omeMeta->setTiffDataIFD(planeState.ifd, series, plane);
+                    omeMeta->setTiffDataIFD(planeState.index, series, plane);
                     omeMeta->setTiffDataPlaneCount(1, series, plane);
                   }
                 else

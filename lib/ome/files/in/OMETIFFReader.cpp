@@ -357,7 +357,7 @@ namespace ome
             const OMETIFFPlane& tiffplane(ometa.tiffPlanes.at(plane));
             std::shared_ptr<const TIFF> tiff(getTIFF(tiffplane.id));
             if (tiff)
-              ifd = std::shared_ptr<const IFD>(tiff->getDirectoryByIndex(tiffplane.ifd));
+              ifd = std::shared_ptr<const IFD>(tiff->getDirectoryByIndex(tiffplane.index));
           }
 
         if (!ifd)
@@ -798,14 +798,14 @@ namespace ome
                     dimension_size_type no = index + q;
                     OMETIFFPlane& plane(coreMeta.tiffPlanes.at(no));
                     plane.id = filename;
-                    plane.ifd = static_cast<dimension_size_type>(*tdIFD) + q;
+                    plane.index = static_cast<dimension_size_type>(*tdIFD) + q;
                     plane.certain = true;
                     plane.status = exists ? OMETIFFPlane::PRESENT : OMETIFFPlane::ABSENT;
 
                     BOOST_LOG_SEV(logger, ome::logging::trivial::debug)
                       << "    Plane[" << no
                       << "]: file=" << plane.id.string()
-                      << ", IFD=" << plane.ifd;
+                      << ", IFD=" << plane.index;
                   }
                 if (numPlanes == 0)
                   {
@@ -819,7 +819,7 @@ namespace ome
                           break;
                         OMETIFFPlane& previousPlane(coreMeta.tiffPlanes.at(no - 1));
                         plane.id = filename;
-                        plane.ifd = previousPlane.ifd + 1;
+                        plane.index = previousPlane.index + 1;
                         plane.status = exists ? OMETIFFPlane::PRESENT : OMETIFFPlane::ABSENT;
 
                         BOOST_LOG_SEV(logger, ome::logging::trivial::debug)
@@ -859,7 +859,7 @@ namespace ome
                 BOOST_LOG_SEV(logger, ome::logging::trivial::debug)
                   << "  Verify Plane[" << no
                   << "]: file=" << plane.id.string()
-                  << ", IFD=" << plane.ifd;
+                  << ", IFD=" << plane.index;
 
                 if (plane.id.empty())
                   {
@@ -877,7 +877,7 @@ namespace ome
                       {
                         OMETIFFPlane& plane(coreMeta.tiffPlanes.at(p));
                         plane.id = *currentId;
-                        plane.ifd = p;
+                        plane.index = p;
                       }
                     break;
                   }
@@ -1024,7 +1024,7 @@ namespace ome
           {
             const OMETIFFPlane& plane(coreFullResolutionMeta.tiffPlanes.at(0));
             std::shared_ptr<const tiff::TIFF> ptiff(getTIFF(plane.id));
-            std::shared_ptr<const tiff::IFD> pifd(ptiff->getDirectoryByIndex(plane.ifd));
+            std::shared_ptr<const tiff::IFD> pifd(ptiff->getDirectoryByIndex(plane.index));
 
             if(!resolution)
               {
@@ -1136,7 +1136,7 @@ namespace ome
 
                 const OMETIFFPlane& plane(coreFullResolutionMeta.tiffPlanes.at(planeIndex));
                 std::shared_ptr<const tiff::TIFF> ctiff(getTIFF(plane.id));
-                std::shared_ptr<const tiff::IFD> cifd(ctiff->getDirectoryByIndex(plane.ifd));
+                std::shared_ptr<const tiff::IFD> cifd(ctiff->getDirectoryByIndex(plane.index));
                 const tiff::TileInfo tinfo(cifd->getTileInfo());
                 const dimension_size_type tiffSamples = cifd->getSamplesPerPixel();
 
@@ -1595,7 +1595,7 @@ namespace ome
             std::shared_ptr<const TIFF> tiff(getTIFF(tiffplane.id));
             if (!tiff)
               continue;
-            auto ifd = tiff->getDirectoryByIndex(tiffplane.ifd);
+            auto ifd = tiff->getDirectoryByIndex(tiffplane.index);
             std::vector<uint64_t> subifds;
             try
               {

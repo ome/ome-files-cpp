@@ -46,6 +46,13 @@ namespace ome
 {
   namespace files
   {
+    namespace tiff
+    {
+
+      class IFD;
+
+    }
+
     namespace detail
     {
 
@@ -66,7 +73,9 @@ namespace ome
         /// File containing this plane.
         boost::filesystem::path id;
         /// IFD index.
-        dimension_size_type ifd;
+        dimension_size_type index;
+        /// IFD
+        std::shared_ptr<tiff::IFD> ifd;
         /// Certainty flag, for dealing with unspecified NumPlanes.
         bool certain;
         /// File status.
@@ -96,6 +105,7 @@ namespace ome
          */
         OMETIFFPlane(const boost::filesystem::path& id):
           id(id),
+          index(),
           ifd(),
           certain(false),
           status(UNKNOWN)
