@@ -212,26 +212,6 @@ namespace ome
                           boost::endian::native_uint16_t>(in, endian);
         }
 
-        uint32_t
-        read_raw_uint32(std::istream&  in,
-                        EndianType     endian)
-        {
-          return read_raw<uint32_t,
-                          boost::endian::big_uint32_t,
-                          boost::endian::little_uint32_t,
-                          boost::endian::native_uint32_t>(in, endian);
-        }
-
-        uint64_t
-        read_raw_uint64(std::istream&  in,
-                        EndianType     endian)
-        {
-          return read_raw<uint64_t,
-                          boost::endian::big_uint64_t,
-                          boost::endian::little_uint64_t,
-                          boost::endian::native_uint64_t>(in, endian);
-        }
-
         uint16_t
         read_raw_uint16(std::istream&  in,
                         std::streamoff off,
@@ -332,51 +312,6 @@ namespace ome
             }
           else
             throw std::runtime_error("Bad ostream");
-        }
-
-        void
-        write_raw_uint16(std::ostream& in,
-                         EndianType    endian,
-                         uint16_t      value)
-        {
-          return write_raw<uint16_t,
-                           boost::endian::big_uint16_t,
-                           boost::endian::little_uint16_t,
-                           boost::endian::native_uint16_t>(in, endian, value);
-        }
-
-        void
-        write_raw_uint32(std::ostream& in,
-                         EndianType    endian,
-                         uint32_t      value)
-        {
-          return write_raw<uint32_t,
-                           boost::endian::big_uint32_t,
-                           boost::endian::little_uint32_t,
-                           boost::endian::native_uint32_t>(in, endian, value);
-        }
-
-        void
-        write_raw_uint64(std::ostream& in,
-                         EndianType    endian,
-                         uint64_t      value)
-        {
-          return write_raw<uint64_t,
-                           boost::endian::big_uint64_t,
-                           boost::endian::little_uint64_t,
-                           boost::endian::native_uint64_t>(in, endian, value);
-        }
-
-        void
-        write_raw_uint16(std::ostream&  in,
-                         std::streamoff off,
-                         EndianType     endian,
-                         uint16_t       value)
-        {
-          write_raw<uint16_t,
-                    boost::endian::big_uint16_t,
-                    boost::endian::little_uint16_t,
-                    boost::endian::native_uint16_t>(in, off, endian, value);
         }
 
         void
