@@ -269,6 +269,19 @@ namespace ome
         writeCurrentDirectory();
 
         /**
+         * Write an IFD.
+         *
+         * The pixel data accompanying this IFD must have been written
+         * using IFD::writeImage() prior to calling this method, or
+         * else the TIFF tags for strip and tile offsets will be
+         * incomplete and the file will fail to read.
+         *
+         * @param ifd the IFD to write.
+         */
+        void
+        writeDirectory(std::shared_ptr<IFD> ifd);
+
+        /**
          * Get the underlying libtiff @c \::TIFF instance.
          *
          * If there is any need to use the libtiff C interface to

@@ -287,13 +287,27 @@ namespace ome
       void
       TIFF::writeCurrentDirectory()
       {
+        writeDirectory(getCurrentDirectory());
+      }
+
+      void
+      TIFF::writeDirectory(std::shared_ptr<IFD> ifd)
+      {
         Sentry sentry;
 
         static const std::string software("OME Files (C++) " OME_FILES_VERSION_MAJOR_S "." OME_FILES_VERSION_MINOR_S "." OME_FILES_VERSION_PATCH_S);
-        getCurrentDirectory()->getField(SOFTWARE).set(software);
+        ifd->getField(SOFTWARE).set(software);
 
-        if (!TIFFWriteDirectory(impl->tiff))
-          sentry.error("Failed to write current directory");
+        if (ifd->getOffset())
+          {
+            if (!TIFFRewriteDirectory(impl->tiff))
+              sentry.error("Failed to rewrite current directory");
+          }
+        else
+          {
+            if (!TIFFWriteDirectory(impl->tiff))
+              sentry.error("Failed to write current directory");
+          }
       }
 
       TIFF::iterator
