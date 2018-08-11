@@ -123,6 +123,9 @@ namespace ome
         /// Current TIFF file.
         tiff_map::iterator currentTIFF;
 
+        /// Current TIFF file.
+        std::shared_ptr<tiff::IFD> currentIFD;
+
         /// TIFF flags.
         std::string flags;
 
@@ -188,7 +191,11 @@ namespace ome
       protected:
         /// Flush current IFD and create new IFD.
         void
-        nextIFD() const;
+        nextIFD();
+
+        /// Flush current IFD and create new SubIFD.
+        void
+        nextSUBIFD();
 
         /// Set IFD parameters for the current series.
         void

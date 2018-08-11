@@ -600,10 +600,13 @@ namespace ome
       OMETIFFWriter::nextIFD()
       {
         currentTIFF->second.tiff->writeCurrentDirectory();
+        ++currentTIFF->second.ifdCount;
+      }
 
-        // Only update IFD count for full resolutions
-        if (getResolution() == 0)
-          ++currentTIFF->second.ifdCount;
+      void
+      OMETIFFWriter::nextSUBIFD()
+      {
+        currentTIFF->second.tiff->writeCurrentDirectory();
       }
 
       void
@@ -709,11 +712,21 @@ namespace ome
 
         // Set up SubIFD if this is a full-resolution image and
         // sub-resolution images are present.
-        if (getResolution() == 0 &&
-            getResolutionCount() > 1)
+        if (getResolution() == 0)
           {
-            ifd->setSubIFDCount(getResolutionCount() - 1);
+            ifd->getField(ome::files::tiff::SUBFILETYPE).set(ome::files::tiff::SUBFILETYPE_PAGE);
+            if (getResolutionCount() > 1)
+              {
+                ifd->setSubIFDCount(getResolutionCount() - 1);
+              }
           }
+        else
+          {
+            ifd->getField(ome::files::tiff::SUBFILETYPE).set
+              (ome::files::tiff::SUBFILETYPE_PAGE|ome::files::tiff::SUBFILETYPE_REDUCEDIMAGE);
+          }
+
+        currentIFD = currentTIFF->second.tiff->getCurrentDirectory();
       }
 
       void
@@ -731,19 +744,17 @@ namespace ome
         // Get plane metadata.
         detail::OMETIFFPlane& planeMeta(seriesState.at(getSeries()).planes.at(plane));
 
-        // Get current IFD.
-        std::shared_ptr<tiff::IFD> ifd = planeMeta.ifd;
-        if (!ifd)
-          ifd = currentTIFF->second.tiff->getCurrentDirectory();
-
-        ifd->writeImage(buf, x, y, w, h);
+        currentIFD->writeImage(buf, x, y, w, h);
 
         // Set plane metadata.
-        planeMeta.id = currentTIFF->first;
-        planeMeta.index = currentTIFF->second.ifdCount;
-        planeMeta.ifd = ifd;
-        planeMeta.certain = true;
-        planeMeta.status = detail::OMETIFFPlane::PRESENT; // Plane now written.
+        if (getResolution() == 0)
+          {
+            planeMeta.id = currentTIFF->first;
+            planeMeta.index = currentTIFF->second.ifdCount;
+            planeMeta.ifd = nullptr; // Unused for writing.
+            planeMeta.certain = true;
+            planeMeta.status = detail::OMETIFFPlane::PRESENT; // Plane now written.
+          }
       }
 
       void
