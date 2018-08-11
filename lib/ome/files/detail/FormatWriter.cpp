@@ -200,7 +200,7 @@ namespace ome
       }
 
       void
-      FormatWriter::setSeries(dimension_size_type series) const
+      FormatWriter::setSeries(dimension_size_type series)
       {
         assertId(currentId, true);
 
@@ -234,7 +234,7 @@ namespace ome
       }
 
       void
-      FormatWriter::setPlane(dimension_size_type plane) const
+      FormatWriter::setPlane(dimension_size_type plane)
       {
         assertId(currentId, true);
 
@@ -635,7 +635,7 @@ namespace ome
       }
 
       void
-      FormatWriter::setResolution(dimension_size_type resolution) const
+      FormatWriter::setResolution(dimension_size_type resolution)
       {
         assertId(currentId, true);
 

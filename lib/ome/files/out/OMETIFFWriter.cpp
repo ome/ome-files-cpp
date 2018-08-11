@@ -593,7 +593,7 @@ namespace ome
       }
 
       void
-      OMETIFFWriter::setSeries(dimension_size_type series) const
+      OMETIFFWriter::setSeries(dimension_size_type series)
       {
         const dimension_size_type currentSeries = getSeries();
         detail::FormatWriter::setSeries(series);
@@ -606,20 +606,20 @@ namespace ome
       }
 
       void
-      OMETIFFWriter::setResolution(dimension_size_type resolution) const
+      OMETIFFWriter::setResolution(dimension_size_type resolution)
       {
         const dimension_size_type currentResolution = getResolution();
         detail::FormatWriter::setResolution(resolution);
 
         if (currentResolution != resolution)
           {
-            nextIFD();
+            nextSUBIFD();
             setupIFD();
           }
       }
 
       void
-      OMETIFFWriter::setPlane(dimension_size_type plane) const
+      OMETIFFWriter::setPlane(dimension_size_type plane)
       {
         const dimension_size_type currentPlane = getPlane();
         detail::FormatWriter::setPlane(plane);
@@ -662,7 +662,7 @@ namespace ome
       }
 
       void
-      OMETIFFWriter::nextIFD() const
+      OMETIFFWriter::nextIFD()
       {
         currentTIFF->second.tiff->writeCurrentDirectory();
 
@@ -672,7 +672,7 @@ namespace ome
       }
 
       void
-      OMETIFFWriter::setupIFD() const
+      OMETIFFWriter::setupIFD()
       {
         // Get current IFD.
         std::shared_ptr<tiff::IFD> ifd (currentTIFF->second.tiff->getCurrentDirectory());

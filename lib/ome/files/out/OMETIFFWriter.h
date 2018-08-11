@@ -167,15 +167,15 @@ namespace ome
 
         // Documented in superclass.
         void
-        setSeries(dimension_size_type series) const;
+        setSeries(dimension_size_type series);
 
         // Documented in superclass.
         void
-        setResolution(dimension_size_type resolution) const;
+        setResolution(dimension_size_type resolution);
 
         // Documented in superclass.
         void
-        setPlane(dimension_size_type plane) const;
+        setPlane(dimension_size_type plane);
 
         // Documented in superclass.
         dimension_size_type
@@ -192,7 +192,7 @@ namespace ome
 
         /// Set IFD parameters for the current series.
         void
-        setupIFD() const;
+        setupIFD();
 
       public:
         // Documented in superclass.

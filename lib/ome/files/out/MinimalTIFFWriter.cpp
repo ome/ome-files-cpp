@@ -197,7 +197,7 @@ namespace ome
       }
 
       void
-      MinimalTIFFWriter::setSeries(dimension_size_type series) const
+      MinimalTIFFWriter::setSeries(dimension_size_type series)
       {
         const dimension_size_type currentSeries = getSeries();
         detail::FormatWriter::setSeries(series);
@@ -210,7 +210,7 @@ namespace ome
       }
 
       void
-      MinimalTIFFWriter::setPlane(dimension_size_type plane) const
+      MinimalTIFFWriter::setPlane(dimension_size_type plane)
       {
         const dimension_size_type currentPlane = getPlane();
         detail::FormatWriter::setPlane(plane);

@@ -121,13 +121,13 @@ namespace ome
         std::shared_ptr<std::ostream> out;
 
         /// Current series.
-        mutable dimension_size_type series;
+        dimension_size_type series;
 
         /// Current resolution.
-        mutable dimension_size_type resolution;
+        dimension_size_type resolution;
 
         /// Current plane.
-        mutable dimension_size_type plane;
+        dimension_size_type plane;
 
         /// The compression type to use.
         boost::optional<std::string> compression;
@@ -198,7 +198,7 @@ namespace ome
 
         // Documented in superclass.
         void
-        setSeries(dimension_size_type series) const;
+        setSeries(dimension_size_type series);
 
         // Documented in superclass.
         dimension_size_type
@@ -206,7 +206,7 @@ namespace ome
 
         // Documented in superclass.
         void
-        setPlane(dimension_size_type plane) const;
+        setPlane(dimension_size_type plane);
 
         // Documented in superclass.
         dimension_size_type
@@ -406,7 +406,7 @@ namespace ome
 
         // Documented in superclass.
         void
-        setResolution(dimension_size_type resolution) const;
+        setResolution(dimension_size_type resolution);
 
         // Documented in superclass.
         dimension_size_type

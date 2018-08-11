@@ -191,7 +191,7 @@ namespace ome
        */
       virtual
       void
-      setSeries(dimension_size_type series) const = 0;
+      setSeries(dimension_size_type series) = 0;
 
       /**
        * Get the active series.
@@ -211,7 +211,7 @@ namespace ome
        * plane switching in const methods.
        */
       virtual void
-      setPlane(dimension_size_type plane) const = 0;
+      setPlane(dimension_size_type plane) = 0;
 
       /**
        * Get the active plane.
@@ -635,7 +635,7 @@ namespace ome
        */
       virtual
       void
-      setResolution(dimension_size_type resolution) const = 0;
+      setResolution(dimension_size_type resolution) = 0;
 
       /**
        * Get the active resolution level.

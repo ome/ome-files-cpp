@@ -114,11 +114,11 @@ namespace ome
       public:
         // Documented in superclass.
         void
-        setSeries(dimension_size_type series) const;
+        setSeries(dimension_size_type series);
 
         // Documented in superclass.
         void
-        setPlane(dimension_size_type plane) const;
+        setPlane(dimension_size_type plane);
 
         // Documented in superclass.
         dimension_size_type
