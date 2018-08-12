@@ -68,7 +68,7 @@ using ome::files::tiff::TIFF;
 
 using namespace boost::filesystem;
 
-class TIFFWriterTest : public ::testing::TestWithParam<TIFFTestParameters>
+class OMETIFFWriterTest : public ::testing::TestWithParam<TIFFTestParameters>
 {
 public:
   std::shared_ptr<TIFF> tiff;
@@ -110,7 +110,7 @@ public:
   }
 };
 
-TEST_P(TIFFWriterTest, setId)
+TEST_P(OMETIFFWriterTest, setId)
 {
   const TIFFTestParameters& params = GetParam();
 
@@ -214,4 +214,4 @@ std::vector<TIFFTestParameters> params(find_tiff_tests());
 #  pragma GCC diagnostic ignored "-Wmissing-declarations"
 #endif
 
-INSTANTIATE_TEST_CASE_P(TIFFWriterVariants, TIFFWriterTest, ::testing::ValuesIn(params));
+INSTANTIATE_TEST_CASE_P(OMETIFFWriterVariants, OMETIFFWriterTest, ::testing::ValuesIn(params));

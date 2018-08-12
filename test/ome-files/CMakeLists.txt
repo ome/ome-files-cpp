@@ -143,7 +143,7 @@ if(BUILD_TESTS)
 
   ome_files_add_test(ome-files/minimaltiffwriter minimaltiffwriter)
 
-  add_executable(ometiffwriter ometiffwriter.cpp tiffsamples.cpp)
+  add_executable(ometiffwriter ometiffwriter.cpp ometiffwriter-subresolutions.cpp tiffsamples.cpp)
   target_link_libraries(ometiffwriter OME::Files)
   target_link_libraries(ometiffwriter ome-test)
 
