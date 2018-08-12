@@ -75,7 +75,7 @@ namespace
     auto meta = make_shared<OMEXMLMetadata>();
 
     // Full image size is 2ᵒʳᵈᵉʳ.
-    constexpr dimension_size_type order = 16U;
+    constexpr dimension_size_type order = 12U;
     static_assert(order > 7U, "Image size too small to generate sub-resolutions");
 
     // Create simple CoreMetadata and use this to set up the OME-XML
