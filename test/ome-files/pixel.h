@@ -8,6 +8,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -257,23 +258,23 @@ struct PixelSubrangeVisitor
 
     ::ome::files::dimension_size_type width = shape[::ome::files::DIM_SPATIAL_X];
     ::ome::files::dimension_size_type height = shape[::ome::files::DIM_SPATIAL_Y];
-    ::ome::files::dimension_size_type subchannels = shape[::ome::files::DIM_SUBCHANNEL];
+    ::ome::files::dimension_size_type samples = shape[::ome::files::DIM_SAMPLE];
 
     for (::ome::files::dimension_size_type dx = 0; dx < width; ++dx)
       for (::ome::files::dimension_size_type dy = 0; dy < height; ++dy)
-        for (::ome::files::dimension_size_type ds = 0; ds < subchannels; ++ds)
+        for (::ome::files::dimension_size_type ds = 0; ds < samples; ++ds)
           {
             ::ome::files::VariantPixelBuffer::indices_type srcidx;
             srcidx[::ome::files::DIM_SPATIAL_X] = x + dx;
             srcidx[::ome::files::DIM_SPATIAL_Y] = y + dy;
-            srcidx[::ome::files::DIM_SUBCHANNEL] = ds;
-            srcidx[2] = srcidx[3] = srcidx[4] = srcidx[6] = srcidx[7] = srcidx[8] = 0;
+            srcidx[::ome::files::DIM_SPATIAL_Z] = 0;
+            srcidx[::ome::files::DIM_SAMPLE] = ds;
 
             ::ome::files::VariantPixelBuffer::indices_type destidx;
             destidx[::ome::files::DIM_SPATIAL_X] = dx;
             destidx[::ome::files::DIM_SPATIAL_Y] = dy;
-            destidx[::ome::files::DIM_SUBCHANNEL] = ds;
-            destidx[2] = destidx[3] = destidx[4] = destidx[6] = destidx[7] = destidx[8] = 0;
+            destidx[::ome::files::DIM_SPATIAL_Z] = 0;
+            destidx[::ome::files::DIM_SAMPLE] = ds;
 
             dest->at(destidx) = src->at(srcidx);
           }

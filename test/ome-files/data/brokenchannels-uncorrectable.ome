@@ -7,7 +7,7 @@
      xmlns:ROI="http://www.openmicroscopy.org/Schemas/ROI/2013-06"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://www.openmicroscopy.org/Schemas/OME/2013-06 http://www.openmicroscopy.org/Schemas/OME/2013-06/ome.xsd">
-  <Image ID="Image:0" Name="valid-mixed1"><!-- Missing SamplesPerPixel with unallocatable subchannels (indivisible) -->
+  <Image ID="Image:0" Name="valid-mixed1"><!-- Missing SamplesPerPixel with unallocatable samples (indivisible) -->
     <OME:AcquisitionDate>2015-04-28T11:05:15</OME:AcquisitionDate>
     <OME:Pixels DimensionOrder="XYZTC" ID="Pixels:0:0" Type="uint8" SizeC="4" SizeT="10" SizeX="10" SizeY="10" SizeZ="10">
       <OME:Channel Color="-2147483648" ID="Channel:0" SamplesPerPixel="1"/>

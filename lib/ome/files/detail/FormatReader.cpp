@@ -352,20 +352,14 @@ namespace ome
                               dimension_size_type scanlinePad,
                               dimension_size_type samples)
       {
-        std::array<VariantPixelBuffer::size_type, 9> shape, dest_shape;
-        shape[DIM_SPATIAL_X] = w;
-        shape[DIM_SPATIAL_Y] = h;
-        shape[DIM_SUBCHANNEL] = samples;
-        shape[DIM_SPATIAL_Z] = shape[DIM_TEMPORAL_T] = shape[DIM_CHANNEL] =
-          shape[DIM_MODULO_Z] = shape[DIM_MODULO_T] = shape[DIM_MODULO_C] = 1;
+        std::array<VariantPixelBuffer::size_type, PixelBufferBase::dimensions> shape, dest_shape;
+        shape = {w, h, 1, samples};
         const VariantPixelBuffer::size_type *dest_shape_ptr(dest.shape());
         std::copy(dest_shape_ptr, dest_shape_ptr + PixelBufferBase::dimensions,
                   dest_shape.begin());
 
-        const ome::xml::model::enums::DimensionOrder order(getDimensionOrder());
-        const bool interleaved(isInterleaved());
         const VariantPixelBuffer::storage_order_type storage_order
-          (PixelBufferBase::make_storage_order(order, interleaved));
+          (PixelBufferBase::make_storage_order(isInterleaved()));
 
         const ome::xml::model::enums::PixelType type(getPixelType());
 
@@ -715,7 +709,7 @@ namespace ome
       }
 
       bool
-      FormatReader::isInterleaved(dimension_size_type /* subC */) const
+      FormatReader::isInterleaved(dimension_size_type /* channel */) const
       {
         assertId(currentId, true);
         return getCoreMetadata(getSeries(), getResolution()).interleaved;

@@ -8,6 +8,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -50,7 +51,6 @@ using ome::files::Dimensions;
 using ome::files::PixelEndianProperties;
 using ome::files::PixelBufferBase;
 using ome::files::PixelBuffer;
-typedef ome::xml::model::enums::DimensionOrder DO;
 typedef ome::xml::model::enums::PixelType PT;
 
 /*
@@ -61,16 +61,13 @@ typedef ome::xml::model::enums::PixelType PT;
 class DimensionOrderTestParameters
 {
 public:
-  DO                                  order;
   bool                                interleaved;
   bool                                is_default;
   PixelBufferBase::storage_order_type expected_order;
 
-  DimensionOrderTestParameters(DO                                  order,
-                               bool                                interleaved,
+  DimensionOrderTestParameters(bool                                interleaved,
                                bool                                is_default,
                                PixelBufferBase::storage_order_type expected_order):
-    order(order),
     interleaved(interleaved),
     is_default(is_default),
     expected_order(expected_order)
@@ -82,7 +79,7 @@ inline std::basic_ostream<charT,traits>&
 operator<< (std::basic_ostream<charT,traits>& os,
             const DimensionOrderTestParameters& params)
 {
-  return os << DO(params.order) << (params.interleaved ? "/chunky" : "/planar");
+  return os << (params.interleaved ? "chunky" : "planar");
 }
 
 class DimensionOrderTest : public ::testing::TestWithParam<DimensionOrderTestParameters>
@@ -93,7 +90,7 @@ TEST_P(DimensionOrderTest, OrderCorrect)
 {
   const DimensionOrderTestParameters& params = GetParam();
 
-  ASSERT_EQ(params.expected_order, PixelBufferBase::make_storage_order(params.order, params.interleaved));
+  ASSERT_EQ(params.expected_order, PixelBufferBase::make_storage_order(params.interleaved));
 }
 
 TEST_P(DimensionOrderTest, Default)
@@ -101,9 +98,9 @@ TEST_P(DimensionOrderTest, Default)
   const DimensionOrderTestParameters& params = GetParam();
 
   if (params.is_default)
-    ASSERT_EQ(PixelBufferBase::default_storage_order(), PixelBufferBase::make_storage_order(params.order, params.interleaved));
+    ASSERT_EQ(PixelBufferBase::default_storage_order(), PixelBufferBase::make_storage_order(params.interleaved));
   else
-    ASSERT_FALSE(PixelBufferBase::default_storage_order() == PixelBufferBase::make_storage_order(params.order, params.interleaved));
+    ASSERT_FALSE(PixelBufferBase::default_storage_order() == PixelBufferBase::make_storage_order(params.interleaved));
 }
 
 namespace
@@ -112,87 +109,23 @@ namespace
   make_order(ome::files::Dimensions d0,
              ome::files::Dimensions d1,
              ome::files::Dimensions d2,
-             ome::files::Dimensions d3,
-             ome::files::Dimensions d4,
-             ome::files::Dimensions d5,
-             ome::files::Dimensions d6,
-             ome::files::Dimensions d7,
-             ome::files::Dimensions d8)
+             ome::files::Dimensions d3)
   {
-    PixelBufferBase::size_type ordering[PixelBufferBase::dimensions] = {d0, d1, d2, d3, d4, d5, d6, d7, d8};
-    bool ascending[PixelBufferBase::dimensions] = {true, true, true, true, true, true, true, true, true};
+    PixelBufferBase::size_type ordering[PixelBufferBase::dimensions] = {d0, d1, d2, d3};
+    bool ascending[PixelBufferBase::dimensions] = {true, true, true, true};
     return PixelBufferBase::storage_order_type(ordering, ascending);
   }
 }
 
 std::vector<DimensionOrderTestParameters> dimension_params
-  { //                           DimensionOrder interleaved default
-    //                           expected-order
-    {DO::XYZTC, true, true,
-     make_order(ome::files::DIM_SUBCHANNEL, ome::files::DIM_SPATIAL_X, ome::files::DIM_SPATIAL_Y,
-                ome::files::DIM_MODULO_Z, ome::files::DIM_SPATIAL_Z,
-                ome::files::DIM_MODULO_T, ome::files::DIM_TEMPORAL_T,
-                ome::files::DIM_MODULO_C, ome::files::DIM_CHANNEL)},
-    {DO::XYZTC, false, false,
-     make_order(ome::files::DIM_SPATIAL_X, ome::files::DIM_SPATIAL_Y, ome::files::DIM_SUBCHANNEL,
-                ome::files::DIM_MODULO_Z, ome::files::DIM_SPATIAL_Z,
-                ome::files::DIM_MODULO_T, ome::files::DIM_TEMPORAL_T,
-                ome::files::DIM_MODULO_C, ome::files::DIM_CHANNEL)},
-
-    {DO::XYZCT, true, false,
-     make_order(ome::files::DIM_SUBCHANNEL, ome::files::DIM_SPATIAL_X, ome::files::DIM_SPATIAL_Y,
-                ome::files::DIM_MODULO_Z, ome::files::DIM_SPATIAL_Z,
-                ome::files::DIM_MODULO_C, ome::files::DIM_CHANNEL,
-                ome::files::DIM_MODULO_T, ome::files::DIM_TEMPORAL_T)},
-    {DO::XYZCT, false, false,
-     make_order(ome::files::DIM_SPATIAL_X, ome::files::DIM_SPATIAL_Y, ome::files::DIM_SUBCHANNEL,
-                ome::files::DIM_MODULO_Z, ome::files::DIM_SPATIAL_Z,
-                ome::files::DIM_MODULO_C, ome::files::DIM_CHANNEL,
-                ome::files::DIM_MODULO_T, ome::files::DIM_TEMPORAL_T)},
-
-    {DO::XYTZC, true, false,
-     make_order(ome::files::DIM_SUBCHANNEL, ome::files::DIM_SPATIAL_X, ome::files::DIM_SPATIAL_Y,
-                ome::files::DIM_MODULO_T, ome::files::DIM_TEMPORAL_T,
-                ome::files::DIM_MODULO_Z, ome::files::DIM_SPATIAL_Z,
-                ome::files::DIM_MODULO_C, ome::files::DIM_CHANNEL)},
-    {DO::XYTZC, false, false,
-     make_order(ome::files::DIM_SPATIAL_X, ome::files::DIM_SPATIAL_Y, ome::files::DIM_SUBCHANNEL,
-                ome::files::DIM_MODULO_T, ome::files::DIM_TEMPORAL_T,
-                ome::files::DIM_MODULO_Z, ome::files::DIM_SPATIAL_Z,
-                ome::files::DIM_MODULO_C, ome::files::DIM_CHANNEL)},
-
-    {DO::XYTCZ, true, false,
-     make_order(ome::files::DIM_SUBCHANNEL, ome::files::DIM_SPATIAL_X, ome::files::DIM_SPATIAL_Y,
-                ome::files::DIM_MODULO_T, ome::files::DIM_TEMPORAL_T,
-                ome::files::DIM_MODULO_C, ome::files::DIM_CHANNEL,
-                ome::files::DIM_MODULO_Z, ome::files::DIM_SPATIAL_Z)},
-    {DO::XYTCZ, false, false,
-     make_order(ome::files::DIM_SPATIAL_X, ome::files::DIM_SPATIAL_Y, ome::files::DIM_SUBCHANNEL,
-                ome::files::DIM_MODULO_T, ome::files::DIM_TEMPORAL_T,
-                ome::files::DIM_MODULO_C, ome::files::DIM_CHANNEL,
-                ome::files::DIM_MODULO_Z, ome::files::DIM_SPATIAL_Z)},
-
-    {DO::XYCZT, true, false,
-     make_order(ome::files::DIM_SUBCHANNEL, ome::files::DIM_SPATIAL_X, ome::files::DIM_SPATIAL_Y,
-                ome::files::DIM_MODULO_C, ome::files::DIM_CHANNEL,
-                ome::files::DIM_MODULO_Z, ome::files::DIM_SPATIAL_Z,
-                ome::files::DIM_MODULO_T, ome::files::DIM_TEMPORAL_T)},
-    {DO::XYCZT, false, false,
-     make_order(ome::files::DIM_SPATIAL_X, ome::files::DIM_SPATIAL_Y, ome::files::DIM_SUBCHANNEL,
-                ome::files::DIM_MODULO_C, ome::files::DIM_CHANNEL,
-                ome::files::DIM_MODULO_Z, ome::files::DIM_SPATIAL_Z,
-                ome::files::DIM_MODULO_T, ome::files::DIM_TEMPORAL_T)},
-
-    {DO::XYCTZ, true, false,
-     make_order(ome::files::DIM_SUBCHANNEL, ome::files::DIM_SPATIAL_X, ome::files::DIM_SPATIAL_Y,
-                ome::files::DIM_MODULO_C, ome::files::DIM_CHANNEL,
-                ome::files::DIM_MODULO_T, ome::files::DIM_TEMPORAL_T,
-                ome::files::DIM_MODULO_Z, ome::files::DIM_SPATIAL_Z)},
-    {DO::XYCTZ, false, false,
-     make_order(ome::files::DIM_SPATIAL_X, ome::files::DIM_SPATIAL_Y, ome::files::DIM_SUBCHANNEL,
-                ome::files::DIM_MODULO_C, ome::files::DIM_CHANNEL,
-                ome::files::DIM_MODULO_T, ome::files::DIM_TEMPORAL_T,
-                ome::files::DIM_MODULO_Z, ome::files::DIM_SPATIAL_Z)}
+  { // interleaved default
+    // expected-order
+    {true, true,
+     make_order(ome::files::DIM_SAMPLE, ome::files::DIM_SPATIAL_X,
+                ome::files::DIM_SPATIAL_Y, ome::files::DIM_SPATIAL_Z)},
+    {false, false,
+     make_order(ome::files::DIM_SPATIAL_X, ome::files::DIM_SPATIAL_Y,
+                ome::files::DIM_SPATIAL_Z, ome::files::DIM_SAMPLE)}
   };
 
 // Disable missing-prototypes warning for INSTANTIATE_TEST_CASE_P;

@@ -1,39 +1,40 @@
 /*
-* #%L
-* OME-FILES C++ library for image IO.
-* Copyright © 2015–2017 Open Microscopy Environment:
-*   - Massachusetts Institute of Technology
-*   - National Institutes of Health
-*   - University of Dundee
-*   - Board of Regents of the University of Wisconsin-Madison
-*   - Glencoe Software, Inc.
-* %%
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-*    this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright notice,
-*    this list of conditions and the following disclaimer in the documentation
-*    and/or other materials provided with the distribution.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*
-* The views and conclusions contained in the software and documentation are
-* those of the authors and should not be interpreted as representing official
-* policies, either expressed or implied, of any organization.
-* #L%
-*/
+ * #%L
+ * OME-FILES C++ library for image IO.
+ * Copyright © 2015–2017 Open Microscopy Environment:
+ *   - Massachusetts Institute of Technology
+ *   - National Institutes of Health
+ *   - University of Dundee
+ *   - Board of Regents of the University of Wisconsin-Madison
+ *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
+ * %%
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are
+ * those of the authors and should not be interpreted as representing official
+ * policies, either expressed or implied, of any organization.
+ * #L%
+ */
 
 #include <iostream>
 #include <memory>
@@ -66,7 +67,6 @@ using ome::files::fillMetadata;
 using ome::files::CoreMetadata;
 using ome::files::DIM_SPATIAL_X;
 using ome::files::DIM_SPATIAL_Y;
-using ome::files::DIM_CHANNEL;
 using ome::files::FormatWriter;
 using ome::files::MetadataMap;
 using ome::files::out::OMETIFFWriter;
@@ -104,7 +104,7 @@ namespace
     shared_ptr<CoreMetadata> core(make_shared<CoreMetadata>());
     core->sizeX = 512U;
     core->sizeY = 512U;
-    core->sizeC.clear(); // defaults to 1 channel with 1 subchannel; clear this
+    core->sizeC.clear(); // defaults to 1 channel with 1 sample; clear this
     core->sizeC.push_back(1);
     core->sizeC.push_back(1);
     core->sizeC.push_back(1);
@@ -288,17 +288,17 @@ namespace
             // Pixel buffer; size 512 × 512 with 3 channels of type
             // uint16_t.  It uses the native endianness and has a
             // storage order of XYZTC without interleaving
-            // (subchannels are planar).
+            // (samples are planar).
             shared_ptr<PixelBuffer<PixelProperties<PixelType::UINT16>::std_type>>
               buffer(make_shared<PixelBuffer<PixelProperties<PixelType::UINT16>::std_type>>
-                     (boost::extents[512][512][1][1][1][1][1][1][1],
+                     (boost::extents[512][512][1][1],
                       PixelType::UINT16, ome::files::ENDIAN_NATIVE,
-                      PixelBufferBase::make_storage_order(DimensionOrder::XYZTC, false)));
+                      PixelBufferBase::make_storage_order(false)));
 
-            // Fill each subchannel with a different intensity ramp in
-            // the 12-bit range.  In a real program, the pixel data
-            // would typically be obtained from data acquisition or
-            // another image.
+            // Fill each R, G or B sample with a different intensity
+            // ramp in the 12-bit range.  In a real program, the pixel
+            // data would typically be obtained from data acquisition
+            // or another image.
             for (dimension_size_type x = 0; x < 512; ++x)
               for (dimension_size_type y = 0; y < 512; ++y)
                 {
@@ -306,8 +306,6 @@ namespace
                   std::fill(idx.begin(), idx.end(), 0);
                   idx[DIM_SPATIAL_X] = x;
                   idx[DIM_SPATIAL_Y] = y;
-
-                  idx[DIM_CHANNEL] = 0;
 
                   switch(p)
                     {

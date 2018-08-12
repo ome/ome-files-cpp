@@ -1082,7 +1082,7 @@ namespace ome
             coreMeta.littleEndian = true;
 #endif
 
-            // This doesn't match the reality, but since subchannels are
+            // This doesn't match the reality, but since samples are
             // addressed as planes this is needed.
             coreMeta.interleaved = (pifd->getPlanarConfiguration() == tiff::CONTIG);
 
@@ -1455,10 +1455,10 @@ namespace ome
 
                 fullsize.sizeZ = 1U;
                 fullsize.sizeT = 1U;
-                // Only one channel, but may contain subchannels.
-                dimension_size_type subchannels = fullsize.sizeC.at(0);
+                // Only one channel, but may contain samples.
+                dimension_size_type samples = fullsize.sizeC.at(0);
                 fullsize.sizeC.clear();
-                fullsize.sizeC.push_back(subchannels);
+                fullsize.sizeC.push_back(samples);
               }
           }
       }
@@ -1555,7 +1555,7 @@ namespace ome
           {
             dimension_size_type channelCount = std::accumulate(coreMeta->sizeC.begin(), coreMeta->sizeC.end(), dimension_size_type(0));
             if (coreMeta->sizeZ * coreMeta->sizeT * channelCount > coreMeta->imageCount && // Total image count is greater than imageCount.
-                channelCount == coreMeta->sizeC.size()) // No subchannels, though it's not clear why this matters since they should be accounted for by imageCount.
+                channelCount == coreMeta->sizeC.size()) // No samples, though it's not clear why this matters since they should be accounted for by imageCount.
               {
                 if (coreMeta->sizeZ == coreMeta->imageCount)
                   {

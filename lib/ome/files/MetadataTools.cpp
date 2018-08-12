@@ -461,12 +461,12 @@ namespace ome
                 }
             }
 
-          // If all subchannels add up to SizeC then the Channel
+          // If all samples add up to SizeC then the Channel
           // metadata is correct; do nothing.
           if (sizeC && realSizeC &&
               sizeC == realSizeC &&
               badChannels.empty())
-            continue;          
+            continue;
 
           valid = false;
           if (!correct)
@@ -474,8 +474,8 @@ namespace ome
 
           if (sizeC == 0 && realSizeC == 0)
             {
-              // No channels or subchannels defined; default to one
-              // subchannel per channel.
+              // No channels or samples defined; default to one
+              // sample per channel.
               meta.setPixelsSizeC(effC, series);
               for (dimension_size_type c = 0; c < effC; ++c)
                 meta.setChannelSamplesPerPixel(1U, series, c);
@@ -483,8 +483,8 @@ namespace ome
           else if (realSizeC > 0 &&
                    badChannels.empty())
             {
-              // All subchannels set and no bad channels; update SizeC
-              // to reflect the subchannel total.
+              // All samples set and no bad channels; update SizeC
+              // to reflect the sample total.
               meta.setPixelsSizeC(realSizeC, series);
             }
           else if (sizeC > 0 &&
@@ -492,7 +492,7 @@ namespace ome
                    !badChannels.empty())
             {
               // Some or all channels are unset.  If the unallocated
-              // subchannels are evenly divisible between the unset
+              // samples are evenly divisible between the unset
               // channels, assign.
               const dimension_size_type allocSamples = realSizeC;
               const dimension_size_type unallocSamples = sizeC >= realSizeC ? sizeC - allocSamples : 0U;
@@ -500,10 +500,10 @@ namespace ome
               const dimension_size_type badSamples = unallocSamples % badChannels.size();
 
               // No point guessing since we can't make a sensible
-              // subchannel allocation; bail out now.
+              // sample allocation; bail out now.
               if (!splitSamples || badSamples || sizeC < realSizeC)
                 {
-                  boost::format fmt("Unable to correct invalid ChannelSamplesPerPixel in Image #%1%; %2% channel(s) set, %3% channel(s) unset, %4% subchannel(s) unallocated");
+                  boost::format fmt("Unable to correct invalid ChannelSamplesPerPixel in Image #%1%; %2% channel(s) set, %3% channel(s) unset, %4% sample(s) unallocated");
                   fmt % series;
                   fmt % (effC - badChannels.size());
                   fmt % badChannels.size();

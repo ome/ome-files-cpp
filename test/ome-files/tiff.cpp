@@ -8,6 +8,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -72,12 +73,14 @@ using ome::files::tiff::Codec;
 using ome::files::dimension_size_type;
 using ome::files::significantBitsPerPixel;
 using ome::files::VariantPixelBuffer;
+using ome::files::PixelBufferBase;
 using ome::files::PixelBuffer;
 using ome::files::PixelProperties;
 using ome::files::PlaneRegion;
 typedef ome::xml::model::enums::PixelType PT;
 
 using namespace boost::filesystem;
+using index_type = ome::files::VariantPixelBuffer::indices_type::value_type;
 
 namespace
 {
@@ -154,15 +157,9 @@ namespace
       const VariantPixelBuffer::size_type *shape = buf->shape();
       VariantPixelBuffer::size_type w = shape[ome::files::DIM_SPATIAL_X];
       VariantPixelBuffer::size_type h = shape[ome::files::DIM_SPATIAL_X];
-      VariantPixelBuffer::size_type s = shape[ome::files::DIM_SUBCHANNEL];
+      VariantPixelBuffer::size_type s = shape[ome::files::DIM_SAMPLE];
 
-      typename T::element_type::indices_type idx;
-      idx[ome::files::DIM_SPATIAL_X] = 0;
-      idx[ome::files::DIM_SPATIAL_Y] = 0;
-      idx[ome::files::DIM_SUBCHANNEL] = 0;
-      idx[ome::files::DIM_SPATIAL_Z] = idx[ome::files::DIM_TEMPORAL_T] =
-        idx[ome::files::DIM_CHANNEL] = idx[ome::files::DIM_MODULO_Z] =
-        idx[ome::files::DIM_MODULO_T] = idx[ome::files::DIM_MODULO_C] = 0;
+      typename T::element_type::indices_type idx = {0U, 0U, 0U, 0U};
 
       const std::array<const char *,5> shades{{" ", "░", "▒", "▓", "█"}};
 
@@ -175,7 +172,7 @@ namespace
                 {
                   idx[ome::files::DIM_SPATIAL_X] = x;
                   idx[ome::files::DIM_SPATIAL_Y] = y;
-                  idx[ome::files::DIM_SUBCHANNEL] = c;
+                  idx[ome::files::DIM_SAMPLE] = c;
 
                   uint16_t shadeidx = static_cast<uint16_t>(std::floor(dump(buf, idx) * 5.0f));
                   if (shadeidx > 4)
@@ -921,15 +918,10 @@ public:
     png_set_interlace_handling(pngptr);
     png_read_update_info(pngptr, infoptr);
 
-    std::array<VariantPixelBuffer::size_type, 9> shape;
-    shape[::ome::files::DIM_SPATIAL_X] = pwidth;
-    shape[::ome::files::DIM_SPATIAL_Y] = pheight;
-    shape[::ome::files::DIM_SUBCHANNEL] = 3U;
-    shape[::ome::files::DIM_SPATIAL_Z] = shape[::ome::files::DIM_TEMPORAL_T] = shape[::ome::files::DIM_CHANNEL] =
-      shape[::ome::files::DIM_MODULO_Z] = shape[::ome::files::DIM_MODULO_T] = shape[::ome::files::DIM_MODULO_C] = 1;
+    std::array<VariantPixelBuffer::size_type, PixelBufferBase::dimensions> shape = {pwidth, pheight, 1U, 3U};
 
     ::ome::files::PixelBufferBase::storage_order_type order_chunky(::ome::files::PixelBufferBase::default_storage_order());
-    ::ome::files::PixelBufferBase::storage_order_type order_planar(::ome::files::PixelBufferBase::make_storage_order(::ome::xml::model::enums::DimensionOrder::XYZTC, false));
+    ::ome::files::PixelBufferBase::storage_order_type order_planar(::ome::files::PixelBufferBase::make_storage_order(false));
 
     VariantPixelBuffer pngdata_chunky;
     pngdata_chunky.setBuffer(shape, PT::UINT8, order_chunky);
@@ -938,13 +930,7 @@ public:
     std::vector<png_bytep> row_pointers(pheight);
     for (dimension_size_type y = 0; y < pheight; ++y)
       {
-        VariantPixelBuffer::indices_type coord;
-        coord[ome::files::DIM_SPATIAL_X] = 0;
-        coord[ome::files::DIM_SPATIAL_Y] = y;
-        coord[ome::files::DIM_SUBCHANNEL] = 0;
-        coord[ome::files::DIM_SPATIAL_Z] = coord[ome::files::DIM_TEMPORAL_T] =
-          coord[ome::files::DIM_CHANNEL] = coord[ome::files::DIM_MODULO_Z] =
-          coord[ome::files::DIM_MODULO_T] = coord[ome::files::DIM_MODULO_C] = 0;
+        VariantPixelBuffer::indices_type coord = {0U, static_cast<index_type>(y), 0U, 0U};
 
         row_pointers[y] = reinterpret_cast<png_bytep>(&(uint8_pngdata_chunky->at(coord)));
       }
@@ -983,7 +969,7 @@ public:
 
         const VariantPixelBuffer::size_type *shape = src.shape();
 
-        VariantPixelBuffer dest(boost::extents[shape[0]][shape[1]][shape[2]][shape[3]][shape[4]][shape[5]][shape[6]][shape[7]][shape[8]], pixeltype, src.storage_order());
+        VariantPixelBuffer dest(boost::extents[shape[0]][shape[1]][shape[2]][shape[3]], pixeltype, src.storage_order());
 
         PixelTypeConversionVisitor<PT::UINT8> v(src, dest);
         ome::compat::visit(v, dest.vbuffer());
@@ -1130,7 +1116,7 @@ TEST_P(TIFFVariantTest, PlaneArea1)
         if (i == j)
           continue;
 
-        // Overlaps expected between different subchannels
+        // Overlaps expected between different samples
         if (info.tileSample(tiles.at(i)) != info.tileSample(tiles.at(j)))
           continue;
 
@@ -1472,7 +1458,7 @@ TEST_P(PixelTest, WriteTIFF)
       dimension_size_type corrected_tilewidth = params.tilewidth;
       dimension_size_type corrected_tileheight = params.tileheight;
       if (params.planarconfig == ::ome::files::tiff::CONTIG)
-        corrected_tilewidth *= shape[ome::files::DIM_SUBCHANNEL];
+        corrected_tilewidth *= shape[ome::files::DIM_SAMPLE];
       if (params.pixeltype == PT::BIT)
         {
           dimension_size_type size = corrected_tilewidth / 8;
@@ -1499,7 +1485,7 @@ TEST_P(PixelTest, WriteTIFF)
         }
       exp_size = (corrected_tilewidth * corrected_tileheight *
                   ::ome::files::bytesPerPixel(params.pixeltype) *
-                  (params.planarconfig == ::ome::files::tiff::CONTIG ? shape[ome::files::DIM_SUBCHANNEL] : 1));
+                  (params.planarconfig == ::ome::files::tiff::CONTIG ? shape[ome::files::DIM_SAMPLE] : 1));
     }
 
   // Write TIFF
@@ -1519,7 +1505,7 @@ TEST_P(PixelTest, WriteTIFF)
     ASSERT_NO_THROW(wifd->setTileHeight(params.tileheight));
     ASSERT_NO_THROW(wifd->setPixelType(params.pixeltype));
     ASSERT_NO_THROW(wifd->setBitsPerSample(significantBitsPerPixel(params.pixeltype)));
-    ASSERT_NO_THROW(wifd->setSamplesPerPixel(shape[ome::files::DIM_SUBCHANNEL]));
+    ASSERT_NO_THROW(wifd->setSamplesPerPixel(shape[ome::files::DIM_SAMPLE]));
     ASSERT_NO_THROW(wifd->setPlanarConfiguration(params.planarconfig));
     ASSERT_NO_THROW(wifd->setPhotometricInterpretation(params.photometricinterp));
     if(params.compression)
@@ -1535,7 +1521,7 @@ TEST_P(PixelTest, WriteTIFF)
     EXPECT_EQ(params.tileheight, wifd->getTileHeight());
     EXPECT_EQ(params.pixeltype, wifd->getPixelType());
     EXPECT_EQ(significantBitsPerPixel(params.pixeltype), wifd->getBitsPerSample());
-    EXPECT_EQ(shape[ome::files::DIM_SUBCHANNEL], wifd->getSamplesPerPixel());
+    EXPECT_EQ(shape[ome::files::DIM_SAMPLE], wifd->getSamplesPerPixel());
     EXPECT_EQ(params.planarconfig, wifd->getPlanarConfiguration());
 
     // Make sure our expectations about buffer size are correct
@@ -1565,16 +1551,10 @@ TEST_P(PixelTest, WriteTIFF)
 
     for (const auto& t : tiles)
       {
-        std::array<VariantPixelBuffer::size_type, 9> shape;
-        shape[::ome::files::DIM_SPATIAL_X] = t.w;
-        shape[::ome::files::DIM_SPATIAL_Y] = t.h;
-        shape[::ome::files::DIM_SUBCHANNEL] = 3U;
-        shape[::ome::files::DIM_SPATIAL_Z] = shape[::ome::files::DIM_TEMPORAL_T] = shape[::ome::files::DIM_CHANNEL] =
-          shape[::ome::files::DIM_MODULO_Z] = shape[::ome::files::DIM_MODULO_T] = shape[::ome::files::DIM_MODULO_C] = 1;
+        std::array<VariantPixelBuffer::size_type, PixelBufferBase::dimensions> shape = {t.w, t.h, 1U, 3U};
 
         ::ome::files::PixelBufferBase::storage_order_type order
-            (::ome::files::PixelBufferBase::make_storage_order(::ome::xml::model::enums::DimensionOrder::XYZTC,
-                                                                    params.planarconfig == ::ome::files::tiff::CONTIG));
+            (::ome::files::PixelBufferBase::make_storage_order(params.planarconfig == ::ome::files::tiff::CONTIG));
 
         VariantPixelBuffer vb;
         vb.setBuffer(shape, params.pixeltype, order);
@@ -1608,7 +1588,7 @@ TEST_P(PixelTest, WriteTIFF)
     EXPECT_EQ(params.tileheight, ifd->getTileHeight());
     EXPECT_EQ(params.pixeltype, ifd->getPixelType());
     EXPECT_EQ(significantBitsPerPixel(params.pixeltype), ifd->getBitsPerSample());
-    EXPECT_EQ(shape[ome::files::DIM_SUBCHANNEL], ifd->getSamplesPerPixel());
+    EXPECT_EQ(shape[ome::files::DIM_SAMPLE], ifd->getSamplesPerPixel());
     EXPECT_EQ(params.planarconfig, ifd->getPlanarConfiguration());
     EXPECT_EQ(params.photometricinterp, ifd->getPhotometricInterpretation());
     if(params.compression)

@@ -170,7 +170,7 @@ namespace ome
         core.littleEndian = true;
 #endif // BOOST_BIG_ENDIAN
 
-        // This doesn't match the reality, but since subchannels are
+        // This doesn't match the reality, but since samples are
         // addressed as planes this is needed.
         core.interleaved = (ifd.getPlanarConfiguration() == tiff::CONTIG);
 
@@ -373,7 +373,7 @@ namespace ome
           }
         const IFDRange& range(seriesIFDRange.at(series));
 
-        // Compute timepoint and subchannel from plane number.
+        // Compute timepoint and sample from plane number.
         dimension_size_type ifdidx = range.begin + plane;
         assert(range.begin <= plane && plane < range.end);
 

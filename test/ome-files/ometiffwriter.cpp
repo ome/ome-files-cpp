@@ -59,6 +59,7 @@
 
 using ome::files::dimension_size_type;
 using ome::files::CoreMetadata;
+using ome::files::PixelBufferBase;
 using ome::files::VariantPixelBuffer;
 using ome::files::in::OMETIFFReader;
 using ome::files::out::OMETIFFWriter;
@@ -142,14 +143,10 @@ TEST_P(TIFFWriterTest, setId)
       ifd->readImage(buf);
 
       // Make a second buffer to ensure correct ordering for saveBytes.
-      std::array<VariantPixelBuffer::size_type, 9> shape;
-      shape[ome::files::DIM_SPATIAL_X] = ifd->getImageWidth();
-      shape[ome::files::DIM_SPATIAL_Y] = ifd->getImageHeight();
-      shape[ome::files::DIM_SUBCHANNEL] = ifd->getSamplesPerPixel();
-      shape[ome::files::DIM_SPATIAL_Z] = shape[ome::files::DIM_TEMPORAL_T] = shape[ome::files::DIM_CHANNEL] =
-        shape[ome::files::DIM_MODULO_Z] = shape[ome::files::DIM_MODULO_T] = shape[ome::files::DIM_MODULO_C] = 1;
+      std::array<VariantPixelBuffer::size_type, PixelBufferBase::dimensions>
+        shape{ifd->getImageWidth(), ifd->getImageHeight(), 1U, ifd->getSamplesPerPixel()};
 
-      ome::files::PixelBufferBase::storage_order_type order(ome::files::PixelBufferBase::make_storage_order(ome::xml::model::enums::DimensionOrder::XYZTC, !params.imageplanar));
+      ome::files::PixelBufferBase::storage_order_type order(ome::files::PixelBufferBase::make_storage_order(!params.imageplanar));
 
       VariantPixelBuffer src(shape, ifd->getPixelType(), order);
       src = buf;

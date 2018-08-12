@@ -549,7 +549,7 @@ namespace ome
 
         // Documented in superclass.
         bool
-        isInterleaved(dimension_size_type subC) const;
+        isInterleaved(dimension_size_type channel) const;
 
         // Documented in superclass.
         void

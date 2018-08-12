@@ -155,7 +155,7 @@ protected:
     c->sizeZ = 20;
     c->sizeT = 5;
 
-    // SizeC is 2 channels each containing 1 and 3 subchannels, respectively.
+    // SizeC is 2 channels each containing 1 and 3 samples, respectively.
     c->sizeC.clear();
     c->sizeC.push_back(1);
     c->sizeC.push_back(3);
@@ -807,7 +807,7 @@ TEST_P(FormatReaderTest, DefaultPixels)
   const FormatReaderTestParameters& params(GetParam());
 
   std::istringstream is("");
-  VariantPixelBuffer buf(boost::extents[512][512][1][1][2][1][1][1][1],
+  VariantPixelBuffer buf(boost::extents[512][512][1][1],
                          params.type);
 
   EXPECT_THROW(r.readPlane(is, buf, 0, 0, 512, 512, 1), std::logic_error);
@@ -857,7 +857,7 @@ namespace
             ss.write(reinterpret_cast<char *>(&val), sizeof(val));
           }
 
-      VariantPixelBuffer buf(boost::extents[512][512][1][1][2][1][1][1][1],
+      VariantPixelBuffer buf(boost::extents[512][512][1][1],
                              reader.getPixelType());
 
       ss.seekg(0, std::ios::beg);
@@ -881,7 +881,7 @@ TEST_P(FormatReaderTest, BasicPixels)
 {
   r.setId("basic");
 
-  VariantPixelBuffer buf(boost::extents[512][512][1][1][2][1][1][1][1],
+  VariantPixelBuffer buf(boost::extents[512][512][1][1],
                          r.getPixelType());
 
   BasicPixelsTest v(r, buf);

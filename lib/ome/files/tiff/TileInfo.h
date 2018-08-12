@@ -152,7 +152,7 @@ namespace ome
          *
          * @param x the image column.
          * @param y the image row.
-         * @param s the image subchannel.
+         * @param s the image sample.
          * @returns the tile index.
          */
         dimension_size_type

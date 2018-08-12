@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -39,6 +40,7 @@
 
 #include <ome/files/VariantPixelBuffer.h>
 
+using ome::files::PixelBufferBase;
 using ome::files::PixelBuffer;
 using ome::files::PixelProperties;
 using ome::files::EndianType;
@@ -235,7 +237,7 @@ namespace
     void
     operator() (T& lhs, const T& rhs) const
     {
-      std::array<VariantPixelBuffer::size_type, 9> source_shape, dest_shape;
+      std::array<VariantPixelBuffer::size_type, PixelBufferBase::dimensions> source_shape, dest_shape;
 
       const VariantPixelBuffer::size_type *source_shape_ptr(rhs->shape());
       std::copy(source_shape_ptr, source_shape_ptr + T::element_type::dimensions,

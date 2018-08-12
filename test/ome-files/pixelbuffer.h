@@ -8,6 +8,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -80,7 +81,7 @@ TYPED_TEST_P(PixelBufferType, DefaultConstruct)
 
 TYPED_TEST_P(PixelBufferType, ConstructSize)
 {
-  ASSERT_NO_THROW(PixelBuffer<TypeParam> buf(boost::extents[5][2][1][1][1][1][1][1][1]));
+  ASSERT_NO_THROW(PixelBuffer<TypeParam> buf(boost::extents[5][2][1][1]));
 }
 
 TYPED_TEST_P(PixelBufferType, ConstructExtent)
@@ -89,10 +90,7 @@ TYPED_TEST_P(PixelBufferType, ConstructExtent)
   for (uint32_t i = 0; i < 10; ++i)
     source.push_back(pixel_value<TypeParam>(i));
 
-  std::array<typename PixelBuffer<TypeParam>::size_type, 9> extents;
-  extents[0] = 5;
-  extents[1] = 2;
-  extents[2] = extents[3] = extents[4] = extents[5] = extents[6] = extents[7] = extents[8] = 1;
+  std::array<typename PixelBuffer<TypeParam>::size_type, PixelBufferBase::dimensions> extents = {5U, 2U, 1U, 1U};
 
   PixelBuffer<TypeParam> buf(extents);
   buf.assign(source.begin(), source.end());
@@ -111,10 +109,7 @@ TYPED_TEST_P(PixelBufferType, ConstructExtentRef)
   for (uint32_t i = 0; i < 10; ++i)
     source[i] = pixel_value<TypeParam>(i);
 
-  std::array<typename PixelBuffer<TypeParam>::size_type, 9> extents;
-  extents[0] = 5;
-  extents[1] = 2;
-  extents[2] = extents[3] = extents[4] = extents[5] = extents[6] = extents[7] = extents[8] = 1;
+  std::array<typename PixelBuffer<TypeParam>::size_type, PixelBufferBase::dimensions> extents = {5U, 2U, 1U, 1U};
 
   PixelBuffer<TypeParam> buf(&*source.begin(),
                              extents);
@@ -133,7 +128,7 @@ TYPED_TEST_P(PixelBufferType, ConstructRange)
   for (uint32_t i = 0; i < 10; ++i)
     source.push_back(pixel_value<TypeParam>(i));
 
-  PixelBuffer<TypeParam> buf(boost::extents[5][2][1][1][1][1][1][1][1]);
+  PixelBuffer<TypeParam> buf(boost::extents[5][2][1][1]);
   buf.assign(source.begin(), source.end());
 
   ASSERT_EQ(buf.num_elements(), 10U);
@@ -150,7 +145,7 @@ TYPED_TEST_P(PixelBufferType, ConstructRangeRef)
   for (uint32_t i = 0; i < 10; ++i)
     source[i] = pixel_value<TypeParam>(i);
 
-  PixelBuffer<TypeParam> buf(boost::extents[5][2][1][1][1][1][1][1][1]);
+  PixelBuffer<TypeParam> buf(boost::extents[5][2][1][1]);
   buf.assign(source.begin(), source.end());
 
   ASSERT_EQ(buf.num_elements(), 10U);
@@ -171,9 +166,9 @@ TYPED_TEST_P(PixelBufferType, ConstructCopy)
   for (uint32_t i = 10; i < 20; ++i)
     source2.push_back(pixel_value<TypeParam>(i));
 
-  PixelBuffer<TypeParam> buf1(boost::extents[5][2][1][1][1][1][1][1][1]);
+  PixelBuffer<TypeParam> buf1(boost::extents[5][2][1][1]);
   buf1.assign(source1.begin(), source1.end());
-  PixelBuffer<TypeParam> buf2(boost::extents[5][2][1][1][1][1][1][1][1]);
+  PixelBuffer<TypeParam> buf2(boost::extents[5][2][1][1]);
   buf2.assign(source2.begin(), source2.end());
 
   ASSERT_EQ(buf1, buf1);
@@ -213,9 +208,9 @@ TYPED_TEST_P(PixelBufferType, Operators)
   for (uint32_t i = 100; i < 120; ++i)
     source2.push_back(pixel_value<TypeParam>(i));
 
-  PixelBuffer<TypeParam> buf1(boost::extents[5][2][1][1][1][1][1][1][1]);
+  PixelBuffer<TypeParam> buf1(boost::extents[5][2][1][1]);
   buf1.assign(source1.begin(), source1.end());
-  PixelBuffer<TypeParam> buf2(boost::extents[5][2][1][1][1][1][1][1][1]);
+  PixelBuffer<TypeParam> buf2(boost::extents[5][2][1][1]);
   buf2.assign(source2.begin(), source2.end());
 
   EXPECT_EQ(buf1, buf1);
@@ -226,7 +221,7 @@ TYPED_TEST_P(PixelBufferType, Operators)
 
 TYPED_TEST_P(PixelBufferType, Array)
 {
-  PixelBuffer<TypeParam> buf(boost::extents[10][10][1][1][1][1][1][1][1]);
+  PixelBuffer<TypeParam> buf(boost::extents[10][10][1][1]);
   const PixelBuffer<TypeParam>& cbuf(buf);
 
   ASSERT_NO_THROW(buf.array());
@@ -237,7 +232,7 @@ TYPED_TEST_P(PixelBufferType, Array)
 
 TYPED_TEST_P(PixelBufferType, Data)
 {
-  PixelBuffer<TypeParam> buf(boost::extents[10][10][1][1][1][1][1][1][1]);
+  PixelBuffer<TypeParam> buf(boost::extents[10][10][1][1]);
   const PixelBuffer<TypeParam>& cbuf(buf);
 
   ASSERT_TRUE(buf.data());
@@ -248,7 +243,7 @@ TYPED_TEST_P(PixelBufferType, Data)
 
 TYPED_TEST_P(PixelBufferType, Valid)
 {
-  PixelBuffer<TypeParam> buf(boost::extents[10][10][1][1][1][1][1][1][1]);
+  PixelBuffer<TypeParam> buf(boost::extents[10][10][1][1]);
   const PixelBuffer<TypeParam>& cbuf(buf);
 
   ASSERT_TRUE(buf.valid());
@@ -257,14 +252,14 @@ TYPED_TEST_P(PixelBufferType, Valid)
 
 TYPED_TEST_P(PixelBufferType, Managed)
 {
-  PixelBuffer<TypeParam> buf(boost::extents[10][10][1][1][1][1][1][1][1]);
+  PixelBuffer<TypeParam> buf(boost::extents[10][10][1][1]);
   const PixelBuffer<TypeParam>& cbuf(buf);
 
   EXPECT_TRUE(buf.managed());
   EXPECT_TRUE(cbuf.managed());
 
   TypeParam *backing = 0;
-  PixelBuffer<TypeParam> mbuf(backing, boost::extents[10][10][1][1][1][1][1][1][1]);
+  PixelBuffer<TypeParam> mbuf(backing, boost::extents[10][10][1][1]);
   const PixelBuffer<TypeParam>& cmbuf(mbuf);
 
   EXPECT_FALSE(mbuf.managed());
@@ -273,7 +268,7 @@ TYPED_TEST_P(PixelBufferType, Managed)
 
 TYPED_TEST_P(PixelBufferType, NumElements)
 {
-  PixelBuffer<TypeParam> buf(boost::extents[10][10][1][1][10][1][1][1][1]);
+  PixelBuffer<TypeParam> buf(boost::extents[10][10][1][10]);
   const PixelBuffer<TypeParam>& cbuf(buf);
 
   ASSERT_EQ(1000U, buf.num_elements());
@@ -282,50 +277,40 @@ TYPED_TEST_P(PixelBufferType, NumElements)
 
 TYPED_TEST_P(PixelBufferType, NumDimensions)
 {
-  PixelBuffer<TypeParam> buf(boost::extents[10][10][1][1][10][1][1][1][1]);
+  PixelBuffer<TypeParam> buf(boost::extents[10][10][1][10]);
   const PixelBuffer<TypeParam>& cbuf(buf);
 
-  ASSERT_EQ(9U, buf.num_dimensions());
-  ASSERT_EQ(9U, cbuf.num_dimensions());
+  ASSERT_EQ(PixelBufferBase::dimensions, buf.num_dimensions());
+  ASSERT_EQ(PixelBufferBase::dimensions, cbuf.num_dimensions());
 }
 
 TYPED_TEST_P(PixelBufferType, Shape)
 {
-  PixelBuffer<TypeParam> buf(boost::extents[10][3][1][1][10][1][4][1][1]);
+  PixelBuffer<TypeParam> buf(boost::extents[10][3][1][4]);
   const PixelBuffer<TypeParam>& cbuf(buf);
 
   const typename PixelBuffer<TypeParam>::size_type *shape = cbuf.shape();
   EXPECT_EQ(10U, *(shape+0));
   EXPECT_EQ( 3U, *(shape+1));
   EXPECT_EQ( 1U, *(shape+2));
-  EXPECT_EQ( 1U, *(shape+3));
-  EXPECT_EQ(10U, *(shape+4));
-  EXPECT_EQ( 1U, *(shape+5));
-  EXPECT_EQ( 4U, *(shape+6));
-  EXPECT_EQ( 1U, *(shape+7));
-  EXPECT_EQ( 1U, *(shape+8));
+  EXPECT_EQ( 4U, *(shape+3));
 }
 
 TYPED_TEST_P(PixelBufferType, Strides)
 {
-  PixelBuffer<TypeParam> buf(boost::extents[10][3][1][1][10][1][4][1][1]);
+  PixelBuffer<TypeParam> buf(boost::extents[10][3][1][1]);
   const PixelBuffer<TypeParam>& cbuf(buf);
 
   const boost::multi_array_types::index *strides = cbuf.strides();
-  EXPECT_EQ(  1U, *(strides+0));
-  EXPECT_EQ( 10U, *(strides+1));
-  EXPECT_EQ(120U, *(strides+2));
-  EXPECT_EQ(120U, *(strides+3));
-  EXPECT_EQ(120U, *(strides+4));
-  EXPECT_EQ(  1U, *(strides+5));
-  EXPECT_EQ( 30U, *(strides+6));
-  EXPECT_EQ(120U, *(strides+7));
-  EXPECT_EQ(120U, *(strides+8));
+  EXPECT_EQ( 1U, *(strides+0));
+  EXPECT_EQ(10U, *(strides+1));
+  EXPECT_EQ(30U, *(strides+2));
+  EXPECT_EQ( 1U, *(strides+3));
 }
 
 TYPED_TEST_P(PixelBufferType, IndexBases)
 {
-  PixelBuffer<TypeParam> buf(boost::extents[10][3][1][1][10][1][4][1][1]);
+  PixelBuffer<TypeParam> buf(boost::extents[10][3][1][1]);
   const PixelBuffer<TypeParam>& cbuf(buf);
 
   const boost::multi_array_types::index *bases = cbuf.index_bases();
@@ -333,16 +318,11 @@ TYPED_TEST_P(PixelBufferType, IndexBases)
   EXPECT_EQ(0U, *(bases+1));
   EXPECT_EQ(0U, *(bases+2));
   EXPECT_EQ(0U, *(bases+3));
-  EXPECT_EQ(0U, *(bases+4));
-  EXPECT_EQ(0U, *(bases+5));
-  EXPECT_EQ(0U, *(bases+6));
-  EXPECT_EQ(0U, *(bases+7));
-  EXPECT_EQ(0U, *(bases+8));
 }
 
 TYPED_TEST_P(PixelBufferType, Origin)
 {
-  PixelBuffer<TypeParam> buf(boost::extents[10][3][1][1][10][1][4][1][1]);
+  PixelBuffer<TypeParam> buf(boost::extents[10][3][1][1]);
   const PixelBuffer<TypeParam>& cbuf(buf);
 
   const TypeParam *origin = cbuf.origin();
@@ -352,30 +332,20 @@ TYPED_TEST_P(PixelBufferType, Origin)
 TYPED_TEST_P(PixelBufferType, StorageOrder)
 {
   {
-    PixelBuffer<TypeParam> buf(boost::extents[10][3][1][1][10][1][4][1][1]);
+    PixelBuffer<TypeParam> buf(boost::extents[10][3][1][1]);
     const PixelBuffer<TypeParam>& cbuf(buf);
 
     const typename PixelBuffer<TypeParam>::storage_order_type& order = cbuf.storage_order();
 
-    EXPECT_EQ(5U, order.ordering(0));
+    EXPECT_EQ(3U, order.ordering(0));
     EXPECT_EQ(0U, order.ordering(1));
     EXPECT_EQ(1U, order.ordering(2));
-    EXPECT_EQ(6U, order.ordering(3));
-    EXPECT_EQ(2U, order.ordering(4));
-    EXPECT_EQ(7U, order.ordering(5));
-    EXPECT_EQ(3U, order.ordering(6));
-    EXPECT_EQ(8U, order.ordering(7));
-    EXPECT_EQ(4U, order.ordering(8));
+    EXPECT_EQ(2U, order.ordering(3));
 
     EXPECT_TRUE(order.ascending(0));
     EXPECT_TRUE(order.ascending(1));
     EXPECT_TRUE(order.ascending(2));
     EXPECT_TRUE(order.ascending(3));
-    EXPECT_TRUE(order.ascending(4));
-    EXPECT_TRUE(order.ascending(5));
-    EXPECT_TRUE(order.ascending(6));
-    EXPECT_TRUE(order.ascending(7));
-    EXPECT_TRUE(order.ascending(8));
   }
 }
 
@@ -385,7 +355,7 @@ TYPED_TEST_P(PixelBufferType, GetIndex)
   for (uint32_t i = 0; i < 100; ++i)
     source.push_back(pixel_value<TypeParam>(i));
 
-  PixelBuffer<TypeParam> buf(boost::extents[10][10][1][1][1][1][1][1][1]);
+  PixelBuffer<TypeParam> buf(boost::extents[10][10][1][1]);
   buf.assign(source.begin(), source.end());
   const PixelBuffer<TypeParam>& cbuf(buf);
 
@@ -394,10 +364,7 @@ TYPED_TEST_P(PixelBufferType, GetIndex)
   for (uint32_t i = 0; i < 10; ++i)
     for (uint32_t j = 0; j < 10; ++j)
       {
-        typename PixelBuffer<TypeParam>::indices_type idx;
-        idx[0] = i;
-        idx[1] = j;
-        idx[2] = idx[3] = idx[4] = idx[5] = idx[6] = idx[7] = idx[8] = 0;
+        typename PixelBuffer<TypeParam>::indices_type idx = {i, j, 0U, 0U};
         EXPECT_EQ(pixel_value<TypeParam>((j * 10) + i), buf.at(idx));
         EXPECT_EQ(pixel_value<TypeParam>((j * 10) + i), cbuf.at(idx));
       }
@@ -405,7 +372,7 @@ TYPED_TEST_P(PixelBufferType, GetIndex)
 
 TYPED_TEST_P(PixelBufferType, SetIndex)
 {
-  PixelBuffer<TypeParam> buf(boost::extents[10][10][1][1][1][1][1][1][1]);
+  PixelBuffer<TypeParam> buf(boost::extents[10][10][1][1]);
   const PixelBuffer<TypeParam>& cbuf(buf);
 
   ASSERT_EQ(buf.num_elements(), 100U);
@@ -413,10 +380,7 @@ TYPED_TEST_P(PixelBufferType, SetIndex)
   for (uint32_t i = 0; i < 10; ++i)
     for (uint32_t j = 0; j < 10; ++j)
       {
-        typename PixelBuffer<TypeParam>::indices_type idx;
-        idx[0] = i;
-        idx[1] = j;
-        idx[2] = idx[3] = idx[4] = idx[5] = idx[6] = idx[7] = idx[8] = 0;
+        typename PixelBuffer<TypeParam>::indices_type idx = {i, j, 0U, 0U};
 
         TypeParam val = pixel_value<TypeParam>(i + j + j);
 
@@ -432,13 +396,10 @@ TYPED_TEST_P(PixelBufferType, SetIndexDeathTest)
 #if !defined(NDEBUG) && !defined(BOOST_DISABLE_ASSERTS)
   ::testing::FLAGS_gtest_death_test_style = "threadsafe";
 
-  PixelBuffer<TypeParam> buf(boost::extents[10][10][1][1][1][1][1][1][1]);
+  PixelBuffer<TypeParam> buf(boost::extents[10][10][1][1]);
   const PixelBuffer<TypeParam>& cbuf(buf);
 
-  typename PixelBuffer<TypeParam>::indices_type badidx;
-  badidx[0] = 13;
-  badidx[1] = 2;
-  badidx[2] = badidx[3] = badidx[4] = badidx[5] = badidx[6] = badidx[7] = badidx[8] = 0;
+  typename PixelBuffer<TypeParam>::indices_type badidx = {13U, 2U, 0U, 0U};
 
   ASSERT_DEATH_IF_SUPPORTED(buf.at(badidx) = 4U, "Assertion.*failed");
   ASSERT_DEATH_IF_SUPPORTED(cbuf.at(badidx), "Assertion.*failed");
@@ -447,7 +408,7 @@ TYPED_TEST_P(PixelBufferType, SetIndexDeathTest)
 
 TYPED_TEST_P(PixelBufferType, StreamInput)
 {
-  PixelBuffer<TypeParam> buf(boost::extents[2][2][3][4][1][1][1][1][1]);
+  PixelBuffer<TypeParam> buf(boost::extents[2][2][3][1]);
   typename PixelBuffer<TypeParam>::size_type size = buf.num_elements();
   std::stringstream ss;
 
@@ -461,10 +422,9 @@ TYPED_TEST_P(PixelBufferType, StreamInput)
   ss >> buf;
   EXPECT_FALSE(!ss);
 
-  typename PixelBuffer<TypeParam>::indices_type idx;
-  idx[0] = idx[1] = idx[2] = idx[3] = idx[4] = idx[5] = idx[6] = idx[7] = idx[8] = 0;
+  typename PixelBuffer<TypeParam>::indices_type idx = {0U, 0U, 0U, 0U};
   std::vector<int>::size_type i = 0;
-  for (idx[3] = 0; idx[3] < 4; ++idx[3])
+  for (idx[3] = 0; idx[3] < 1; ++idx[3])
     for (idx[2] = 0; idx[2] < 3; ++idx[2])
       for (idx[1] = 0; idx[1] < 2; ++idx[1])
         for (idx[0] = 0; idx[0] < 2; ++idx[0])
@@ -473,7 +433,7 @@ TYPED_TEST_P(PixelBufferType, StreamInput)
 
 TYPED_TEST_P(PixelBufferType, StreamOutput)
 {
-  PixelBuffer<TypeParam> buf(boost::extents[2][2][3][4][1][1][1][1][1]);
+  PixelBuffer<TypeParam> buf(boost::extents[2][2][3][1]);
   typename PixelBuffer<TypeParam>::size_type size = buf.num_elements();
   std::stringstream ss;
 
@@ -489,10 +449,9 @@ TYPED_TEST_P(PixelBufferType, StreamOutput)
   EXPECT_FALSE(!ss);
   ss.seekg(0, std::ios::beg);
 
-  typename PixelBuffer<TypeParam>::indices_type idx;
-  idx[0] = idx[1] = idx[2] = idx[3] = idx[4] = idx[5] = idx[6] = idx[7] = idx[8] = 0;
+  typename PixelBuffer<TypeParam>::indices_type idx = {0U, 0U, 0U, 0U};
   typename std::vector<TypeParam>::size_type i = 0;
-  for (idx[3] = 0; idx[3] < 4; ++idx[3])
+  for (idx[3] = 0; idx[3] < 1; ++idx[3])
     for (idx[2] = 0; idx[2] < 3; ++idx[2])
       for (idx[1] = 0; idx[1] < 2; ++idx[1])
         for (idx[0] = 0; idx[0] < 2; ++idx[0])

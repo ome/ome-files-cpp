@@ -504,11 +504,11 @@ namespace ome
 
         /**
          * @copydoc IFD::readImage(VariantPixelBuffer&) const
-         * @param subC the subchannel to read.
+         * @param sample the sample index to read.
          */
         void
         readImage(VariantPixelBuffer& buf,
-                  dimension_size_type subC) const;
+                  dimension_size_type sample) const;
 
         /**
          * Read a region of an image plane into a pixel buffer.
@@ -533,7 +533,7 @@ namespace ome
 
         /**
          * @copydoc IFD::readImage(VariantPixelBuffer&,dimension_size_type,dimension_size_type,dimension_size_type,dimension_size_type) const
-         * @param subC the subchannel to read.
+         * @param sample the sample index to read.
          */
         void
         readImage(VariantPixelBuffer& dest,
@@ -541,7 +541,7 @@ namespace ome
                   dimension_size_type y,
                   dimension_size_type w,
                   dimension_size_type h,
-                  dimension_size_type subC) const;
+                  dimension_size_type sample) const;
 
         /**
          * Read a lookup table into a pixel buffer.
@@ -561,11 +561,11 @@ namespace ome
 
         /**
          * @copydoc IFD::writeImage(const VariantPixelBuffer&)
-         * @param subC the subchannel to write.
+         * @param sample the sample index to write.
          */
         void
         writeImage(const VariantPixelBuffer& buf,
-                   dimension_size_type       subC);
+                   dimension_size_type       sample);
 
         /**
          * Write a whole image plane from a pixel buffer.
@@ -589,7 +589,7 @@ namespace ome
 
         /**
          * @copydoc IFD::writeImage(const VariantPixelBuffer&,dimension_size_type,dimension_size_type,dimension_size_type,dimension_size_type)
-         * @param subC the subchannel to write.
+         * @param sample the sample index to write.
          */
         void
         writeImage(const VariantPixelBuffer& source,
@@ -597,7 +597,7 @@ namespace ome
                    dimension_size_type       y,
                    dimension_size_type       w,
                    dimension_size_type       h,
-                   dimension_size_type       subC);
+                   dimension_size_type       sample);
 
         /**
          * Get next directory.

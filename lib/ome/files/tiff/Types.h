@@ -169,7 +169,7 @@ namespace ome
         {
           MIN_IS_WHITE = 0,  ///< Minimum value is white.
           MIN_IS_BLACK = 1,  ///< Minimum value is black.
-          RGB = 2,           ///< RGB subchannels.
+          RGB = 2,           ///< RGB samples.
           PALETTE = 3,       ///< Indexed colour with colormap.
           MASK = 4,          ///< Mask.
           SEPARATED = 5,     ///< Color separations.

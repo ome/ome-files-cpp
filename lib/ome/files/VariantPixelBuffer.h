@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -121,7 +122,7 @@ namespace ome
        */
       explicit
       VariantPixelBuffer():
-        buffer(createBuffer(boost::extents[1][1][1][1][1][1][1][1][1]))
+        buffer(createBuffer(boost::extents[1][1][1][1]))
       {
       }
 
@@ -794,28 +795,28 @@ namespace ome
         }
       };
 
-      /// Copy a single subchannel from a PixelBuffer.
-      struct CopySubchannelVisitor
+      /// Copy a single sample from a PixelBuffer.
+      struct CopySampleVisitor
       {
         /// Destination pixel buffer.
         VariantPixelBuffer& dest;
-        /// Subchannel to copy.
-        dimension_size_type subC;
+        /// Sample to copy.
+        dimension_size_type sample;
 
         /**
          * Constructor.
          *
          * @param dest the destination pixel buffer.
-         * @param subC the subchannel to copy.
+         * @param sample the sample to copy.
          */
-        CopySubchannelVisitor(VariantPixelBuffer& dest,
-                              dimension_size_type subC):
+        CopySampleVisitor(VariantPixelBuffer& dest,
+                              dimension_size_type sample):
           dest(dest),
-          subC(subC)
+          sample(sample)
         {}
 
         /**
-         * Copy subchannel.
+         * Copy sample.
          *
          * @param v the PixelBuffer to use.
          */
@@ -823,17 +824,17 @@ namespace ome
         void
         operator()(const T& v)
         {
-          // Shape is the same as the source buffer, but with one subchannel.
-          std::array<VariantPixelBuffer::size_type, 9> dest_shape;
+          // Shape is the same as the source buffer, but with one sample.
+          std::array<VariantPixelBuffer::size_type, PixelBufferBase::dimensions> dest_shape;
           const VariantPixelBuffer::size_type *shape_ptr(v->shape());
           std::copy(shape_ptr, shape_ptr + PixelBufferBase::dimensions,
                     dest_shape.begin());
-          dest_shape[DIM_SUBCHANNEL] = 1;
+          dest_shape[DIM_SAMPLE] = 1;
 
           // Default to planar ordering; since openByes/saveBytes
           // don't use ZTC the DimensionOrder doesn't matter here so
           // long as it matches what the TIFF reader/writer uses.
-          PixelBufferBase::storage_order_type order(PixelBufferBase::make_storage_order(ome::xml::model::enums::DimensionOrder::XYZTC, false));
+          PixelBufferBase::storage_order_type order(PixelBufferBase::make_storage_order(false));
 
           /// @todo Only call setBuffer if the shape and pixel type
           /// differ, to allow user control over storage order.
@@ -843,32 +844,32 @@ namespace ome
 
           typename boost::multi_array_types::index_gen indices;
           typedef boost::multi_array_types::index_range range;
-          destbuf->array() = v->array()[boost::indices[range()][range()][range()][range()][range()][range(subC,subC+1)][range()][range()][range()]];
+          destbuf->array() = v->array()[boost::indices[range()][range()][range()][range(sample,sample+1)]];
         }
       };
 
-      /// Merge a single subchannel into a PixelBuffer.
-      struct MergeSubchannelVisitor
+      /// Merge a single sample into a PixelBuffer.
+      struct MergeSampleVisitor
       {
         /// Destination pixel buffer.
         VariantPixelBuffer& dest;
-        /// Subchannel to copy.
-        dimension_size_type subC;
+        /// Sample to copy.
+        dimension_size_type sample;
 
         /**
          * Constructor.
          *
          * @param dest the destination pixel buffer.
-         * @param subC the subchannel to copy.
+         * @param sample the sample to copy.
          */
-        MergeSubchannelVisitor(VariantPixelBuffer& dest,
-                               dimension_size_type subC):
+        MergeSampleVisitor(VariantPixelBuffer& dest,
+                               dimension_size_type sample):
           dest(dest),
-          subC(subC)
+          sample(sample)
         {}
 
         /**
-         * Merge subchannel.
+         * Merge sample.
          *
          * @param v the PixelBuffer to use.
          */
@@ -880,7 +881,7 @@ namespace ome
 
           typename boost::multi_array_types::index_gen indices;
           typedef boost::multi_array_types::index_range range;
-          destbuf->array()[boost::indices[range()][range()][range()][range()][range()][range(subC,subC+1)][range()][range()][range()]] = v->array();
+          destbuf->array()[boost::indices[range()][range()][range()][range(sample,sample+1)]] = v->array();
         }
       };
 

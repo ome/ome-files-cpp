@@ -269,10 +269,10 @@ namespace ome
       getImageCount() const = 0;
 
       /**
-       * Does a channel contain subchannels?
+       * Does a channel contain multiple samples?
        *
-       * Check if the image planes in the file have more than one subchannel per
-       * openBytes() call for the specified channel.
+       * Check if the image planes in the file have more than one
+       * sample per openBytes() call for the specified channel.
        *
        * @param channel the channel to use, range [0, EffectiveSizeC).
        * @returns @c true if and only if @c getRGBChannelCount(channel) returns
@@ -499,7 +499,7 @@ namespace ome
       getCompression() const = 0;
 
       /**
-       * Set subchannel interleaving.
+       * Set sample interleaving.
        *
        * @param interleaved @c true to enable interleaving (chunky) or
        * @c false to disable interleaving (planar).
@@ -509,7 +509,7 @@ namespace ome
       setInterleaved(bool interleaved) = 0;
 
       /**
-       * Set subchannel interleaving.
+       * Get sample interleaving.
        *
        * @returns the current interleaving setting; @c false if unset.
        */

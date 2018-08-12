@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -63,29 +64,16 @@ namespace ome
   {
 
     /**
-     * Dimensions.
-     *
-     * The OME data model currently supports five dimensions (XYZTC),
-     * plus an implicit dimension (subchannel) and three modulo
-     * dimensions which subdivide Z, T and C.  This enumeration is
-     * used to refer to specific dimensions, and the value is the
-     * logical dimension order used for the PixelBuffer interface.
-     *
-     * The current interface requires all dimensions to be present
-     * even if unused.  Future model changes may remove this
-     * requirement.
+     * Dimensions used in a pixel buffer.  Currently limited to
+     * physical dimensions and sample dimension; typically used for
+     * RGB samples.
      */
     enum Dimensions
       {
         DIM_SPATIAL_X  = 0, ///< Spatial x dimension (X).
         DIM_SPATIAL_Y  = 1, ///< Spatial y dimension (Y).
         DIM_SPATIAL_Z  = 2, ///< Spatial z dimension (Z).
-        DIM_TEMPORAL_T = 3, ///< Temporal t dimension (T).
-        DIM_CHANNEL    = 4, ///< Logical channel (typically detectors of specific wavelengths) (C).
-        DIM_SUBCHANNEL = 5, ///< Logical sub-channel (typically used for RGB channel sub-components) (S).
-        DIM_MODULO_Z   = 6, ///< Logical subdivision of the spatial z dimension (z).
-        DIM_MODULO_T   = 7, ///< Logical subdivision of the temporal t dimension (t).
-        DIM_MODULO_C   = 8  ///< Logical subdivision of the logical channel dimension (c).
+        DIM_SAMPLE     = 3, ///< Samples (typically used for RGB samples) (S).
       };
 
     /**
@@ -104,7 +92,7 @@ namespace ome
     {
     public:
       /// Total number of supported dimensions.
-      static const uint16_t dimensions = 9;
+      static constexpr uint16_t dimensions = 4;
 
       /// Size type.
       typedef boost::multi_array_types::size_type size_type;
@@ -164,16 +152,25 @@ namespace ome
       }
 
       /**
-       * Generate storage ordering for a given dimension order.
+       * Generate storage ordering.
        *
-       * This converts the OME data model dimension ordering
-       * specification to the native 9D ordering, including subchannel
-       * and modulo components.
+       * @param interleaved @c true if samples are interleaved
+       * (chunky, @c SXYZ order), @c false otherwise (planar, @c XYZS
+       * order).
+       * @returns the storage ordering.
+       */
+      static storage_order_type
+      make_storage_order(bool interleaved);
+
+      /**
+       * Generate storage ordering.
        *
-       * @param order the OME data model dimension ordering
-       * @param interleaved @c true if subchannels are interleaved
+       * @param order the OME data model dimension ordering (ignored)
+       * @param interleaved @c true if samples are interleaved
        * (chunky), @c false otherwise (planar).
        * @returns the storage ordering.
+       *
+       * @deprecated Use the variant without @c DimensionOrder.
        */
       static storage_order_type
       make_storage_order(ome::xml::model::enums::DimensionOrder order,
@@ -182,8 +179,8 @@ namespace ome
       /**
        * Generate default storage ordering.
        *
-       * The default is @c XYZTC with subchannel interleaving (i.e. @c
-       * SXYzZtTcC as the 9D order).
+       * The default is @c SXYZ sample interleaving (i.e. @c SXYZ as
+       * the 4D order).
        *
        * @returns the storage ordering.
        */
@@ -259,7 +256,7 @@ namespace ome
        */
       explicit PixelBuffer():
         PixelBufferBase(::ome::xml::model::enums::PixelType::UINT8, ENDIAN_NATIVE),
-        multiarray(std::make_shared<array_type>(boost::extents[1][1][1][1][1][1][1][1][1],
+        multiarray(std::make_shared<array_type>(boost::extents[1][1][1][1],
                                                 PixelBufferBase::default_storage_order()))
       {}
 
@@ -531,10 +528,9 @@ namespace ome
       /**
        * Get the origin of the array.
        *
-       * This is the address of the element at @c
-       * [0][0][0][0][0][0][0][0][0].  Note that this is not always
-       * the buffer start address, depending upon the dimension
-       * ordering.
+       * This is the address of the element at @c [0][0][0][0].  Note
+       * that this is not always the buffer start address, depending
+       * upon the dimension ordering.
        *
        * @returns the address of the array origin.
        */

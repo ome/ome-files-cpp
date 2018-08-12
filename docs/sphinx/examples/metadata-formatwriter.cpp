@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -56,7 +57,7 @@ using ome::files::fillMetadata;
 using ome::files::CoreMetadata;
 using ome::files::DIM_SPATIAL_X;
 using ome::files::DIM_SPATIAL_Y;
-using ome::files::DIM_SUBCHANNEL;
+using ome::files::DIM_SAMPLE;
 using ome::files::FormatWriter;
 using ome::files::MetadataMap;
 using ome::files::out::OMETIFFWriter;
@@ -93,7 +94,7 @@ namespace
     shared_ptr<CoreMetadata> core(make_shared<CoreMetadata>());
     core->sizeX = 512U;
     core->sizeY = 512U;
-    core->sizeC.clear(); // defaults to 1 channel with 1 subchannel; clear this
+    core->sizeC.clear(); // defaults to 1 channel with 1 sample; clear this
     core->sizeC.push_back(3U); // replace with single RGB channel
     core->pixelType = ome::xml::model::enums::PixelType::UINT16;
     core->interleaved = false;
@@ -220,20 +221,20 @@ namespace
         // Loop over planes (for this image index)
         for (dimension_size_type p = 0 ; p < pc; ++p)
           {
-            // Pixel buffer; size 512 × 512 with 3 subchannels of type
+            // Pixel buffer; size 512 × 512 with 3 samples of type
             // uint16_t.  It uses the native endianness and has a
             // storage order of XYZTC without interleaving
-            // (subchannels are planar).
+            // (samples are planar).
             shared_ptr<PixelBuffer<PixelProperties<PixelType::UINT16>::std_type>>
               buffer(make_shared<PixelBuffer<PixelProperties<PixelType::UINT16>::std_type>>
-                     (boost::extents[512][512][1][1][1][3][1][1][1],
+                     (boost::extents[512][512][1][3],
                       PixelType::UINT16, ome::files::ENDIAN_NATIVE,
-                      PixelBufferBase::make_storage_order(DimensionOrder::XYZTC, false)));
+                      PixelBufferBase::make_storage_order(false)));
 
-            // Fill each subchannel with a different intensity ramp in
-            // the 12-bit range.  In a real program, the pixel data
-            // would typically be obtained from data acquisition or
-            // another image.
+            // Fill each R, G or B sample with a different intensity
+            // ramp in the 12-bit range.  In a real program, the pixel
+            // data would typically be obtained from data acquisition
+            // or another image.
             for (dimension_size_type x = 0; x < 512; ++x)
               for (dimension_size_type y = 0; y < 512; ++y)
                 {
@@ -242,11 +243,11 @@ namespace
                   idx[DIM_SPATIAL_X] = x;
                   idx[DIM_SPATIAL_Y] = y;
 
-                  idx[DIM_SUBCHANNEL] = 0;
+                  idx[DIM_SAMPLE] = 0;
                   buffer->at(idx) = (static_cast<float>(x) / 512.0f) * 4096.0f;
-                  idx[DIM_SUBCHANNEL] = 1;
+                  idx[DIM_SAMPLE] = 1;
                   buffer->at(idx) = (static_cast<float>(y) / 512.0f) * 4096.0f;
-                  idx[DIM_SUBCHANNEL] = 2;
+                  idx[DIM_SAMPLE] = 2;
                   buffer->at(idx) = (static_cast<float>(x+y) / 1024.0f) * 4096.0f;
                 }
 

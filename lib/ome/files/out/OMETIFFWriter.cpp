@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -697,7 +698,7 @@ namespace ome
 
         // This isn't necessarily always true; we might want to use a
         // photometric interpretation other than RGB with three
-        // subchannels.
+        // samples.
         if (isRGB(channel) && getRGBChannelCount(channel) == 3)
           ifd->setPhotometricInterpretation(tiff::RGB);
         else

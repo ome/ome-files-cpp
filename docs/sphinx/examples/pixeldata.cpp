@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -63,23 +64,18 @@ namespace
     // Language type for FLOAT pixel data
     typedef PixelProperties<PixelType::FLOAT>::std_type float_pixel_type;
     // Create PixelBuffer for floating point data
-    // X=512 Y=512 Z=16 T=1 C=3 S/z/t/c=1
+    // X=512 Y=512 Z=16 S=1
     PixelBuffer<float_pixel_type> buffer
-      (boost::extents[512][512][16][1][3][1][1][1][1], PixelType::FLOAT);
+      (boost::extents[512][512][16][1], PixelType::FLOAT);
     /* create-example-end */
 
     /* at-example-start */
-    // Set all pixel values for Z=2 and C=1 to 0.5
-    // 9D index, default values to zero if unused
+    // Set all pixel values for Z=2 and S=1 to 0.5
+    // 4D index, default values to zero if unused
     PixelBuffer<float_pixel_type>::indices_type idx;
     // Set Z and C indices
     idx[ome::files::DIM_SPATIAL_Z] = 2;
-    idx[ome::files::DIM_CHANNEL] = 1;
-    idx[ome::files::DIM_TEMPORAL_T] =
-      idx[ome::files::DIM_SUBCHANNEL] =
-      idx[ome::files::DIM_MODULO_Z] =
-      idx[ome::files::DIM_MODULO_T] =
-      idx[ome::files::DIM_MODULO_C] = 0;
+    idx[ome::files::DIM_SAMPLE] = 1;
 
     for (uint16_t x = 0; x < 512; ++x)
       {
@@ -99,32 +95,30 @@ namespace
     /* create-ordered-example-start */
     // Language type for UINT16 pixel data
     typedef PixelProperties<PixelType::UINT16>::std_type uint16_pixel_type;
-    // Storage order is XYSCTZctz; subchannels are not interleaved
-    // ("planar") after XY; lowercase letters are unused Modulo
-    // dimensions
+    // Storage order is XYZS; samples are not interleaved
+    // ("planar") after XYZ
     PixelBufferBase::storage_order_type order1
-      (PixelBufferBase::make_storage_order(DimensionOrder::XYCTZ, false));
+      (PixelBufferBase::make_storage_order(false));
     // Create PixelBuffer for unsigned 16-bit data with specified
     // storage order
-    // X=512 Y=512 Z=16 T=1 C=3 S/z/t/c=1
+    // X=512 Y=512 Z=16 S=1
     PixelBuffer<uint16_pixel_type> buffer1
-      (boost::extents[512][512][16][1][3][1][1][1][1],
+      (boost::extents[512][512][16][1],
        PixelType::UINT16,
        ome::files::ENDIAN_NATIVE,
        order1);
 
     // Language type for INT8 pixel data
     typedef PixelProperties<PixelType::INT8>::std_type int8_pixel_type;
-    // Storage order is SXYZCTzct; subchannels are interleaved
-    // ("chunky") before XY; lowercase letters are unused Modulo
-    // dimensions
+    // Storage order is SXYZ; samples are interleaved
+    // ("chunky") before XYZ
     PixelBufferBase::storage_order_type order2
-      (PixelBufferBase::make_storage_order(DimensionOrder::XYZCT, true));
+      (PixelBufferBase::make_storage_order(true));
     // Create PixelBuffer for signed 8-bit RGB data with specified storage
     // order
-    // X=1024 Y=1024 Z=1 T=1 C=1 S=3 z/t/c=1
+    // X=1024 Y=1024 Z=1 S=3
     PixelBuffer<int8_pixel_type> buffer2
-      (boost::extents[1024][1024][1][1][1][3][1][1][1],
+      (boost::extents[1024][1024][1][2],
        PixelType::INT8,
        ome::files::ENDIAN_NATIVE,
        order2);
@@ -137,29 +131,27 @@ namespace
     /* reorder-example-start */
     // Language type for FLOAT pixel data
     typedef PixelProperties<PixelType::FLOAT>::std_type float_pixel_type;
-    // Storage order is XYSZCTzct; subchannels are not interleaved
-    // ("planar") after XY; lowercase letters are unused Modulo
-    // dimensions
+    // Storage order is XYZS; samples are not interleaved
+    // ("planar") after XYZ
     PixelBufferBase::storage_order_type planar_order
-      (PixelBufferBase::make_storage_order(DimensionOrder::XYZCT, false));
-    // Storage order is SXYZCTzct; subchannels are interleaved
-    // ("chunky" or "contiguous") before XY; lowercase letters are
-    // unused Modulo dimensions
+      (PixelBufferBase::make_storage_order(false));
+    // Storage order is SXYZ; samples are interleaved ("chunky" or
+    // "contiguous") before XYZ
     PixelBufferBase::storage_order_type contiguous_order
-      (PixelBufferBase::make_storage_order(DimensionOrder::XYZCT, true));
+      (PixelBufferBase::make_storage_order(true));
 
     // Create PixelBuffer for float data with planar order
-    // X=512 Y=512 Z=16 T=1 C=3 S/z/t/c=1
+    // X=512 Y=512 Z=16 S=1
     PixelBuffer<float_pixel_type> planar_buffer
-      (boost::extents[512][512][16][1][3][1][1][1][1],
+      (boost::extents[512][512][16][1],
        PixelType::FLOAT,
        ome::files::ENDIAN_NATIVE,
        planar_order);
 
     // Create PixelBuffer for float data with contiguous order
-    // X=512 Y=512 Z=16 T=1 C=3 S/z/t/c=1
+    // X=512 Y=512 Z=16 S=1
     PixelBuffer<float_pixel_type> contiguous_buffer
-      (boost::extents[512][512][16][1][3][1][1][1][1],
+      (boost::extents[512][512][16][1],
        PixelType::FLOAT,
        ome::files::ENDIAN_NATIVE,
        contiguous_order);
@@ -243,7 +235,7 @@ namespace
   applyVariant()
   {
     // Make variant buffer (int32, 16×16 single plane)
-    VariantPixelBuffer variant(boost::extents[16][16][1][1][1][1][1][1][1],
+    VariantPixelBuffer variant(boost::extents[16][16][1][1],
                                PixelType::INT32);
     // Get buffer size
     VariantPixelBuffer::size_type size = variant.num_elements();

@@ -376,7 +376,7 @@ TEST_P(FormatWriterTest, IsThisType)
 
 TEST_P(FormatWriterTest, DefaultLUT)
 {
-  VariantPixelBuffer buf(boost::extents[256][1][1][1][1][3][1][1][1]);
+  VariantPixelBuffer buf(boost::extents[256][1][1][3]);
   EXPECT_THROW(w.setLookupTable(0U, buf), std::logic_error);
 }
 
@@ -384,7 +384,7 @@ TEST_P(FormatWriterTest, OutputLUT)
 {
   w.setId("output.test");
 
-  VariantPixelBuffer buf(boost::extents[256][1][1][1][1][3][1][1][1]);
+  VariantPixelBuffer buf(boost::extents[256][1][1][3]);
   EXPECT_THROW(w.setLookupTable(0U, buf), std::runtime_error);
 }
 
@@ -392,7 +392,7 @@ TEST_P(FormatWriterTest, DefaultPixels)
 {
   const FormatWriterTestParameters& params(GetParam());
 
-  VariantPixelBuffer buf(boost::extents[512][512][1][1][2][1][1][1][1],
+  VariantPixelBuffer buf(boost::extents[512][512][1][1],
                          params.type);
 
   EXPECT_THROW(w.saveBytes(0, buf), std::logic_error);
@@ -440,7 +440,7 @@ namespace
             ss.write(reinterpret_cast<char *>(&val), sizeof(val));
           }
 
-      VariantPixelBuffer buf(boost::extents[512][512][1][1][2][1][1][1][1],
+      VariantPixelBuffer buf(boost::extents[512][512][1][1],
                              params.type);
 
       // ss.seekg(0, std::ios::beg);
@@ -465,7 +465,7 @@ TEST_P(FormatWriterTest, OutputPixels)
 
   w.setId("output.test");
 
-  VariantPixelBuffer buf(boost::extents[512][512][1][1][2][1][1][1][1],
+  VariantPixelBuffer buf(boost::extents[512][512][1][1],
                          params.type);
 
   OutputPixelsTest v(params, w, buf);

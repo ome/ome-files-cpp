@@ -7,6 +7,7 @@
  *   - University of Dundee
  *   - Board of Regents of the University of Wisconsin-Madison
  *   - Glencoe Software, Inc.
+ * Copyright © 2018 Quantitative Imaging Systems, LLC
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -50,79 +51,37 @@ namespace ome
 #  pragma GCC diagnostic ignored "-Wswitch-default"
 #endif
 
+    constexpr uint16_t PixelBufferBase::dimensions;
+
     PixelBufferBase::storage_order_type
-    PixelBufferBase::make_storage_order(ome::xml::model::enums::DimensionOrder order,
-                                        bool                                   interleaved)
+    PixelBufferBase::make_storage_order(bool interleaved)
     {
       size_type ordering[dimensions];
-      bool ascending[dimensions] = {true, true, true, true, true, true, true, true, true};
+      bool ascending[dimensions] = {true, true, true, true};
 
       if (interleaved)
         {
-          ordering[0] = DIM_SUBCHANNEL;
+          ordering[0] = DIM_SAMPLE;
           ordering[1] = DIM_SPATIAL_X;
           ordering[2] = DIM_SPATIAL_Y;
+          ordering[3] = DIM_SPATIAL_Z;
         }
       else
         {
           ordering[0] = DIM_SPATIAL_X;
           ordering[1] = DIM_SPATIAL_Y;
-          ordering[2] = DIM_SUBCHANNEL;
-        }
-
-      switch(order)
-        {
-        case ome::xml::model::enums::DimensionOrder::XYZTC:
-          ordering[3] = DIM_MODULO_Z;
-          ordering[4] = DIM_SPATIAL_Z;
-          ordering[5] = DIM_MODULO_T;
-          ordering[6] = DIM_TEMPORAL_T;
-          ordering[7] = DIM_MODULO_C;
-          ordering[8] = DIM_CHANNEL;
-          break;
-        case ome::xml::model::enums::DimensionOrder::XYZCT:
-          ordering[3] = DIM_MODULO_Z;
-          ordering[4] = DIM_SPATIAL_Z;
-          ordering[5] = DIM_MODULO_C;
-          ordering[6] = DIM_CHANNEL;
-          ordering[7] = DIM_MODULO_T;
-          ordering[8] = DIM_TEMPORAL_T;
-          break;
-        case ome::xml::model::enums::DimensionOrder::XYTZC:
-          ordering[3] = DIM_MODULO_T;
-          ordering[4] = DIM_TEMPORAL_T;
-          ordering[5] = DIM_MODULO_Z;
-          ordering[6] = DIM_SPATIAL_Z;
-          ordering[7] = DIM_MODULO_C;
-          ordering[8] = DIM_CHANNEL;
-          break;
-        case ome::xml::model::enums::DimensionOrder::XYTCZ:
-          ordering[3] = DIM_MODULO_T;
-          ordering[4] = DIM_TEMPORAL_T;
-          ordering[5] = DIM_MODULO_C;
-          ordering[6] = DIM_CHANNEL;
-          ordering[7] = DIM_MODULO_Z;
-          ordering[8] = DIM_SPATIAL_Z;
-          break;
-        case ome::xml::model::enums::DimensionOrder::XYCZT:
-          ordering[3] = DIM_MODULO_C;
-          ordering[4] = DIM_CHANNEL;
-          ordering[5] = DIM_MODULO_Z;
-          ordering[6] = DIM_SPATIAL_Z;
-          ordering[7] = DIM_MODULO_T;
-          ordering[8] = DIM_TEMPORAL_T;
-          break;
-        case ome::xml::model::enums::DimensionOrder::XYCTZ:
-          ordering[3] = DIM_MODULO_C;
-          ordering[4] = DIM_CHANNEL;
-          ordering[5] = DIM_MODULO_T;
-          ordering[6] = DIM_TEMPORAL_T;
-          ordering[7] = DIM_MODULO_Z;
-          ordering[8] = DIM_SPATIAL_Z;
-          break;
+          ordering[2] = DIM_SPATIAL_Z;
+          ordering[3] = DIM_SAMPLE;
         }
 
       return storage_order_type(ordering, ascending);
+    }
+
+    PixelBufferBase::storage_order_type
+    PixelBufferBase::make_storage_order(ome::xml::model::enums::DimensionOrder /* order */,
+                                        bool                                   interleaved)
+    {
+      return make_storage_order(interleaved);
     }
 
 #ifdef __GNUC__
@@ -132,7 +91,7 @@ namespace ome
     PixelBufferBase::storage_order_type
     PixelBufferBase::default_storage_order()
     {
-      return make_storage_order(ome::xml::model::enums::DimensionOrder::XYZTC, true);
+      return make_storage_order(true);
     }
 
   }
