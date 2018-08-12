@@ -340,49 +340,45 @@ namespace
       tiles(tiles)
     {}
 
-    // Flush covered tiles.
+    // Flush covered tile.
     void
-    flush()
+    flush(tstrile_t tile)
     {
       std::shared_ptr<::ome::files::tiff::TIFF>& tiff(ifd.getTIFF());
       ::TIFF *tiffraw = reinterpret_cast<::TIFF *>(tiff->getWrapped());
       TileType type = tileinfo.tileType();
       PlaneRegion rimage(0, 0, ifd.getImageWidth(), ifd.getImageHeight());
-      tstrile_t tile = static_cast<tstrile_t>(ifd.getCurrentTile());
 
       Sentry sentry;
-      while(tile < tileinfo.tileCount())
+
+      dimension_size_type tile_subchannel = tileinfo.tileSample(tile);
+
+      PlaneRegion validarea = tileinfo.tileRegion(tile) & rimage;
+      if (!validarea.area())
+        return;
+
+      if (!tilecoverage.at(tile_subchannel).covered(validarea))
+        return;
+
+      assert(tilecache.find(tile));
+      TileBuffer& tilebuf = *tilecache.find(tile);
+      if (type == TILE)
         {
-          dimension_size_type tile_subchannel = tileinfo.tileSample(tile);
-
-          PlaneRegion validarea = tileinfo.tileRegion(tile) & rimage;
-          if (!validarea.area())
-            break;
-
-          if (!tilecoverage.at(tile_subchannel).covered(validarea))
-            break;
-
-          assert(tilecache.find(tile));
-          TileBuffer& tilebuf = *tilecache.find(tile);
-          if (type == TILE)
-            {
-              tsize_t byteswritten = TIFFWriteEncodedTile(tiffraw, tile, tilebuf.data(), static_cast<tsize_t>(tilebuf.size()));
-              if (byteswritten < 0)
-                sentry.error("Failed to write encoded tile");
-              else if (static_cast<dimension_size_type>(byteswritten) != tilebuf.size())
-                sentry.error("Failed to write encoded tile fully");
-            }
-          else
-            {
-              tsize_t byteswritten = TIFFWriteEncodedStrip(tiffraw, tile, tilebuf.data(), static_cast<tsize_t>(tilebuf.size()));
-              if (byteswritten < 0)
-                sentry.error("Failed to write encoded strip");
-              else if (static_cast<dimension_size_type>(byteswritten) != tilebuf.size())
-                sentry.error("Failed to write encoded strip fully");
-            }
-          tilecache.erase(tile);
-          ifd.setCurrentTile(++tile);
+          tsize_t byteswritten = TIFFWriteEncodedTile(tiffraw, tile, tilebuf.data(), static_cast<tsize_t>(tilebuf.size()));
+          if (byteswritten < 0)
+            sentry.error("Failed to write encoded tile");
+          else if (static_cast<dimension_size_type>(byteswritten) != tilebuf.size())
+            sentry.error("Failed to write encoded tile fully");
         }
+      else
+        {
+          tsize_t byteswritten = TIFFWriteEncodedStrip(tiffraw, tile, tilebuf.data(), static_cast<tsize_t>(tilebuf.size()));
+          if (byteswritten < 0)
+            sentry.error("Failed to write encoded strip");
+          else if (static_cast<dimension_size_type>(byteswritten) != tilebuf.size())
+            sentry.error("Failed to write encoded strip fully");
+        }
+      tilecache.erase(tile);
     }
 
     template<typename T>
@@ -525,10 +521,11 @@ namespace
 
           transfer(buffer, srcidx, tilebuf, rfull, rclip, copysamples);
           tilecoverage.at(dest_subchannel).insert(rclip);
+
+          // Flush tile if covered.
+          flush(tile);
         }
 
-      // Flush covered tiles
-      flush();
     }
   };
 
@@ -604,8 +601,6 @@ namespace ome
         boost::optional<Compression> compression;
         /// Compression scheme.
         boost::optional<std::vector<uint64_t>> subifds;
-        /// Current tile (for writing).
-        tstrile_t ctile;
 
         /**
          * Constructor.
@@ -625,8 +620,7 @@ namespace ome
           tileheight(),
           pixeltype(),
           samples(),
-          planarconfig(),
-          ctile(0)
+          planarconfig()
         {
         }
 
@@ -647,7 +641,7 @@ namespace ome
           pixeltype(copy.pixeltype),
           samples(copy.samples),
           planarconfig(copy.planarconfig),
-          ctile(copy.ctile)
+          subifds(copy.subifds)
         {
         }
 
@@ -676,7 +670,7 @@ namespace ome
           pixeltype = rhs.pixeltype;
           samples = rhs.samples;
           planarconfig = rhs.planarconfig;
-          ctile = rhs.ctile;
+          subifds = rhs.subifds;
 
           return *this;
         }
@@ -875,18 +869,6 @@ namespace ome
       IFD::setTileType(TileType type)
       {
         impl->tiletype = type;
-      }
-
-      dimension_size_type
-      IFD::getCurrentTile() const
-      {
-        return impl->ctile;
-      }
-
-      void
-      IFD::setCurrentTile(dimension_size_type tile)
-      {
-        impl->ctile = static_cast<tstrile_t>(tile);
       }
 
       TileInfo
