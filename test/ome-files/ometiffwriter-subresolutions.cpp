@@ -167,7 +167,6 @@ TEST(OMETIFFWriter, SubResolutions)
     writer->setTileSizeX(256);
     writer->setTileSizeY(256);
 
-
     // Open the file
     writer->setId(filename);
 
@@ -229,6 +228,118 @@ TEST(OMETIFFWriter, SubResolutions)
             reader->setResolution(r);
 
             std::cout << "Reading and checking series " << i+1 << '/' << ic
+                      << " resolution " << r+1 << '/' << rc
+                      << std::endl;
+
+            if (r)
+              {
+                ASSERT_EQ(resolutions[i][r-1][0], reader->getSizeX());
+                ASSERT_EQ(resolutions[i][r-1][1], reader->getSizeY());
+                ASSERT_EQ(resolutions[i][r-1][2], reader->getSizeZ());
+              }
+            else
+              {
+                ASSERT_EQ(static_cast<dimension_size_type>(meta->getPixelsSizeX(i)), reader->getSizeX());
+                ASSERT_EQ(static_cast<dimension_size_type>(meta->getPixelsSizeY(i)), reader->getSizeY());
+                ASSERT_EQ(static_cast<dimension_size_type>(meta->getPixelsSizeZ(i)), reader->getSizeZ());
+              }
+            VariantPixelBuffer vbuffer;
+            reader->openBytes(0U, vbuffer);
+            ASSERT_EQ(*(pixels[i][r]), vbuffer);
+          }
+      }
+    reader->close();
+  }
+
+  // Now repeat, but this time use the saved file as the data source.
+
+  path filename2(PROJECT_BINARY_DIR "/test/ome-files/data/subresolution2.ome.tiff");
+
+  {
+    auto readmeta = std::make_shared<ome::xml::meta::OMEXMLMetadata>();
+    std::shared_ptr<ome::xml::meta::MetadataStore> store =
+      std::static_pointer_cast<ome::xml::meta::MetadataStore>(readmeta);
+
+    auto reader = std::make_shared<OMETIFFReader>();
+    reader->setMetadataStore(store);
+    reader->setId(filename);
+
+    auto resolutions = ome::files::getResolutions(*reader);
+    ome::files::addResolutions(*store, resolutions);
+
+    auto writer = std::make_shared<OMETIFFWriter>();
+
+    auto retrieve = std::static_pointer_cast<ome::xml::meta::MetadataRetrieve>(readmeta);
+    writer->setMetadataRetrieve(retrieve);
+    writer->setInterleaved(true);
+    writer->setTileSizeX(256);
+    writer->setTileSizeY(256);
+
+    // Open the file
+    writer->setId(filename2);
+
+    // Write pixel data for each series and resolution
+    dimension_size_type ic = writer->getSeriesCount();
+    pixels.resize(ic);
+    for (dimension_size_type i = 0 ; i < ic; ++i)
+      {
+        reader->setSeries(i);
+        writer->setSeries(i);
+
+        dimension_size_type rc = writer->getResolutionCount();
+        pixels[i].resize(rc);
+        for (dimension_size_type r = 0 ; r < rc; ++r)
+          {
+            reader->setResolution(r);
+            writer->setResolution(r);
+
+            std::cout << "Re-writing series " << i+1 << '/' << ic
+                      << " resolution " << r+1 << '/' << rc
+                      << " (" << writer->getSizeX()
+                      << ',' << writer->getSizeY()
+                      << ',' << writer->getSizeZ()
+                      << ')' << std::endl;
+
+            if (r)
+              {
+                ASSERT_EQ(resolutions[i][r-1][0], writer->getSizeX());
+                ASSERT_EQ(resolutions[i][r-1][1], writer->getSizeY());
+                ASSERT_EQ(resolutions[i][r-1][2], writer->getSizeZ());
+              }
+            else
+              {
+                ASSERT_EQ(static_cast<dimension_size_type>(meta->getPixelsSizeX(i)), writer->getSizeX());
+                ASSERT_EQ(static_cast<dimension_size_type>(meta->getPixelsSizeY(i)), writer->getSizeY());
+                ASSERT_EQ(static_cast<dimension_size_type>(meta->getPixelsSizeZ(i)), writer->getSizeZ());
+              }
+
+            VariantPixelBuffer vbuffer;
+            reader->openBytes(0U, vbuffer);
+            writer->saveBytes(0U, vbuffer);
+          }
+      }
+    reader->close();
+    writer->close();
+  }
+
+  // Now re-verify metadata and pixel data.
+
+  {
+    auto reader = std::make_shared<OMETIFFReader>();
+    reader->setId(filename2);
+
+    dimension_size_type ic = reader->getSeriesCount();
+    ASSERT_EQ(meta->getImageCount(), ic);
+    for (dimension_size_type i = 0 ; i < ic; ++i)
+      {
+        reader->setSeries(i);
+        dimension_size_type rc = reader->getResolutionCount();
+        ASSERT_EQ(resolutions.at(i).size() + 1, rc);
+        for (dimension_size_type r = 0 ; r < rc; ++r)
+          {
+            reader->setResolution(r);
+
+            std::cout << "Re-reading and checking series " << i+1 << '/' << ic
                       << " resolution " << r+1 << '/' << rc
                       << std::endl;
 

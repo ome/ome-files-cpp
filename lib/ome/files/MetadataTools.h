@@ -484,13 +484,20 @@ namespace ome
     /**
      * Get resolution levels for all series.
      *
-     * Note: Also includes the full resolution image size.
-     *
      * @param retrieve the OME-XML metadata store.
      * @returns a metadata list of all resolution levels.
      */
     MetadataList<Resolution>
     getResolutions(::ome::xml::meta::MetadataRetrieve& retrieve);
+
+    /**
+     * Get resolution levels for all series.
+     *
+     * @param reader the reader to use.
+     * @returns a metadata list of all resolution levels.
+     */
+    MetadataList<Resolution>
+    getResolutions(const FormatReader& reader);
 
     /**
      * Remove additional resolution levels for the specified series.

@@ -947,6 +947,37 @@ namespace ome
       return ret;
     }
 
+    MetadataList<Resolution>
+    getResolutions(const FormatReader& reader)
+    {
+      dimension_size_type oldseries = reader.getSeries();
+      dimension_size_type oldresolution = reader.getResolution();
+
+      MetadataList<Resolution> resolutions;
+
+      dimension_size_type ic = reader.getSeriesCount();
+      resolutions.resize(ic);
+      for (dimension_size_type i = 0 ; i < ic; ++i)
+        {
+          reader.setSeries(i);
+          dimension_size_type rc = reader.getResolutionCount();
+          resolutions[i].resize(rc - 1);
+          for (dimension_size_type r = 0 ; r < rc; ++r)
+            {
+              if (r)
+                {
+                  reader.setResolution(r);
+                  resolutions[i][r - 1] = {reader.getSizeX(), reader.getSizeY(), reader.getSizeZ()};
+                }
+            }
+        }
+
+      reader.setSeries(oldseries);
+      reader.setResolution(oldresolution);
+
+      return resolutions;
+    }
+
     void
     removeResolutions(::ome::xml::meta::MetadataStore& store,
                       dimension_size_type              series)
