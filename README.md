@@ -1,7 +1,9 @@
 # OME Files C++
 
 OME Files is a standalone C++ library for reading and writing life sciences
-image file formats. **Development has migrated to https://gitlab.com/codelibre/ome-files !**
+image file formats. This project has been archived while seeking further funding.
+
+**Independent development is taking place under https://gitlab.com/codelibre/ome-files **
 
 Links
 -----
